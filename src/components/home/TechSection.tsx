@@ -32,7 +32,7 @@ function TechCard({
 export default function TechSection() {
   return (
     <section id="tech" aria-label="Tech I know and use" className="scroll-mt-20">
-      <ul className="inline-grid max-w-full grid-cols-1 gap-2 sm:grid-cols-2 lg:mb-0 lg:grid-cols-[repeat(4,1fr)]">
+      <ul className="grid w-full grid-cols-1 gap-2 sm:grid-cols-2 lg:mb-0 lg:grid-cols-4">
         {HOMEPAGE_TECH.map((tech) => (
           <TechCard key={tech.id} {...tech} />
         ))}

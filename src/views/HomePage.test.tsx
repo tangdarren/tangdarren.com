@@ -1,22 +1,36 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
 import HomePage from '@/views/HomePage';
-import { HOMEPAGE_TECH } from '@/data/homepage';
+import { HOMEPAGE_PROJECTS, HOMEPAGE_TECH } from '@/data/homepage';
 import { renderWithProviders } from '@/test/render';
 
 describe('HomePage', () => {
   it('renders a three-level intro with tech, experience, projects, and footer', () => {
     renderWithProviders(<HomePage />, { initialPath: '/' });
 
+    const intro = screen.getByRole('region', { name: 'Introduction' });
     expect(
-      screen.getByRole('heading', { level: 1, name: /hi, i'm darren/i }),
+      within(intro).getByRole('heading', { level: 1, name: /hi, i'm darren/i }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText('Software Engineer', {
-        selector: 'section[aria-label="Introduction"] p',
+      within(intro).getByRole('link', {
+        name: /linkedin: linkedin\.com\/in\/tang-darren/i,
       }),
+    ).toBeInTheDocument();
+    expect(
+      within(intro).getByRole('link', {
+        name: /github: github\.com\/tangdarren/i,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(intro).getByRole('link', {
+        name: /email: tang\.darren@gmail\.com/i,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(intro).getByText('Software Engineer', { selector: 'p' }),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
@@ -128,16 +142,70 @@ describe('HomePage', () => {
     const user = userEvent.setup();
     renderWithProviders(<HomePage />, { initialPath: '/' });
 
-    expect(screen.getByText('Tempest')).toBeInTheDocument();
-    expect(screen.getByText('SafeCall')).toBeInTheDocument();
-    expect(screen.getByText('SQL Detective')).toBeInTheDocument();
-    expect(screen.queryByText('TensorDigits')).not.toBeInTheDocument();
+    const featuredNames = ['Tempest', 'SafeCall', 'SQL Detective', 'TensorDigits'];
+    const allOnlyNames = [
+      'ExpenSense',
+      'MusicBloom',
+      'GoDo',
+      'SafeCall Web',
+      'Water Reminder',
+    ];
+
+    for (const name of featuredNames) {
+      expect(screen.getByText(name)).toBeInTheDocument();
+    }
+    for (const name of allOnlyNames) {
+      expect(screen.queryByText(name)).not.toBeInTheDocument();
+    }
 
     await user.click(screen.getByRole('button', { name: 'All' }));
-    expect(screen.getByText('TensorDigits')).toBeInTheDocument();
+
+    const allNames = [...featuredNames, ...allOnlyNames];
+    expect(HOMEPAGE_PROJECTS.map((project) => project.name)).toEqual(allNames);
+    expect(HOMEPAGE_PROJECTS.filter((project) => project.featured).map((p) => p.name)).toEqual(
+      featuredNames,
+    );
+
+    for (const name of allNames) {
+      expect(screen.getByText(name)).toBeInTheDocument();
+    }
+
+    expect(screen.getByRole('link', { name: 'Tempest on GitHub' })).toHaveAttribute(
+      'href',
+      'https://github.com/tangdarren/stock-market-dashboard',
+    );
+    expect(screen.getByRole('link', { name: 'SafeCall on GitHub' })).toHaveAttribute(
+      'href',
+      'https://github.com/tangdarren/safecall-vr',
+    );
+    expect(screen.getByRole('link', { name: 'SafeCall Web on GitHub' })).toHaveAttribute(
+      'href',
+      'https://github.com/tangdarren/safecall-website',
+    );
+    expect(screen.getByRole('link', { name: 'ExpenSense on GitHub' })).toHaveAttribute(
+      'href',
+      'https://github.com/tangdarren/expensense',
+    );
+    expect(screen.getByRole('link', { name: 'MusicBloom on GitHub' })).toHaveAttribute(
+      'href',
+      'https://github.com/tangdarren/musicbloom',
+    );
+    expect(screen.getByRole('link', { name: 'GoDo on GitHub' })).toHaveAttribute(
+      'href',
+      'https://github.com/tangdarren/godo-social-app',
+    );
+    expect(screen.getByRole('link', { name: 'Water Reminder on GitHub' })).toHaveAttribute(
+      'href',
+      'https://github.com/tangdarren/water-reminder-app',
+    );
 
     await user.click(screen.getByRole('button', { name: 'Featured' }));
-    expect(screen.queryByText('TensorDigits')).not.toBeInTheDocument();
+    for (const name of featuredNames) {
+      expect(screen.getByText(name)).toBeInTheDocument();
+    }
+    for (const name of allOnlyNames) {
+      expect(screen.queryByText(name)).not.toBeInTheDocument();
+    }
   });
 
   it('renders curated tech cards with exact descriptions and no abbreviation marks', () => {

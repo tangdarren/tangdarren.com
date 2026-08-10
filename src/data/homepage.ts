@@ -38,6 +38,42 @@ export const HOMEPAGE_PROJECTS: HomepageProject[] = [
     description: 'Draw a number and predict the digit.',
     label: 'Machine Learning',
     githubUrl: 'https://github.com/tangdarren/tensor-digits',
+    featured: true,
+  },
+  {
+    id: 'expensense',
+    name: 'ExpenSense',
+    description: 'Automate expense reviews with specialized AI agents.',
+    label: 'AI Agents',
+    githubUrl: 'https://github.com/tangdarren/expensense',
+  },
+  {
+    id: 'musicbloom',
+    name: 'MusicBloom',
+    description: 'Grow a virtual garden while listening to music.',
+    label: 'Full-Stack',
+    githubUrl: 'https://github.com/tangdarren/musicbloom',
+  },
+  {
+    id: 'godo',
+    name: 'GoDo',
+    description: 'Discover places, plan events, and share local recommendations.',
+    label: 'Mobile',
+    githubUrl: 'https://github.com/tangdarren/godo-social-app',
+  },
+  {
+    id: 'safecall-web',
+    name: 'SafeCall Web',
+    description: 'Practice emergency dispatch calls with an AI voice caller.',
+    label: 'AI Voice',
+    githubUrl: 'https://github.com/tangdarren/safecall-website',
+  },
+  {
+    id: 'water-reminder',
+    name: 'Water Reminder',
+    description: 'Track daily water intake and progress toward a goal.',
+    label: 'Mobile',
+    githubUrl: 'https://github.com/tangdarren/water-reminder-app',
   },
 ];
 
@@ -63,9 +99,9 @@ export interface HomepageTech {
  */
 export const HOMEPAGE_TECH: HomepageTech[] = [
   { id: 'java', name: 'Java', description: 'Backend language' },
-  { id: 'python', name: 'Python', description: 'Automation & scripting' },
-  { id: 'typescript', name: 'TypeScript', description: 'Typesafe JavaScript' },
-  { id: 'postgresql', name: 'PostgreSQL', description: 'Relational database' },
+  { id: 'python', name: 'Python', description: 'Scripting' },
+  { id: 'typescript', name: 'TypeScript', description: 'Typed JavaScript' },
+  { id: 'postgresql', name: 'PostgreSQL', description: 'Database' },
   { id: 'react', name: 'React', description: 'UI library' },
   { id: 'nextjs', name: 'Next.js', description: 'React framework' },
   { id: 'springboot', name: 'Spring Boot', description: 'Java framework' },

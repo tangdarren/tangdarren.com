@@ -9,6 +9,9 @@ import { DesktopNav } from '@/components/layout/Navbar';
 const CONTENT_COLUMN =
   'min-w-0 w-full flex-1 px-[var(--gutter)] lg:pl-9 lg:pr-8 xl:pl-12';
 
+/** Midpoint between max-w-2xl (42rem) and max-w-3xl (48rem). */
+const CONTENT_WIDTH = 'w-full max-w-[45rem]';
+
 function HomeProfile() {
   return (
     <div className="w-full">
@@ -37,13 +40,13 @@ export default function HomePage() {
             id="home"
             className="scroll-mt-20 py-8 lg:flex lg:h-dvh lg:items-center lg:py-0"
           >
-            <div className="w-full max-w-5xl">
+            <div className={CONTENT_WIDTH}>
               <HomeProfile />
             </div>
           </div>
 
           <div className="border-t border-ink-600 pt-12 sm:pt-14 lg:border-t-0 lg:pt-8">
-            <div className="w-full max-w-5xl space-y-16 sm:space-y-20">
+            <div className={`${CONTENT_WIDTH} space-y-16 sm:space-y-20`}>
               <ExperienceEducationSection />
               <ProjectsSection />
             </div>

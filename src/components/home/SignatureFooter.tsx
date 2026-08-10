@@ -19,7 +19,7 @@ export default function SignatureFooter() {
         marginLeft: 'calc(3vw - 2 * var(--page-side-inset))',
       }}
     >
-      <div className="relative h-[22rem] overflow-hidden rounded-t-[1.75rem] bg-accent-cyan sm:h-[26rem] sm:rounded-t-[2rem] lg:h-[520px] lg:rounded-t-[34px]">
+      <div className="relative h-[22rem] overflow-hidden rounded-t-[1.75rem] bg-[#60A5FA] sm:h-[26rem] sm:rounded-t-[2rem] lg:h-[520px] lg:rounded-t-[34px]">
         <nav aria-label="Footer" className="absolute inset-x-0 top-0 z-20">
           <div className="flex justify-center px-4 pt-5 sm:pt-6 lg:pt-7">
             <button

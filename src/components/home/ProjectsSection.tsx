@@ -14,7 +14,7 @@ function ProjectRow({ project }: { project: HomepageProject }) {
     <li className="border-b border-ink-600 last:border-b-0">
       <div className="flex flex-col gap-1 py-4 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
         <div className="min-w-0">
-          <p className="font-display text-base font-semibold text-mist-50 sm:text-lg">
+          <p className="font-display text-base font-normal tracking-tight text-mist-50">
             {project.name}
           </p>
           <p className="mt-1 text-sm leading-relaxed text-mist-300">
@@ -50,12 +50,12 @@ export default function ProjectsSection() {
     <section
       id="projects"
       aria-labelledby="projects-heading"
-      className="w-full max-w-[52rem] scroll-mt-20"
+      className="w-full scroll-mt-20"
     >
       <div className="flex flex-wrap items-end justify-between gap-4">
         <h2
           id="projects-heading"
-          className="text-lg font-medium tracking-tight text-mist-50"
+          className="text-base font-medium tracking-tight text-mist-50 sm:text-lg"
         >
           Projects
         </h2>
@@ -63,7 +63,7 @@ export default function ProjectsSection() {
         <div
           role="group"
           aria-label="Project filter"
-          className="flex items-center gap-2 text-sm text-mist-400"
+          className="flex items-center gap-2 text-base font-medium tracking-tight text-mist-400 sm:text-lg"
         >
           <button
             type="button"

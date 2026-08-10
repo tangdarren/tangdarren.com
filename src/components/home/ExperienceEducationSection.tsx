@@ -28,7 +28,7 @@ function ExperienceItem({
         aria-hidden
         className="absolute left-0 top-1.5 z-10 h-2 w-2 -translate-x-1/2 rounded-full bg-accent-cyan"
       />
-      <p className="text-base font-medium tracking-tight text-mist-50">{role}</p>
+      <p className="text-base font-normal tracking-tight text-mist-50">{role}</p>
       <p className="mt-0.5 text-sm text-mist-300">
         {company} · {type}
       </p>
@@ -99,7 +99,7 @@ export default function ExperienceEducationSection() {
           tabIndex={tab === 'experience' ? 0 : -1}
           onClick={() => setTab('experience')}
           className={[
-            'border-b pb-1 text-base transition-colors',
+            'border-b pb-1 text-base transition-colors sm:text-lg',
             tab === 'experience'
               ? 'border-accent-cyan font-medium text-mist-50'
               : 'border-transparent text-mist-400 hover:text-mist-200',
@@ -116,7 +116,7 @@ export default function ExperienceEducationSection() {
           tabIndex={tab === 'education' ? 0 : -1}
           onClick={() => setTab('education')}
           className={[
-            'border-b pb-1 text-base transition-colors',
+            'border-b pb-1 text-base transition-colors sm:text-lg',
             tab === 'education'
               ? 'border-accent-cyan font-medium text-mist-50'
               : 'border-transparent text-mist-400 hover:text-mist-200',
