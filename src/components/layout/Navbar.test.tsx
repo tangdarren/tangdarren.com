@@ -26,6 +26,11 @@ describe('DesktopNav', () => {
     const resume = within(primary).getByRole('link', { name: 'Resume' });
     expect(resume).toHaveAttribute('href', RESUME_PDF_PATH);
     expect(resume).toHaveAttribute('target', '_blank');
+    expect(resume.querySelector('svg')).toBeTruthy();
+
+    expect(within(primary).getByText('01')).toBeInTheDocument();
+    expect(within(primary).getByText('02')).toBeInTheDocument();
+    expect(within(primary).getByText('03')).toBeInTheDocument();
 
     expect(
       screen.queryByRole('link', { name: /^contact$/i }),

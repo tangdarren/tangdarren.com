@@ -3,7 +3,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X } from 'lucide-react';
+import { ArrowUpRight, Menu, X } from 'lucide-react';
 
 import { NAV_ITEMS } from '@/data/navigation';
 
@@ -12,6 +12,10 @@ const HOME_SCROLL_SECTIONS = [
   { href: '/#experience', id: 'experience' },
   { href: '/#projects', id: 'projects' },
 ] as const;
+
+function sectionNumber(index: number): string {
+  return String(index + 1).padStart(2, '0');
+}
 
 function isNavItemActive(
   pathname: string,
@@ -29,12 +33,16 @@ function isNavItemActive(
 
 function navLinkClass(active: boolean, compact: boolean): string {
   return [
-    'block w-fit transition-colors',
+    'group inline-flex items-baseline gap-2.5 transition-colors',
     compact ? 'py-0.5 text-[15px]' : 'py-1 text-xl lg:text-2xl',
-    active
-      ? 'text-mist-50 underline decoration-accent-cyan/70 underline-offset-4'
-      : 'text-mist-300 hover:text-mist-50 hover:underline hover:decoration-ink-500 hover:underline-offset-4',
+    active ? 'text-mist-50' : 'text-mist-300 hover:text-mist-50',
   ].join(' ');
+}
+
+function navLabelClass(active: boolean): string {
+  return active
+    ? 'underline decoration-accent-cyan/70 underline-offset-4'
+    : 'group-hover:underline group-hover:decoration-ink-500 group-hover:underline-offset-4';
 }
 
 export function NavLinks({
@@ -51,11 +59,16 @@ export function NavLinks({
 }) {
   const pathname = usePathname();
 
+  const sectionItems = NAV_ITEMS.filter((item) => !item.external);
+
   return (
     <ul className={className}>
       {NAV_ITEMS.map((item) => {
         const isActive = isNavItemActive(pathname, item.to, activeHref);
         const className = navLinkClass(isActive, compact);
+        const sectionIndex = sectionItems.findIndex(
+          (entry) => entry.to === item.to,
+        );
 
         if (item.external) {
           return (
@@ -67,7 +80,15 @@ export function NavLinks({
                 onClick={onNavigate}
                 className={className}
               >
-                {item.label}
+                <span className={navLabelClass(isActive)}>{item.label}</span>
+                <ArrowUpRight
+                  aria-hidden
+                  className={[
+                    'shrink-0 self-center',
+                    compact ? 'h-3.5 w-3.5' : 'h-4 w-4 lg:h-5 lg:w-5',
+                  ].join(' ')}
+                  strokeWidth={2.25}
+                />
               </a>
             </li>
           );
@@ -95,7 +116,16 @@ export function NavLinks({
                 onNavigate?.();
               }}
             >
-              {item.label}
+              <span className={navLabelClass(isActive)}>{item.label}</span>
+              <span
+                aria-hidden
+                className={[
+                  'font-mono tabular-nums tracking-wide text-mist-400',
+                  compact ? 'text-[10px]' : 'text-xs lg:text-sm',
+                ].join(' ')}
+              >
+                {sectionNumber(sectionIndex)}
+              </span>
             </Link>
           </li>
         );
