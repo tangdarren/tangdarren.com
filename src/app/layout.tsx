@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { DM_Sans, JetBrains_Mono } from 'next/font/google';
 
 import SiteShell from '@/components/layout/SiteShell';
 import {
@@ -9,6 +10,20 @@ import {
 } from '@/config/site';
 
 import '../index.css';
+
+const dmSans = DM_Sans({
+  subsets: ['latin'],
+  variable: '--font-dm-sans',
+  display: 'swap',
+  weight: ['300', '400', '500', '600', '700'],
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-jetbrains-mono',
+  display: 'swap',
+  weight: ['400', '500', '600'],
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
@@ -40,7 +55,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
-  themeColor: '#F7FAFC',
+  themeColor: '#F7F6F3',
 };
 
 export default function RootLayout({
@@ -49,20 +64,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body>
+    <html
+      lang="en"
+      className={`${dmSans.variable} ${jetbrainsMono.variable}`}
+    >
+      <body className={`${dmSans.className} antialiased`}>
         <div id="root">
           <SiteShell>{children}</SiteShell>
         </div>

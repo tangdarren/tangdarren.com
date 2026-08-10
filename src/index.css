@@ -5,6 +5,8 @@
 :root {
   color-scheme: light;
   --gutter: clamp(1rem, 3vw, 2rem);
+  /* Side inset from centering max-w-7xl (80rem). Doubling left inset uses this. */
+  --page-side-inset: max(0px, calc((100vw - 80rem) / 2));
 }
 
 html,
@@ -22,25 +24,6 @@ html {
 
 body {
   @apply bg-ink-950 text-mist-100 font-sans;
-  background-image:
-    radial-gradient(1000px 520px at 12% -8%, rgba(37, 99, 235, 0.08), transparent 60%),
-    radial-gradient(900px 480px at 100% 0%, rgba(8, 145, 178, 0.06), transparent 55%),
-    linear-gradient(180deg, #F7FAFC 0%, #EDF4FA 100%);
-  background-attachment: fixed;
-}
-
-/* Very subtle grid — light and low-contrast */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background-image:
-    linear-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
-  background-size: 44px 44px;
-  mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
-  z-index: 0;
 }
 
 #root {
@@ -127,33 +110,6 @@ body::before {
 
   .eyebrow {
     @apply inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-accent-cyan;
-  }
-
-  /*
-   * Hero pixel-menu buttons — hard-edged shadow (no blur), quick press feel.
-   * Artwork stays untouched; filter/transform only.
-   */
-  .hero-nav-btn {
-    transition:
-      transform 120ms ease-out,
-      filter 120ms ease-out;
-    filter: drop-shadow(0 2px 0 rgb(40 28 18 / 0.28));
-  }
-
-  .hero-nav-btn:hover,
-  .hero-nav-btn:focus-visible {
-    transform: translate3d(0, -3px, 0);
-    filter:
-      brightness(1.07)
-      drop-shadow(0 3px 0 rgb(40 28 18 / 0.34))
-      drop-shadow(0 5px 0 rgb(40 28 18 / 0.22));
-  }
-
-  .hero-nav-btn:active {
-    transform: translate3d(0, 2px, 0);
-    filter:
-      brightness(0.93)
-      drop-shadow(0 1px 0 rgb(40 28 18 / 0.2));
   }
 
   /* —— Projects gallery (Stardew-inspired, portfolio-appropriate) —— */
@@ -502,13 +458,6 @@ body::before {
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
-  }
-
-  /* Keep brightness/shadow feedback; disable positional movement only. */
-  .hero-nav-btn:hover,
-  .hero-nav-btn:focus-visible,
-  .hero-nav-btn:active {
-    transform: none;
   }
 
   .projects-card:hover,
