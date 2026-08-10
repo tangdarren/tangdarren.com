@@ -1,17 +1,13 @@
-import { screen, within } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
 import HomePage from '@/views/HomePage';
 import { HOMEPAGE_TECH } from '@/data/homepage';
-import {
-  SOCIAL_LINKS,
-  getSocialDisplayText,
-} from '@/data/socials';
 import { renderWithProviders } from '@/test/render';
 
 describe('HomePage', () => {
-  it('renders a three-level intro with social, tech, experience, projects, and footer', () => {
+  it('renders a three-level intro with tech, experience, projects, and footer', () => {
     renderWithProviders(<HomePage />, { initialPath: '/' });
 
     expect(
@@ -34,16 +30,16 @@ describe('HomePage', () => {
       screen.queryByText(/responsive interfaces to APIs/i),
     ).not.toBeInTheDocument();
 
-    const findMeAtHeading = screen.getByRole('heading', {
-      name: /- find me at/i,
-    });
-    expect(findMeAtHeading).toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', { name: /- find me at/i }),
+    ).not.toBeInTheDocument();
     expect(
       screen.queryByRole('img', { name: 'Darren Tang' }),
     ).not.toBeInTheDocument();
     expect(
-      screen.getByRole('heading', { name: /- tech i know and use/i }),
-    ).toBeInTheDocument();
+      screen.queryByRole('heading', { name: /- tech i know and use/i }),
+    ).not.toBeInTheDocument();
+    expect(document.getElementById('tech')).toBeTruthy();
     expect(
       screen.getByRole('heading', { name: /experience and education/i }),
     ).toBeInTheDocument();
@@ -77,42 +73,6 @@ describe('HomePage', () => {
     ).toBeInTheDocument();
     expect(document.getElementById('tech')).toBeTruthy();
     expect(document.getElementById('projects')).toBeTruthy();
-  });
-
-  it('renders social links as GitHub → LinkedIn → Email with URL display text', () => {
-    renderWithProviders(<HomePage />, { initialPath: '/' });
-
-    expect(SOCIAL_LINKS.map((link) => link.label)).toEqual([
-      'GitHub',
-      'LinkedIn',
-      'Email',
-    ]);
-
-    const findMeAt = screen.getByRole('heading', {
-      name: /- find me at/i,
-    }).closest('section');
-    expect(findMeAt).toBeTruthy();
-
-    for (const link of SOCIAL_LINKS) {
-      const display = getSocialDisplayText(link);
-      const matches = within(findMeAt as HTMLElement).getAllByRole('link', {
-        name: new RegExp(`${link.label}:\\s*${display}`, 'i'),
-      });
-      expect(matches.length).toBeGreaterThanOrEqual(1);
-      for (const match of matches) {
-        expect(match).toHaveAttribute('href', link.href);
-      }
-    }
-
-    expect(getSocialDisplayText(SOCIAL_LINKS[0])).toBe(
-      'github.com/tangdarren',
-    );
-    expect(getSocialDisplayText(SOCIAL_LINKS[1])).toBe(
-      'linkedin.com/in/tang-darren',
-    );
-    expect(getSocialDisplayText(SOCIAL_LINKS[2])).toBe(
-      'tang.darren@gmail.com',
-    );
   });
 
   it('renders experience timeline and switches to education', async () => {

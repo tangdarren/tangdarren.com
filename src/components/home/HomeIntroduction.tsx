@@ -7,7 +7,7 @@ export default function HomeIntroduction() {
       <p className="mt-1 text-lg font-normal text-mist-300 sm:text-xl">
         Software Engineer
       </p>
-      <p className="mt-8 max-w-2xl text-sm font-normal leading-snug text-mist-200 sm:mt-10 sm:text-base lg:mt-12 lg:whitespace-nowrap">
+      <p className="mt-8 text-lg font-normal text-mist-300 sm:mt-10 sm:text-xl lg:mt-12">
         Based in San Francisco, I build full-stack applications and keep
         learning along the way.
       </p>

@@ -2,10 +2,8 @@ import ExperienceEducationSection from '@/components/home/ExperienceEducationSec
 import HomeIntroduction from '@/components/home/HomeIntroduction';
 import ProjectsSection from '@/components/home/ProjectsSection';
 import SignatureFooter from '@/components/home/SignatureFooter';
-import SocialLinksSection from '@/components/home/SocialLinksSection';
 import TechSection from '@/components/home/TechSection';
 import { DesktopNav } from '@/components/layout/Navbar';
-import { HorizontalSeparator } from '@/components/layout/Separator';
 
 /** Shared content inset — matches Home, Experience, and Projects. */
 const CONTENT_COLUMN =
@@ -16,13 +14,7 @@ function HomeProfile() {
     <div className="w-full">
       <HomeIntroduction />
 
-      <div className="py-6">
-        <HorizontalSeparator />
-      </div>
-
-      <SocialLinksSection />
-
-      <div className="py-3" />
+      <div className="py-6" />
 
       <TechSection />
     </div>
