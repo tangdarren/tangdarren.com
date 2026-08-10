@@ -12,13 +12,13 @@ export default {
       colors: {
         // Surfaces (light)
         ink: {
-          950: '#F7FAFC', // Main page background
+          950: '#F7F6F3', // Main page background (warm off-white)
           900: '#FFFFFF', // Card / panel background
-          850: '#F1F5FA', // Header strips inside panels
-          800: '#EDF4FA', // Secondary background, hover on cards
-          700: '#E2E8F0', // Subtle dividers
-          600: '#DCE5EF', // Standard border
-          500: '#CBD5E1', // Stronger border
+          850: '#F1F0EC', // Header strips inside panels
+          800: '#EBEAE6', // Secondary background, hover on cards
+          700: '#E2E0DB', // Subtle dividers
+          600: '#D8D6D0', // Standard border
+          500: '#C9C6BF', // Stronger border
         },
         // Text (dark navy / charcoal)
         mist: {
@@ -48,23 +48,19 @@ export default {
       },
       fontFamily: {
         sans: [
-          'Inter',
+          'var(--font-dm-sans)',
           'ui-sans-serif',
           'system-ui',
-          '-apple-system',
-          'Segoe UI',
-          'Roboto',
           'sans-serif',
         ],
         display: [
-          'Space Grotesk',
-          'Inter',
+          'var(--font-dm-sans)',
           'ui-sans-serif',
           'system-ui',
           'sans-serif',
         ],
         mono: [
-          'JetBrains Mono',
+          'var(--font-jetbrains-mono)',
           'ui-monospace',
           'SFMono-Regular',
           'Menlo',
@@ -80,12 +76,6 @@ export default {
         glow:
           '0 0 0 1px rgba(37, 99, 235, 0.25), 0 10px 28px -14px rgba(37, 99, 235, 0.35)',
       },
-      backgroundImage: {
-        'hero-gradient':
-          'radial-gradient(1200px 500px at 15% -10%, rgba(37, 99, 235, 0.10), transparent 60%), radial-gradient(900px 500px at 100% 0%, rgba(8, 145, 178, 0.08), transparent 55%), linear-gradient(180deg, #F7FAFC 0%, #EDF4FA 100%)',
-        'header-gradient':
-          'linear-gradient(135deg, #EFF6FF 0%, #F7FAFC 100%)',
-      },
       keyframes: {
         'fade-in-up': {
           '0%': { opacity: '0', transform: 'translateY(8px)' },
@@ -99,17 +89,11 @@ export default {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0.55' },
         },
-        /* Track is [tile][gap][tile][gap]; -50% shifts exactly one tile+gap. */
-        'hero-cloud-drift': {
-          from: { transform: 'translate3d(0, 0, 0)' },
-          to: { transform: 'translate3d(-50%, 0, 0)' },
-        },
       },
       animation: {
         'fade-in-up': 'fade-in-up 0.5s ease-out forwards',
         blink: 'blink 1.1s steps(1) infinite',
         'pulse-soft': 'pulse-soft 2.4s ease-in-out infinite',
-        'hero-cloud-drift': 'hero-cloud-drift 40s linear infinite',
       },
     },
   },

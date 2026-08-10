@@ -6,7 +6,7 @@ import { createPageMetadata } from '@/lib/metadata';
 export const metadata: Metadata = createPageMetadata({
   title: 'Home | Darren Christopher Tang',
   description:
-    'Full-stack and AI agent engineer. Explore projects, résumé, and background.',
+    'Software engineer in San Francisco building reliable full-stack systems, backend services, automation, and intelligent applications.',
   path: '/',
 });
 

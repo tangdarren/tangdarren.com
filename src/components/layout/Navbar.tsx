@@ -1,29 +1,237 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 
 import { NAV_ITEMS } from '@/data/navigation';
-import Monogram from './Monogram';
 
-function isNavItemActive(pathname: string, href: string): boolean {
+const HOME_SCROLL_SECTIONS = [
+  { href: '/', id: 'home' },
+  { href: '/#experience', id: 'experience' },
+  { href: '/#projects', id: 'projects' },
+] as const;
+
+function isNavItemActive(
+  pathname: string,
+  href: string,
+  activeHref: string | null,
+): boolean {
+  if (pathname === '/' && activeHref) {
+    return href === activeHref;
+  }
   if (href === '/') return pathname === '/';
+  if (href.startsWith('/#')) return false;
+  if (href.endsWith('.pdf')) return pathname === '/resume';
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export default function Navbar() {
+function navLinkClass(active: boolean, compact: boolean): string {
+  return [
+    'block w-fit transition-colors',
+    compact ? 'py-0.5 text-[15px]' : 'py-1 text-xl lg:text-2xl',
+    active
+      ? 'text-mist-50 underline decoration-accent-cyan/70 underline-offset-4'
+      : 'text-mist-300 hover:text-mist-50 hover:underline hover:decoration-ink-500 hover:underline-offset-4',
+  ].join(' ');
+}
+
+export function NavLinks({
+  onNavigate,
+  className,
+  compact = false,
+  activeHref = null,
+}: {
+  onNavigate?: () => void;
+  className?: string;
+  compact?: boolean;
+  /** Scroll-spy override for homepage section highlighting. */
+  activeHref?: string | null;
+}) {
   const pathname = usePathname();
-  const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+
+  return (
+    <ul className={className}>
+      {NAV_ITEMS.map((item) => {
+        const isActive = isNavItemActive(pathname, item.to, activeHref);
+        const className = navLinkClass(isActive, compact);
+
+        if (item.external) {
+          return (
+            <li key={item.to}>
+              <a
+                href={item.to}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={onNavigate}
+                className={className}
+              >
+                {item.label}
+              </a>
+            </li>
+          );
+        }
+
+        return (
+          <li key={item.to}>
+            <Link
+              href={item.to}
+              aria-current={isActive ? 'page' : undefined}
+              className={className}
+              onClick={(event) => {
+                if (pathname === '/') {
+                  if (item.to === '/') {
+                    event.preventDefault();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  } else if (item.to.startsWith('/#')) {
+                    event.preventDefault();
+                    const id = item.to.slice(2);
+                    document
+                      .getElementById(id)
+                      ?.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }
+                onNavigate?.();
+              }}
+            >
+              {item.label}
+            </Link>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+/**
+ * Desktop nav — on the homepage the nav + divider stay fixed in their initial
+ * screen position while scrolling, hide over the footer, and underline the
+ * active section.
+ */
+export function DesktopNav() {
+  const pathname = usePathname();
+  const isHome = pathname === '/';
+  const slotRef = useRef<HTMLDivElement>(null);
+  const [left, setLeft] = useState<number | null>(null);
+  const [activeHref, setActiveHref] = useState('/');
+  const [hiddenByFooter, setHiddenByFooter] = useState(false);
+
+  useLayoutEffect(() => {
+    if (!isHome) return;
+
+    const syncLeft = () => {
+      const slot = slotRef.current;
+      if (!slot) return;
+      setLeft(slot.getBoundingClientRect().left);
+    };
+
+    syncLeft();
+    window.addEventListener('resize', syncLeft);
+    return () => window.removeEventListener('resize', syncLeft);
+  }, [isHome]);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 4);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+    if (!isHome) return;
+
+    const updateScrollState = () => {
+      const probe = window.innerHeight * 0.35;
+      let nextActive: string = '/';
+
+      for (const section of HOME_SCROLL_SECTIONS) {
+        const el = document.getElementById(section.id);
+        if (!el) continue;
+        if (el.getBoundingClientRect().top <= probe) {
+          nextActive = section.href;
+        }
+      }
+      setActiveHref(nextActive);
+
+      const footer = document.getElementById('contact');
+      if (footer) {
+        const footerTop = footer.getBoundingClientRect().top;
+        setHiddenByFooter(footerTop < window.innerHeight * 0.62);
+      }
+    };
+
+    updateScrollState();
+    window.addEventListener('scroll', updateScrollState, { passive: true });
+    window.addEventListener('resize', updateScrollState);
+    return () => {
+      window.removeEventListener('scroll', updateScrollState);
+      window.removeEventListener('resize', updateScrollState);
+    };
+  }, [isHome]);
+
+  const links = (
+    <NavLinks
+      activeHref={isHome ? activeHref : null}
+      className="flex flex-col items-end gap-1.5"
+    />
+  );
+
+  const railExtras = (
+    <>
+      <div aria-hidden className="w-9 shrink-0 xl:w-12" />
+      <div
+        aria-hidden
+        className="h-[33vh] w-px shrink-0 bg-gradient-to-b from-transparent via-mist-300/35 to-transparent"
+      />
+    </>
+  );
+
+  if (!isHome) {
+    return (
+      <nav
+        aria-label="Primary"
+        className="hidden w-fit shrink-0 lg:block lg:pr-0.5 xl:pr-1"
+      >
+        {links}
+      </nav>
+    );
+  }
+
+  return (
+    <>
+      {/* Invisible slot preserves the original flex layout / horizontal position. */}
+      <div
+        ref={slotRef}
+        aria-hidden
+        className="invisible hidden shrink-0 items-center lg:flex"
+      >
+        <div className="w-fit shrink-0 lg:pr-0.5 xl:pr-1">
+          <NavLinks className="flex flex-col items-end gap-1.5" />
+        </div>
+        {railExtras}
+      </div>
+
+      <div
+        className={[
+          'fixed top-1/2 z-40 hidden -translate-y-1/2 items-center lg:flex',
+          'transition-opacity duration-200',
+          hiddenByFooter
+            ? 'pointer-events-none opacity-0'
+            : 'pointer-events-auto opacity-100',
+        ].join(' ')}
+        style={left === null ? { visibility: 'hidden' } : { left }}
+      >
+        <nav
+          aria-label="Primary"
+          className="w-fit shrink-0 lg:pr-0.5 xl:pr-1"
+        >
+          {links}
+        </nav>
+        {railExtras}
+      </div>
+    </>
+  );
+}
+
+/** Compact top bar for tablet/mobile — does not keep the desktop sidebar. */
+export function MobileNav() {
+  const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  const [activeHref, setActiveHref] = useState('/');
 
   useEffect(() => {
     if (!open) return;
@@ -43,69 +251,47 @@ export default function Navbar() {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [open]);
 
+  useEffect(() => {
+    if (pathname !== '/') return;
+
+    const updateActive = () => {
+      const probe = window.innerHeight * 0.35;
+      let nextActive: string = '/';
+      for (const section of HOME_SCROLL_SECTIONS) {
+        const el = document.getElementById(section.id);
+        if (!el) continue;
+        if (el.getBoundingClientRect().top <= probe) {
+          nextActive = section.href;
+        }
+      }
+      setActiveHref(nextActive);
+    };
+
+    updateActive();
+    window.addEventListener('scroll', updateActive, { passive: true });
+    return () => window.removeEventListener('scroll', updateActive);
+  }, [pathname]);
+
   const closeMenu = () => setOpen(false);
 
   return (
-    <header
-      className={[
-        'fixed inset-x-0 top-0 z-50 transition-colors',
-        scrolled
-          ? 'border-b border-ink-600 bg-ink-950/85 backdrop-blur-md'
-          : 'border-b border-transparent bg-ink-950/60 backdrop-blur-sm',
-      ].join(' ')}
-    >
-      <div className="container-page flex h-16 items-center justify-between gap-4">
+    <header className="sticky top-0 z-50 border-b border-ink-600 bg-ink-950 lg:hidden">
+      <div className="flex h-14 items-center justify-between px-[var(--gutter)]">
         <Link
           href="/"
-          className="group flex items-center gap-3"
-          aria-label="Darren Christopher Tang — Home"
-          onClick={closeMenu}
+          className="text-sm font-medium text-mist-50"
+          aria-label="Darren Tang — Home"
+          onClick={() => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            closeMenu();
+          }}
         >
-          <Monogram />
-          <span className="hidden font-display text-sm font-semibold tracking-tight text-mist-50 sm:inline">
-            Darren Christopher Tang
-          </span>
-          <span className="font-display text-sm font-semibold tracking-tight text-mist-50 sm:hidden">
-            Darren C. Tang
-          </span>
+          Darren Tang
         </Link>
-
-        <nav
-          aria-label="Primary"
-          className="hidden items-center gap-1 md:flex"
-        >
-          {NAV_ITEMS.map((item) => {
-            const isActive = isNavItemActive(pathname, item.to);
-            return (
-              <Link
-                key={item.to}
-                href={item.to}
-                aria-current={isActive ? 'page' : undefined}
-                className={[
-                  'relative rounded-md px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.18em] transition-colors',
-                  isActive
-                    ? 'text-accent-cyan'
-                    : 'text-mist-300 hover:text-mist-50',
-                ].join(' ')}
-              >
-                <span>{item.label}</span>
-                <span
-                  aria-hidden
-                  className={[
-                    'pointer-events-none absolute inset-x-3 -bottom-0.5 h-px origin-left transition-transform duration-300',
-                    isActive
-                      ? 'scale-x-100 bg-accent-cyan/70'
-                      : 'scale-x-0 bg-accent-cyan/50',
-                  ].join(' ')}
-                />
-              </Link>
-            );
-          })}
-        </nav>
 
         <button
           type="button"
-          className="btn-ghost md:hidden"
+          className="btn-ghost"
           aria-expanded={open}
           aria-controls="mobile-navigation"
           aria-label={open ? 'Close menu' : 'Open menu'}
@@ -118,38 +304,30 @@ export default function Navbar() {
       {open && (
         <div
           id="mobile-navigation"
-          className="md:hidden"
           role="dialog"
           aria-modal="true"
+          className="border-t border-ink-600 bg-ink-950"
         >
-          <div className="border-t border-ink-600 bg-ink-900/95 backdrop-blur">
-            <nav
-              aria-label="Mobile"
-              className="container-page flex flex-col gap-1 py-3"
-            >
-              {NAV_ITEMS.map((item) => {
-                const isActive = isNavItemActive(pathname, item.to);
-                return (
-                  <Link
-                    key={item.to}
-                    href={item.to}
-                    onClick={closeMenu}
-                    aria-current={isActive ? 'page' : undefined}
-                    className={[
-                      'rounded-md px-3 py-3 font-mono text-xs uppercase tracking-[0.2em] transition-colors',
-                      isActive
-                        ? 'bg-brand-50 text-accent-cyan'
-                        : 'text-mist-300 hover:bg-brand-50/70 hover:text-mist-50',
-                    ].join(' ')}
-                  >
-                    {item.label}
-                  </Link>
-                );
-              })}
-            </nav>
-          </div>
+          <nav aria-label="Mobile" className="px-[var(--gutter)] py-4">
+            <NavLinks
+              onNavigate={closeMenu}
+              compact
+              activeHref={pathname === '/' ? activeHref : null}
+              className="flex flex-col gap-1"
+            />
+          </nav>
         </div>
       )}
     </header>
+  );
+}
+
+/** @deprecated Prefer DesktopNav / MobileNav — kept for existing test imports. */
+export default function Navbar() {
+  return (
+    <>
+      <DesktopNav />
+      <MobileNav />
+    </>
   );
 }

@@ -1,63 +1,57 @@
 'use client';
 
-import { useEffect, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 
-import Navbar from './Navbar';
+import { DesktopNav, MobileNav } from './Navbar';
+import { VerticalSeparator } from './Separator';
 
 interface LayoutProps {
   children: ReactNode;
 }
 
+/**
+ * Site shell modeled on Filyys FullContent:
+ * centered max-width container; desktop = nav | short separator | main.
+ * Homepage owns its first-viewport row so Projects can sit below the fold
+ * without vertically centering the nav against the full document height.
+ */
 export default function Layout({ children }: LayoutProps) {
   const pathname = usePathname();
   const isHome = pathname === '/';
 
-  useEffect(() => {
-    if (!isHome) return;
-
-    const html = document.documentElement;
-    const { body } = document;
-    const prevHtmlOverflow = html.style.overflow;
-    const prevBodyOverflow = body.style.overflow;
-
-    html.style.overflow = 'hidden';
-    body.style.overflow = 'hidden';
-
-    return () => {
-      html.style.overflow = prevHtmlOverflow;
-      body.style.overflow = prevBodyOverflow;
-    };
-  }, [isHome]);
-
-  if (isHome) {
-    return (
-      <div className="h-[100svh] overflow-hidden">
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-accent-cyan focus:px-3 focus:py-2 focus:text-white"
-        >
-          Skip to main content
-        </a>
-        <main id="main-content" className="h-full">
-          {children}
-        </main>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="min-h-screen">
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-accent-cyan focus:px-3 focus:py-2 focus:text-white"
       >
         Skip to main content
       </a>
-      <Navbar />
-      <main id="main-content" className="flex-1 pt-20">
-        {children}
-      </main>
+
+      <MobileNav />
+
+      <div className="flex min-h-screen justify-center">
+        {isHome ? (
+          <div className="w-full max-w-7xl lg:pl-[var(--page-side-inset)]">
+            <main id="main-content" className="w-full">
+              {children}
+            </main>
+          </div>
+        ) : (
+          <div className="flex w-full max-w-7xl flex-col lg:min-h-dvh lg:flex-row lg:items-center lg:pl-[var(--page-side-inset)]">
+            <DesktopNav />
+            <div aria-hidden className="hidden w-9 shrink-0 lg:block xl:w-12" />
+            <VerticalSeparator />
+            <main
+              id="main-content"
+              className="min-w-0 w-full flex-1 px-[var(--gutter)] py-8 lg:py-10 lg:pl-9 lg:pr-8 xl:pl-12"
+            >
+              <div className="w-full max-w-5xl">{children}</div>
+            </main>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
