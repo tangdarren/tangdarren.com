@@ -60,7 +60,7 @@ export default function HomeIntroduction() {
     <section aria-label="Introduction">
       <div className="flex items-start justify-between gap-6 sm:gap-10">
         <div>
-          <h1 className="text-lg font-semibold tracking-tight text-accent-cyan sm:text-xl">
+          <h1 className="text-lg font-semibold tracking-tight text-[rgb(0,100,250)] sm:text-xl">
             Hi, I&apos;m Darren
           </h1>
           <p className="mt-0.5 text-lg font-normal text-mist-300 sm:text-xl">
@@ -68,7 +68,7 @@ export default function HomeIntroduction() {
           </p>
         </div>
 
-        <ul className="flex shrink-0 flex-col gap-0.5 pr-2.5 text-[13px] leading-snug text-accent-cyan">
+        <ul className="flex shrink-0 flex-col gap-0.5 pr-2.5 text-[13px] leading-snug text-[rgb(0,100,250)]">
           {introLinks.map((link) => (
             <li key={link.label}>
               <a

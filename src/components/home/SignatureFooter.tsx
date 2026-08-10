@@ -2,7 +2,27 @@
 
 import { ArrowUp } from 'lucide-react';
 
-import { SOCIAL_LINKS, getSocialDisplayText } from '@/data/socials';
+import SocialBrandIcon, {
+  type SocialBrandId,
+} from '@/components/home/SocialBrandIcon';
+import {
+  SOCIAL_LINKS,
+  getSocialDisplayText,
+  type SocialLink,
+} from '@/data/socials';
+
+function brandIdFor(link: SocialLink): SocialBrandId {
+  switch (link.label) {
+    case 'GitHub':
+      return 'github';
+    case 'LinkedIn':
+      return 'linkedin';
+    case 'Email':
+      return 'gmail';
+    default:
+      return 'github';
+  }
+}
 
 function scrollToTop() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -12,14 +32,14 @@ export default function SignatureFooter() {
   return (
     <footer
       id="contact"
-      className="relative mt-24 max-w-none scroll-mt-20 sm:mt-28 lg:mt-32"
+      className="relative mt-40 max-w-none scroll-mt-20 sm:mt-44 lg:mt-52"
       style={{
         width: '94vw',
         /* Escape the asymmetric home shell so left/right page margins stay equal. */
         marginLeft: 'calc(3vw - 2 * var(--page-side-inset))',
       }}
     >
-      <div className="relative h-[22rem] overflow-hidden rounded-t-[1.75rem] bg-[#60A5FA] sm:h-[26rem] sm:rounded-t-[2rem] lg:h-[520px] lg:rounded-t-[34px]">
+      <div className="relative h-[22rem] overflow-hidden rounded-t-[1.75rem] bg-[#93C5FD] sm:h-[26rem] sm:rounded-t-[2rem] lg:h-[520px] lg:rounded-t-[34px]">
         <nav aria-label="Footer" className="absolute inset-x-0 top-0 z-20">
           <div className="flex justify-center px-4 pt-5 sm:pt-6 lg:pt-7">
             <button
@@ -34,7 +54,6 @@ export default function SignatureFooter() {
 
           <ul className="absolute inset-x-0 top-14 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 px-4 text-base text-white/90 sm:top-16 sm:gap-x-10 lg:top-[150px] lg:gap-x-11">
             {SOCIAL_LINKS.map((link) => {
-              const Icon = link.icon;
               const display = getSocialDisplayText(link);
               return (
                 <li key={link.label}>
@@ -46,7 +65,10 @@ export default function SignatureFooter() {
                     aria-label={`${link.label}: ${display}`}
                     className="inline-flex items-center gap-2.5 transition-colors hover:text-white"
                   >
-                    <Icon className="h-5 w-5 shrink-0" aria-hidden />
+                    <SocialBrandIcon
+                      id={brandIdFor(link)}
+                      className="h-5 w-5 shrink-0"
+                    />
                     <span>{display}</span>
                   </a>
                 </li>
