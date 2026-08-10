@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { DM_Sans, JetBrains_Mono } from 'next/font/google';
+import { DM_Sans } from 'next/font/google';
 
 import SiteShell from '@/components/layout/SiteShell';
 import {
@@ -16,13 +16,6 @@ const dmSans = DM_Sans({
   variable: '--font-dm-sans',
   display: 'swap',
   weight: ['300', '400', '500', '600', '700'],
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ['latin'],
-  variable: '--font-jetbrains-mono',
-  display: 'swap',
-  weight: ['400', '500', '600'],
 });
 
 export const metadata: Metadata = {
@@ -55,7 +48,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
-  themeColor: '#F7F6F3',
+  themeColor: '#FFFFFF',
 };
 
 export default function RootLayout({
@@ -64,10 +57,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html
-      lang="en"
-      className={`${dmSans.variable} ${jetbrainsMono.variable}`}
-    >
+    <html lang="en" className={dmSans.variable}>
       <body className={`${dmSans.className} antialiased`}>
         <div id="root">
           <SiteShell>{children}</SiteShell>

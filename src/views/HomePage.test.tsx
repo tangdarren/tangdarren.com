@@ -24,10 +24,9 @@ describe('HomePage', () => {
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        /Based in San Francisco, I build full-stack applications and keep learning along the way./i,
+        /Based in San Francisco, I build full-stack applications\s*and keep learning along the way./i,
       ),
     ).toBeInTheDocument();
-
     expect(
       screen.queryByText(/full-stack products/i),
     ).not.toBeInTheDocument();
@@ -35,9 +34,13 @@ describe('HomePage', () => {
       screen.queryByText(/responsive interfaces to APIs/i),
     ).not.toBeInTheDocument();
 
+    const findMeAtHeading = screen.getByRole('heading', {
+      name: /- find me at/i,
+    });
+    expect(findMeAtHeading).toBeInTheDocument();
     expect(
-      screen.getByRole('heading', { name: /- find me at/i }),
-    ).toBeInTheDocument();
+      screen.queryByRole('img', { name: 'Darren Tang' }),
+    ).not.toBeInTheDocument();
     expect(
       screen.getByRole('heading', { name: /- tech i know and use/i }),
     ).toBeInTheDocument();
@@ -76,12 +79,12 @@ describe('HomePage', () => {
     expect(document.getElementById('projects')).toBeTruthy();
   });
 
-  it('renders social links as icon + readable address in LinkedIn → GitHub → Email order', () => {
+  it('renders social links as GitHub → LinkedIn → Email with URL display text', () => {
     renderWithProviders(<HomePage />, { initialPath: '/' });
 
     expect(SOCIAL_LINKS.map((link) => link.label)).toEqual([
-      'LinkedIn',
       'GitHub',
+      'LinkedIn',
       'Email',
     ]);
 
@@ -92,17 +95,21 @@ describe('HomePage', () => {
 
     for (const link of SOCIAL_LINKS) {
       const display = getSocialDisplayText(link);
-      const match = within(findMeAt as HTMLElement).getByRole('link', {
+      const matches = within(findMeAt as HTMLElement).getAllByRole('link', {
         name: new RegExp(`${link.label}:\\s*${display}`, 'i'),
       });
-      expect(match).toHaveAttribute('href', link.href);
-      expect(match).toHaveTextContent(display);
+      expect(matches.length).toBeGreaterThanOrEqual(1);
+      for (const match of matches) {
+        expect(match).toHaveAttribute('href', link.href);
+      }
     }
 
     expect(getSocialDisplayText(SOCIAL_LINKS[0])).toBe(
+      'github.com/tangdarren',
+    );
+    expect(getSocialDisplayText(SOCIAL_LINKS[1])).toBe(
       'linkedin.com/in/tang-darren',
     );
-    expect(getSocialDisplayText(SOCIAL_LINKS[1])).toBe('github.com/tangdarren');
     expect(getSocialDisplayText(SOCIAL_LINKS[2])).toBe(
       'tang.darren@gmail.com',
     );

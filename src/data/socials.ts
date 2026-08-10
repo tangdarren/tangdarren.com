@@ -11,17 +11,17 @@ export interface SocialLink {
 
 export const SOCIAL_LINKS: SocialLink[] = [
   {
-    label: 'LinkedIn',
-    href: 'https://www.linkedin.com/in/tang-darren',
-    icon: Linkedin,
-    handle: 'tang-darren',
-    external: true,
-  },
-  {
     label: 'GitHub',
     href: 'https://github.com/tangdarren',
     icon: Github,
     handle: 'tangdarren',
+    external: true,
+  },
+  {
+    label: 'LinkedIn',
+    href: 'https://linkedin.com/in/tang-darren',
+    icon: Linkedin,
+    handle: 'tang-darren',
     external: true,
   },
   {

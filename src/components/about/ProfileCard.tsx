@@ -1,6 +1,6 @@
 import { Briefcase, GraduationCap, MapPin } from 'lucide-react';
 
-const HEADSHOT_SRC = '/images/darren-tang-headshot.png';
+const HEADSHOT_SRC = '/images/darren-headshot.png';
 const HEADSHOT_ALT =
   'Professional headshot of Darren Tang smiling, wearing a black suit and tie against a blurred modern building background.';
 

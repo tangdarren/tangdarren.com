@@ -12,7 +12,7 @@ export default {
       colors: {
         // Surfaces (light)
         ink: {
-          950: '#F7F6F3', // Main page background (warm off-white)
+          950: '#FFFFFF', // Main page background
           900: '#FFFFFF', // Card / panel background
           850: '#F1F0EC', // Header strips inside panels
           800: '#EBEAE6', // Secondary background, hover on cards
@@ -60,11 +60,10 @@ export default {
           'sans-serif',
         ],
         mono: [
-          'var(--font-jetbrains-mono)',
-          'ui-monospace',
-          'SFMono-Regular',
-          'Menlo',
-          'monospace',
+          'var(--font-dm-sans)',
+          'ui-sans-serif',
+          'system-ui',
+          'sans-serif',
         ],
       },
       boxShadow: {
