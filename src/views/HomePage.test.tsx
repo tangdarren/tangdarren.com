@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 import HomePage from '@/views/HomePage';
 import { HOMEPAGE_PROJECTS, HOMEPAGE_TECH } from '@/data/homepage';
+import { RESUME_PDF_PATH } from '@/data/socials';
 import { renderWithProviders } from '@/test/render';
 
 describe('HomePage', () => {
@@ -29,12 +30,19 @@ describe('HomePage', () => {
         name: /email: tang\.darren@gmail\.com/i,
       }),
     ).toBeInTheDocument();
+
+    const resume = within(intro).getByRole('link', {
+      name: /resume: resume\.pdf/i,
+    });
+    expect(resume).toHaveAttribute('href', RESUME_PDF_PATH);
+    expect(resume).toHaveAttribute('target', '_blank');
+
     expect(
       within(intro).getByText('Software Engineer', { selector: 'p' }),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        /Based in San Francisco, I build full-stack applications\s*and keep learning along the way./i,
+        /Based in San Francisco, I build Full Stack applications\s*and learn along the way./i,
       ),
     ).toBeInTheDocument();
     expect(
@@ -151,6 +159,14 @@ describe('HomePage', () => {
       'Water Reminder',
     ];
 
+    const allNames = [...featuredNames, ...allOnlyNames];
+
+    // Every project shows by default; Featured narrows the list.
+    for (const name of allNames) {
+      expect(screen.getByText(name)).toBeInTheDocument();
+    }
+
+    await user.click(screen.getByRole('button', { name: 'Featured' }));
     for (const name of featuredNames) {
       expect(screen.getByText(name)).toBeInTheDocument();
     }
@@ -160,7 +176,6 @@ describe('HomePage', () => {
 
     await user.click(screen.getByRole('button', { name: 'All' }));
 
-    const allNames = [...featuredNames, ...allOnlyNames];
     expect(HOMEPAGE_PROJECTS.map((project) => project.name)).toEqual(allNames);
     expect(HOMEPAGE_PROJECTS.filter((project) => project.featured).map((p) => p.name)).toEqual(
       featuredNames,
@@ -198,14 +213,6 @@ describe('HomePage', () => {
       'href',
       'https://github.com/tangdarren/water-reminder-app',
     );
-
-    await user.click(screen.getByRole('button', { name: 'Featured' }));
-    for (const name of featuredNames) {
-      expect(screen.getByText(name)).toBeInTheDocument();
-    }
-    for (const name of allOnlyNames) {
-      expect(screen.queryByText(name)).not.toBeInTheDocument();
-    }
   });
 
   it('renders curated tech cards with exact descriptions and no abbreviation marks', () => {

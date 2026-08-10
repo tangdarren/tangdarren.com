@@ -45,8 +45,8 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="border-t border-ink-600 pt-12 sm:pt-14 lg:border-t-0 lg:pt-8">
-            <div className={`${CONTENT_WIDTH} space-y-16 sm:space-y-20`}>
+          <div className="border-t border-ink-600 pt-12 sm:pt-14 lg:border-t-0 lg:pt-4">
+            <div className={`${CONTENT_WIDTH} space-y-48 sm:space-y-64`}>
               <ExperienceEducationSection />
               <ProjectsSection />
             </div>

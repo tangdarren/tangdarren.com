@@ -1,6 +1,6 @@
 'use client';
 
-import { useId, useState } from 'react';
+import { useId, useLayoutEffect, useRef, useState } from 'react';
 
 import {
   HOMEPAGE_EDUCATION,
@@ -23,7 +23,7 @@ function ExperienceItem({
   description: string;
 }) {
   return (
-    <li className="relative pb-8 pl-6 last:pb-0">
+    <li className="relative pb-8 pl-11 last:pb-0">
       <span
         aria-hidden
         className="absolute left-0 top-1.5 z-10 h-2 w-2 -translate-x-1/2 rounded-full bg-accent-cyan"
@@ -52,7 +52,7 @@ function EducationItem({
   description: string;
 }) {
   return (
-    <li className="relative pb-8 pl-6 last:pb-0">
+    <li className="relative pb-8 pl-11 last:pb-0">
       <span
         aria-hidden
         className="absolute left-0 top-1.5 z-10 h-2 w-2 -translate-x-1/2 rounded-full bg-accent-cyan"
@@ -75,11 +75,31 @@ export default function ExperienceEducationSection() {
   const experiencePanelId = `${baseId}-experience`;
   const educationPanelId = `${baseId}-education`;
 
+  /* Reserve the tallest panel's height so switching tabs never shifts Projects. */
+  const panelRef = useRef<HTMLDivElement>(null);
+  const [reservedHeight, setReservedHeight] = useState(0);
+
+  useLayoutEffect(() => {
+    const panel = panelRef.current;
+    if (!panel) return;
+
+    const grow = () =>
+      setReservedHeight((prev) =>
+        Math.max(prev, panel.getBoundingClientRect().height),
+      );
+    // A width change re-wraps text, so start the measurement over.
+    const reset = () => setReservedHeight(panel.getBoundingClientRect().height);
+
+    grow();
+    window.addEventListener('resize', reset);
+    return () => window.removeEventListener('resize', reset);
+  }, [tab]);
+
   return (
     <section
       id="experience"
       aria-labelledby="experience-education-heading"
-      className="scroll-mt-20"
+      className="scroll-mt-20 lg:pl-3"
     >
       <h2 id="experience-education-heading" className="sr-only">
         Experience and Education
@@ -93,13 +113,13 @@ export default function ExperienceEducationSection() {
         <button
           type="button"
           role="tab"
-          id={`${baseId}-tab-experience`}
+          id="home-experience-title"
           aria-controls={experiencePanelId}
           aria-selected={tab === 'experience'}
           tabIndex={tab === 'experience' ? 0 : -1}
           onClick={() => setTab('experience')}
           className={[
-            'border-b pb-1 text-base transition-colors sm:text-lg',
+            'scroll-mt-20 border-b pb-1 text-base transition-colors sm:text-lg',
             tab === 'experience'
               ? 'border-accent-cyan font-medium text-mist-50'
               : 'border-transparent text-mist-400 hover:text-mist-200',
@@ -127,31 +147,36 @@ export default function ExperienceEducationSection() {
       </div>
 
       <div
-        role="tabpanel"
-        id={experiencePanelId}
-        aria-labelledby={`${baseId}-tab-experience`}
-        hidden={tab !== 'experience'}
         className="mt-8"
+        style={reservedHeight ? { minHeight: reservedHeight } : undefined}
       >
-        <ol className="relative ml-1 border-l border-ink-600">
-          {HOMEPAGE_EXPERIENCE.map((entry) => (
-            <ExperienceItem key={entry.id} {...entry} />
-          ))}
-        </ol>
-      </div>
+        <div ref={panelRef}>
+          <div
+            role="tabpanel"
+            id={experiencePanelId}
+            aria-labelledby="home-experience-title"
+            hidden={tab !== 'experience'}
+          >
+            <ol className="relative ml-3 border-l border-ink-600">
+              {HOMEPAGE_EXPERIENCE.map((entry) => (
+                <ExperienceItem key={entry.id} {...entry} />
+              ))}
+            </ol>
+          </div>
 
-      <div
-        role="tabpanel"
-        id={educationPanelId}
-        aria-labelledby={`${baseId}-tab-education`}
-        hidden={tab !== 'education'}
-        className="mt-8"
-      >
-        <ol className="relative ml-1 border-l border-ink-600">
-          {HOMEPAGE_EDUCATION.map((entry) => (
-            <EducationItem key={entry.id} {...entry} />
-          ))}
-        </ol>
+          <div
+            role="tabpanel"
+            id={educationPanelId}
+            aria-labelledby={`${baseId}-tab-education`}
+            hidden={tab !== 'education'}
+          >
+            <ol className="relative ml-3 border-l border-ink-600">
+              {HOMEPAGE_EDUCATION.map((entry) => (
+                <EducationItem key={entry.id} {...entry} />
+              ))}
+            </ol>
+          </div>
+        </div>
       </div>
     </section>
   );

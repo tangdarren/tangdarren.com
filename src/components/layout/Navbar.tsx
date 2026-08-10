@@ -1,20 +1,43 @@
 'use client';
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import type { RefObject } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ArrowUpRight, Menu, X } from 'lucide-react';
+import { ArrowDown, ArrowUp, Menu, X } from 'lucide-react';
 
 import { NAV_ITEMS } from '@/data/navigation';
 
+/** `lead` = px a title may still sit below the anchor and already take over. */
 const HOME_SCROLL_SECTIONS = [
-  { href: '/', id: 'home' },
-  { href: '/#experience', id: 'experience' },
-  { href: '/#projects', id: 'projects' },
+  { href: '/', id: 'home', lead: 0 },
+  { href: '/#experience', id: 'home-experience-title', lead: 160 },
+  { href: '/#projects', id: 'projects-heading', lead: 96 },
 ] as const;
 
-function sectionNumber(index: number): string {
-  return String(index + 1).padStart(2, '0');
+/**
+ * Active section = last section whose content title top has reached the fixed
+ * anchor line where the active nav label sits.
+ */
+function getActiveHrefFromAnchor(anchor: HTMLElement | null): string {
+  const anchorTop = anchor
+    ? anchor.getBoundingClientRect().top
+    : window.innerHeight * 0.35;
+
+  let nextActive: string = '/';
+
+  for (const section of HOME_SCROLL_SECTIONS) {
+    if (section.href === '/') continue;
+
+    const title = document.getElementById(section.id);
+    if (!title) continue;
+
+    if (title.getBoundingClientRect().top <= anchorTop + section.lead) {
+      nextActive = section.href;
+    }
+  }
+
+  return nextActive;
 }
 
 function isNavItemActive(
@@ -27,7 +50,6 @@ function isNavItemActive(
   }
   if (href === '/') return pathname === '/';
   if (href.startsWith('/#')) return false;
-  if (href.endsWith('.pdf')) return pathname === '/resume';
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
@@ -45,6 +67,28 @@ function navLabelClass(active: boolean): string {
     : 'group-hover:underline group-hover:decoration-ink-500 group-hover:underline-offset-4';
 }
 
+/** Smooth-scrolls in-page section links while on the homepage. */
+function scrollToHomeSection(
+  event: { preventDefault: () => void },
+  pathname: string,
+  href: string,
+) {
+  if (pathname !== '/') return;
+
+  if (href === '/') {
+    event.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
+
+  if (href.startsWith('/#')) {
+    event.preventDefault();
+    document
+      .getElementById(href.slice(2))
+      ?.scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
 export function NavLinks({
   onNavigate,
   className,
@@ -59,40 +103,11 @@ export function NavLinks({
 }) {
   const pathname = usePathname();
 
-  const sectionItems = NAV_ITEMS.filter((item) => !item.external);
-
   return (
     <ul className={className}>
       {NAV_ITEMS.map((item) => {
         const isActive = isNavItemActive(pathname, item.to, activeHref);
         const className = navLinkClass(isActive, compact);
-        const sectionIndex = sectionItems.findIndex(
-          (entry) => entry.to === item.to,
-        );
-
-        if (item.external) {
-          return (
-            <li key={item.to}>
-              <a
-                href={item.to}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={onNavigate}
-                className={className}
-              >
-                <span className={navLabelClass(isActive)}>{item.label}</span>
-                <ArrowUpRight
-                  aria-hidden
-                  className={[
-                    'shrink-0 self-center',
-                    compact ? 'h-3.5 w-3.5' : 'h-4 w-4 lg:h-5 lg:w-5',
-                  ].join(' ')}
-                  strokeWidth={2.25}
-                />
-              </a>
-            </li>
-          );
-        }
 
         return (
           <li key={item.to}>
@@ -101,36 +116,107 @@ export function NavLinks({
               aria-current={isActive ? 'page' : undefined}
               className={className}
               onClick={(event) => {
-                if (pathname === '/') {
-                  if (item.to === '/') {
-                    event.preventDefault();
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  } else if (item.to.startsWith('/#')) {
-                    event.preventDefault();
-                    const id = item.to.slice(2);
-                    document
-                      .getElementById(id)
-                      ?.scrollIntoView({ behavior: 'smooth' });
-                  }
-                }
+                scrollToHomeSection(event, pathname, item.to);
                 onNavigate?.();
               }}
             >
               <span className={navLabelClass(isActive)}>{item.label}</span>
-              <span
-                aria-hidden
-                className={[
-                  'font-mono tabular-nums tracking-wide text-mist-400',
-                  compact ? 'text-[10px]' : 'text-xs lg:text-sm',
-                ].join(' ')}
-              >
-                {sectionNumber(sectionIndex)}
-              </span>
             </Link>
           </li>
         );
       })}
     </ul>
+  );
+}
+
+/** Share of the divider taken up by the scroll marker. */
+const RAIL_MARKER_PCT = 16;
+
+/** Vertical travel between the active line and its adjacent previews. */
+const PREVIEW_STEP_REM = 3;
+const PREVIEW_SCALE = 0.62;
+
+/**
+ * Homepage desktop nav — the active section always sits on one fixed line,
+ * with the adjacent sections as small previews above and below it.
+ */
+function HomeSectionNavigator({
+  activeHref,
+  anchorRef,
+}: {
+  activeHref: string;
+  anchorRef?: RefObject<HTMLSpanElement>;
+}) {
+  const pathname = usePathname();
+  const activeIndex = Math.max(
+    0,
+    NAV_ITEMS.findIndex((item) => item.to === activeHref),
+  );
+
+  return (
+    /* Height stays equal to the active line so it centers on the viewport. */
+    <div className="relative flex flex-col items-end">
+      <div className="relative">
+        {/* Sizer holds the width and pins the active label to one fixed line. */}
+        <span
+          ref={anchorRef}
+          aria-hidden
+          className="invisible block whitespace-nowrap text-[2.125rem] font-medium leading-tight tracking-tight"
+        >
+          Experience
+        </span>
+
+        {NAV_ITEMS.map((item, index) => {
+          const offset = index - activeIndex;
+          const isActive = offset === 0;
+          const isVisible = Math.abs(offset) <= 1;
+
+          return (
+            <Link
+              key={item.to}
+              href={item.to}
+              aria-current={isActive ? 'page' : undefined}
+              onClick={(event) => scrollToHomeSection(event, pathname, item.to)}
+              style={{
+                transform: `translateY(${offset * PREVIEW_STEP_REM}rem) scale(${
+                  isActive ? 1 : PREVIEW_SCALE
+                })`,
+              }}
+              className={[
+                'absolute right-0 top-0 inline-flex origin-right items-center whitespace-nowrap text-[2.125rem] leading-tight tracking-tight',
+                'transition-[transform,opacity,color] duration-300 ease-out motion-reduce:transition-none',
+                isActive
+                  ? 'font-medium text-mist-50'
+                  : 'font-normal text-mist-400 hover:text-mist-200 focus-visible:text-mist-200',
+                isVisible
+                  ? 'opacity-100'
+                  : 'pointer-events-none opacity-0 focus-visible:opacity-100',
+              ].join(' ')}
+            >
+              <span>{item.label}</span>
+              {/* Sits outside the text box so every label shares one right edge. */}
+              {offset !== 0 && (
+                <span className="absolute left-full top-1/2 ml-2 -translate-y-1/2">
+                  {offset === -1 ? (
+                    <ArrowUp
+                      aria-hidden
+                      className="h-[0.75em] w-[0.75em]"
+                      strokeWidth={2.25}
+                    />
+                  ) : (
+                    <ArrowDown
+                      aria-hidden
+                      className="h-[0.75em] w-[0.75em]"
+                      strokeWidth={2.25}
+                    />
+                  )}
+                </span>
+              )}
+            </Link>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
@@ -143,8 +229,10 @@ export function DesktopNav() {
   const pathname = usePathname();
   const isHome = pathname === '/';
   const slotRef = useRef<HTMLDivElement>(null);
+  const anchorRef = useRef<HTMLSpanElement>(null);
   const [left, setLeft] = useState<number | null>(null);
   const [activeHref, setActiveHref] = useState('/');
+  const [progress, setProgress] = useState(0);
   const [hiddenByFooter, setHiddenByFooter] = useState(false);
 
   useLayoutEffect(() => {
@@ -165,22 +253,18 @@ export function DesktopNav() {
     if (!isHome) return;
 
     const updateScrollState = () => {
-      const probe = window.innerHeight * 0.35;
-      let nextActive: string = '/';
+      setActiveHref(getActiveHrefFromAnchor(anchorRef.current));
 
-      for (const section of HOME_SCROLL_SECTIONS) {
-        const el = document.getElementById(section.id);
-        if (!el) continue;
-        if (el.getBoundingClientRect().top <= probe) {
-          nextActive = section.href;
-        }
-      }
-      setActiveHref(nextActive);
+      const scrollable =
+        document.documentElement.scrollHeight - window.innerHeight;
+      const ratio = scrollable > 0 ? window.scrollY / scrollable : 0;
+      // Quantized so scrolling only re-renders on meaningful movement.
+      setProgress(Math.round(Math.min(1, Math.max(0, ratio)) * 200) / 200);
 
       const footer = document.getElementById('contact');
       if (footer) {
         const footerTop = footer.getBoundingClientRect().top;
-        setHiddenByFooter(footerTop < window.innerHeight * 0.62);
+        setHiddenByFooter(footerTop < window.innerHeight * 0.85);
       }
     };
 
@@ -193,20 +277,22 @@ export function DesktopNav() {
     };
   }, [isHome]);
 
-  const links = (
-    <NavLinks
-      activeHref={isHome ? activeHref : null}
-      className="flex flex-col items-end gap-1.5"
-    />
-  );
-
   const railExtras = (
     <>
       <div aria-hidden className="w-9 shrink-0 xl:w-12" />
       <div
         aria-hidden
-        className="h-[33vh] w-px shrink-0 bg-gradient-to-b from-transparent via-mist-300/35 to-transparent"
-      />
+        className="relative h-[33vh] w-px shrink-0 bg-gradient-to-b from-transparent via-mist-300/35 to-transparent"
+      >
+        {/* Same gray, just solid — a short marker riding the line as you scroll. */}
+        <span
+          className="absolute inset-x-0 rounded-full bg-mist-300 transition-[top] duration-150 ease-out motion-reduce:transition-none"
+          style={{
+            height: `${RAIL_MARKER_PCT}%`,
+            top: `${progress * (100 - RAIL_MARKER_PCT)}%`,
+          }}
+        />
+      </div>
     </>
   );
 
@@ -216,7 +302,7 @@ export function DesktopNav() {
         aria-label="Primary"
         className="hidden w-fit shrink-0 lg:block lg:pr-0.5 xl:pr-1"
       >
-        {links}
+        <NavLinks className="flex flex-col items-end gap-1.5" />
       </nav>
     );
   }
@@ -230,7 +316,7 @@ export function DesktopNav() {
         className="invisible hidden shrink-0 items-center lg:flex"
       >
         <div className="w-fit shrink-0 lg:pr-0.5 xl:pr-1">
-          <NavLinks className="flex flex-col items-end gap-1.5" />
+          <HomeSectionNavigator activeHref={activeHref} />
         </div>
         {railExtras}
       </div>
@@ -245,11 +331,11 @@ export function DesktopNav() {
         ].join(' ')}
         style={left === null ? { visibility: 'hidden' } : { left }}
       >
-        <nav
-          aria-label="Primary"
-          className="w-fit shrink-0 lg:pr-0.5 xl:pr-1"
-        >
-          {links}
+        <nav aria-label="Primary" className="w-fit shrink-0 lg:pr-0.5 xl:pr-1">
+          <HomeSectionNavigator
+            activeHref={activeHref}
+            anchorRef={anchorRef}
+          />
         </nav>
         {railExtras}
       </div>
@@ -285,9 +371,11 @@ export function MobileNav() {
     if (pathname !== '/') return;
 
     const updateActive = () => {
-      const probe = window.innerHeight * 0.35;
+      // Mobile has no side rail — activate when each section title reaches below the sticky header.
+      const probe = 72;
       let nextActive: string = '/';
       for (const section of HOME_SCROLL_SECTIONS) {
+        if (section.href === '/') continue;
         const el = document.getElementById(section.id);
         if (!el) continue;
         if (el.getBoundingClientRect().top <= probe) {

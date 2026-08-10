@@ -39,7 +39,7 @@ function ProjectRow({ project }: { project: HomepageProject }) {
 }
 
 export default function ProjectsSection() {
-  const [filter, setFilter] = useState<ProjectFilter>('featured');
+  const [filter, setFilter] = useState<ProjectFilter>('all');
 
   const projects =
     filter === 'featured'
@@ -50,7 +50,7 @@ export default function ProjectsSection() {
     <section
       id="projects"
       aria-labelledby="projects-heading"
-      className="w-full scroll-mt-20"
+      className="w-full scroll-mt-20 lg:pl-4"
     >
       <div className="flex flex-wrap items-end justify-between gap-4">
         <h2

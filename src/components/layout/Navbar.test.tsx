@@ -4,11 +4,10 @@ import { describe, expect, it } from 'vitest';
 
 import Layout from '@/components/layout/Layout';
 import { DesktopNav, MobileNav, NavLinks } from '@/components/layout/Navbar';
-import { RESUME_PDF_PATH } from '@/data/socials';
 import { renderWithProviders } from '@/test/render';
 
 describe('DesktopNav', () => {
-  it('shows Home, Experience, Projects, and Resume without About or Contact', () => {
+  it('shows Home, Experience, and Projects without Resume, About, or Contact', () => {
     renderWithProviders(<DesktopNav />, { initialPath: '/' });
 
     const primary = screen.getByRole('navigation', { name: 'Primary' });
@@ -23,14 +22,19 @@ describe('DesktopNav', () => {
       within(primary).getByRole('link', { name: 'Projects' }),
     ).toHaveAttribute('href', '/#projects');
 
-    const resume = within(primary).getByRole('link', { name: 'Resume' });
-    expect(resume).toHaveAttribute('href', RESUME_PDF_PATH);
-    expect(resume).toHaveAttribute('target', '_blank');
-    expect(resume.querySelector('svg')).toBeTruthy();
+    // Resume now lives with the intro contact links, not the nav.
+    expect(
+      within(primary).queryByRole('link', { name: 'Resume' }),
+    ).not.toBeInTheDocument();
 
-    expect(within(primary).getByText('01')).toBeInTheDocument();
-    expect(within(primary).getByText('02')).toBeInTheDocument();
-    expect(within(primary).getByText('03')).toBeInTheDocument();
+    // Home is the initial active section; Projects is only a preview away.
+    expect(within(primary).getByRole('link', { name: 'Home' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    expect(
+      within(primary).getByRole('link', { name: 'Experience' }),
+    ).not.toHaveAttribute('aria-current');
 
     expect(
       screen.queryByRole('link', { name: /^contact$/i }),

@@ -1,5 +1,8 @@
-/** Official brand marks (Simple Icons) for intro social links. */
-export type SocialBrandId = 'github' | 'linkedin' | 'gmail';
+/**
+ * Official brand marks (Simple Icons) for intro social links, plus a matching
+ * filled document glyph for the resume (which has no brand mark).
+ */
+export type SocialBrandId = 'github' | 'linkedin' | 'gmail' | 'resume';
 
 export default function SocialBrandIcon({
   id,
@@ -33,6 +36,13 @@ export default function SocialBrandIcon({
       return (
         <svg {...props}>
           <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z" />
+        </svg>
+      );
+    case 'resume':
+      return (
+        <svg {...props} fillRule="evenodd" clipRule="evenodd">
+          <path d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8h-5a1 1 0 0 1-1-1V2H6Zm1.4 6.4h4.2V10H7.4V8.4Zm0 3.6h9.2v1.6H7.4V12Zm0 3.6h9.2v1.6H7.4v-1.6Zm0 3.6h6.4v1.6H7.4v-1.6Z" />
+          <path d="M14.6 2.9l4.5 4.5h-4.5V2.9Z" />
         </svg>
       );
     default:
