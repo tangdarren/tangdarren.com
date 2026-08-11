@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 
 import { DesktopNav, MobileNav } from './Navbar';
 import { VerticalSeparator } from './Separator';
-import ThemeToggle from '@/components/theme/ThemeToggle';
+import TopCornerControls from '@/components/easter-egg/TopCornerControls';
 
 interface LayoutProps {
   children: ReactNode;
@@ -33,7 +33,7 @@ export default function Layout({ children }: LayoutProps) {
       <MobileNav />
 
       <div className="fixed left-2 top-2 z-50 hidden lg:left-3 lg:top-3 lg:block">
-        <ThemeToggle />
+        <TopCornerControls showEgg />
       </div>
 
       <div className="flex min-h-screen justify-center">

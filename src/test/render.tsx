@@ -3,6 +3,7 @@ import { render, type RenderOptions } from '@testing-library/react';
 import { ThemeProvider } from 'next-themes';
 import { usePathname, useSearchParams } from 'next/navigation';
 
+import { EasterEggProvider } from '@/components/easter-egg/EasterEggContext';
 import { nextRouterState } from '@/test/next-router-state';
 
 function LocationProbe() {
@@ -31,8 +32,10 @@ function Providers({ children }: ProvidersProps) {
       defaultTheme="light"
       enableSystem={false}
     >
-      <LocationProbe />
-      {children}
+      <EasterEggProvider>
+        <LocationProbe />
+        {children}
+      </EasterEggProvider>
     </ThemeProvider>
   );
 }

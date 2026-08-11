@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ArrowDown, ArrowUp, Menu, X } from 'lucide-react';
 
-import ThemeToggle from '@/components/theme/ThemeToggle';
+import TopCornerControls from '@/components/easter-egg/TopCornerControls';
 import { NAV_ITEMS } from '@/data/navigation';
 
 /** `lead` = px a title may still sit below the anchor and already take over. */
@@ -416,7 +416,7 @@ export function MobileNav() {
     <header className="sticky top-0 z-50 border-b border-ink-600 bg-ink-950 lg:hidden">
       <div className="flex h-14 items-center justify-between px-[var(--gutter)]">
         <div className="flex items-center gap-2">
-          <ThemeToggle />
+          <TopCornerControls showEgg />
           <Link
             href="/"
             className="text-sm font-medium text-mist-50"
