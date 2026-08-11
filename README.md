@@ -79,7 +79,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Copying `.env.example` to `.env.local` is optional unless you are configuring the contact endpoint or production site URL. The Next.js development server runs at [http://localhost:3000](http://localhost:3000).
+Copying `.env.example` to `.env.local` is optional unless you are configuring the contact endpoint or overriding the site origin for local metadata testing. The Next.js development server runs at [http://localhost:3000](http://localhost:3000). Public metadata falls back to `https://tangdarren.com` when `SITE_URL` is unset.
 
 ## Available Scripts
 
@@ -98,7 +98,7 @@ Copying `.env.example` to `.env.local` is optional unless you are configuring th
 | Variable | Purpose |
 | --- | --- |
 | `NEXT_PUBLIC_CONTACT_ENDPOINT` | Optional URL the contact form POSTs to (JSON body: `name`, `email`, `subject`, `message`). Exposed to the browser. |
-| `SITE_URL` | Server-only public site origin for canonical URLs, Open Graph/Twitter images, `robots.txt`, and `sitemap.xml`. No trailing slash. |
+| `SITE_URL` | Optional server-only public site origin for canonical URLs, Open Graph images, `robots.txt`, and `sitemap.xml`. No trailing slash. When unset or invalid, defaults to `https://tangdarren.com` (never localhost). |
 
 When `NEXT_PUBLIC_CONTACT_ENDPOINT` is unset, the form still validates input, then opens a `mailto:` link to `tang.darren@gmail.com` with the submitted subject and message. It does not claim a server-side send succeeded.
 
@@ -114,4 +114,4 @@ npm test
 
 ## Deployment
 
-The app is configured for Vercel with the Next.js App Router. Connect the repository to Vercel, set `SITE_URL` (and optionally `NEXT_PUBLIC_CONTACT_ENDPOINT`) in the project environment, then deploy. Vercel runs `npm run build` and serves the Next.js application; no SPA rewrite configuration is required.
+The app is configured for Vercel with the Next.js App Router. Connect the repository to Vercel and deploy. Setting `SITE_URL` is optional because the app already defaults to `https://tangdarren.com`; you may still set it (and optionally `NEXT_PUBLIC_CONTACT_ENDPOINT`) in the project environment if you need an override. Vercel runs `npm run build` and serves the Next.js application; no SPA rewrite configuration is required.

@@ -12,6 +12,8 @@ export function isValidHttpUrl(value?: string): value is string {
 /** Resolve a site-relative or absolute path to an absolute URL. */
 export function toAbsoluteUrl(origin: string, path: string): string {
   if (/^https?:\/\//i.test(path)) return path;
+  const base = origin.replace(/\/$/, '');
+  if (!path || path === '/') return base;
   const normalized = path.startsWith('/') ? path : `/${path}`;
-  return `${origin.replace(/\/$/, '')}${normalized}`;
+  return `${base}${normalized}`;
 }

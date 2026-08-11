@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  CANONICAL_SITE_URL,
   SITE_DEFAULT_OG_IMAGE,
   SITE_NAME,
   getSitemapPaths,
@@ -9,6 +10,26 @@ import {
 import { createPageMetadata, getProjectShareImage } from '@/lib/metadata';
 import { PROJECTS, hasCaseStudy } from '@/data/projects';
 import { toAbsoluteUrl } from '@/lib/url';
+
+describe('resolveSiteUrl', () => {
+  it('defaults to the canonical production origin (never localhost)', () => {
+    expect(resolveSiteUrl(undefined)).toBe(CANONICAL_SITE_URL);
+    expect(resolveSiteUrl(null)).toBe(CANONICAL_SITE_URL);
+    expect(resolveSiteUrl('')).toBe(CANONICAL_SITE_URL);
+    expect(resolveSiteUrl('   ')).toBe(CANONICAL_SITE_URL);
+    expect(resolveSiteUrl('not-a-url')).toBe(CANONICAL_SITE_URL);
+    expect(resolveSiteUrl(undefined)).toBe('https://tangdarren.com');
+    expect(resolveSiteUrl(undefined)).not.toMatch(/localhost|127\.0\.0\.1/i);
+  });
+
+  it('uses an explicit valid SITE_URL override and strips trailing slashes', () => {
+    expect(resolveSiteUrl('https://example.com')).toBe('https://example.com');
+    expect(resolveSiteUrl('https://example.com/')).toBe('https://example.com');
+    expect(resolveSiteUrl('http://localhost:3000')).toBe(
+      'http://localhost:3000',
+    );
+  });
+});
 
 describe('createPageMetadata', () => {
   it('emits absolute canonical and social image URLs via metadataBase-relative paths', () => {
@@ -34,16 +55,55 @@ describe('createPageMetadata', () => {
     expect(toAbsoluteUrl(siteUrl, imagePath)).toBe(`${siteUrl}${imagePath}`);
   });
 
-  it('falls back to the default social preview image', () => {
+  it('uses the homepage portfolio title and default Open Graph image', () => {
     const metadata = createPageMetadata({
-      title: 'Home | Darren Christopher Tang',
+      title: 'Darren Tang Portfolio',
       path: '/',
     });
 
+    expect(metadata.title).toEqual({ absolute: 'Darren Tang Portfolio' });
+    expect(metadata.openGraph?.title).toBe('Darren Tang Portfolio');
+    expect(metadata.alternates?.canonical).toBe('/');
+    expect(metadata.openGraph?.url).toBe('/');
     expect(metadata.openGraph?.images).toEqual([
       { url: SITE_DEFAULT_OG_IMAGE },
     ]);
     expect(metadata.twitter).toBeUndefined();
+  });
+
+  it('resolves homepage absolute social URLs to the canonical production origin', () => {
+    const siteUrl = resolveSiteUrl(undefined);
+    const metadata = createPageMetadata({
+      title: 'Darren Tang Portfolio',
+      path: '/',
+    });
+
+    const images = metadata.openGraph?.images;
+    const imageList = Array.isArray(images) ? images : images ? [images] : [];
+    const firstImage = imageList[0];
+    const ogImagePath =
+      typeof firstImage === 'string'
+        ? firstImage
+        : firstImage && typeof firstImage === 'object' && 'url' in firstImage
+          ? String(firstImage.url)
+          : '';
+
+    const canonical = toAbsoluteUrl(
+      siteUrl,
+      String(metadata.alternates?.canonical ?? ''),
+    );
+    const ogUrl = toAbsoluteUrl(siteUrl, String(metadata.openGraph?.url ?? ''));
+    const ogImage = toAbsoluteUrl(siteUrl, ogImagePath);
+
+    expect(siteUrl).toBe('https://tangdarren.com');
+    expect(canonical).toBe('https://tangdarren.com');
+    expect(ogUrl).toBe('https://tangdarren.com');
+    expect(ogImage).toBe('https://tangdarren.com/opengraph-image.png');
+
+    for (const value of [siteUrl, canonical, ogUrl, ogImage]) {
+      expect(value).not.toMatch(/localhost|127\.0\.0\.1/i);
+      expect(value.startsWith('https://')).toBe(true);
+    }
   });
 
   it('marks pages as noindex when requested', () => {
@@ -94,5 +154,13 @@ describe('project share images and sitemap paths', () => {
     for (const project of PROJECTS.filter(hasCaseStudy)) {
       expect(paths).toContain(`/projects/${project.id}`);
     }
+  });
+
+  it('builds sitemap homepage URL without localhost', () => {
+    const siteUrl = resolveSiteUrl(undefined);
+    expect(toAbsoluteUrl(siteUrl, '/')).toBe('https://tangdarren.com');
+    expect(toAbsoluteUrl(siteUrl, '/sitemap.xml')).toBe(
+      'https://tangdarren.com/sitemap.xml',
+    );
   });
 });
