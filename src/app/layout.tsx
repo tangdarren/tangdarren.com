@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { DM_Sans } from 'next/font/google';
 
 import SiteShell from '@/components/layout/SiteShell';
+import ThemeProvider from '@/components/theme/ThemeProvider';
 import {
   SITE_DEFAULT_DESCRIPTION,
   SITE_DEFAULT_OG_IMAGE,
@@ -48,7 +49,10 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
-  themeColor: '#FFFFFF',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#FFFFFF' },
+    { media: '(prefers-color-scheme: dark)', color: '#171717' },
+  ],
 };
 
 export default function RootLayout({
@@ -57,11 +61,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={dmSans.variable}>
+    <html lang="en" className={dmSans.variable} suppressHydrationWarning>
       <body className={`${dmSans.className} antialiased`}>
-        <div id="root">
-          <SiteShell>{children}</SiteShell>
-        </div>
+        <ThemeProvider>
+          <div id="root">
+            <SiteShell>{children}</SiteShell>
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ArrowDown, ArrowUp, Menu, X } from 'lucide-react';
 
+import ThemeToggle from '@/components/theme/ThemeToggle';
 import { NAV_ITEMS } from '@/data/navigation';
 
 /** `lead` = px a title may still sit below the anchor and already take over. */
@@ -16,13 +17,21 @@ const HOME_SCROLL_SECTIONS = [
 ] as const;
 
 /**
+ * Screen line the active nav label sits on. It is derived from the viewport
+ * rather than measured, because the page transition's transform turns the rail
+ * into a page-relative box while it runs, which would place the line mid-page.
+ */
+function getAnchorLineTop(anchor: HTMLElement | null): number {
+  if (!anchor) return window.innerHeight * 0.35;
+  return (window.innerHeight - anchor.offsetHeight) / 2;
+}
+
+/**
  * Active section = last section whose content title top has reached the fixed
  * anchor line where the active nav label sits.
  */
 function getActiveHrefFromAnchor(anchor: HTMLElement | null): string {
-  const anchorTop = anchor
-    ? anchor.getBoundingClientRect().top
-    : window.innerHeight * 0.35;
+  const anchorTop = getAnchorLineTop(anchor);
 
   let nextActive: string = '/';
 
@@ -269,9 +278,20 @@ export function DesktopNav() {
     };
 
     updateScrollState();
+
+    /* Section heights aren't final on first paint (fonts/images still settling),
+       so re-measure once layout is stable or the browser restores scroll. */
+    const raf = requestAnimationFrame(() =>
+      requestAnimationFrame(updateScrollState),
+    );
+    window.addEventListener('load', updateScrollState);
+    document.fonts?.ready.then(updateScrollState).catch(() => {});
+
     window.addEventListener('scroll', updateScrollState, { passive: true });
     window.addEventListener('resize', updateScrollState);
     return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('load', updateScrollState);
       window.removeEventListener('scroll', updateScrollState);
       window.removeEventListener('resize', updateScrollState);
     };
@@ -395,17 +415,20 @@ export function MobileNav() {
   return (
     <header className="sticky top-0 z-50 border-b border-ink-600 bg-ink-950 lg:hidden">
       <div className="flex h-14 items-center justify-between px-[var(--gutter)]">
-        <Link
-          href="/"
-          className="text-sm font-medium text-mist-50"
-          aria-label="Darren Tang — Home"
-          onClick={() => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            closeMenu();
-          }}
-        >
-          Darren Tang
-        </Link>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <Link
+            href="/"
+            className="text-sm font-medium text-mist-50"
+            aria-label="Darren Tang — Home"
+            onClick={() => {
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+              closeMenu();
+            }}
+          >
+            Darren Tang
+          </Link>
+        </div>
 
         <button
           type="button"

@@ -149,7 +149,7 @@ function ScreenshotLightbox({
     <AnimatePresence>
       {shot && (
         <motion.div
-          className="fixed inset-0 z-[90] flex items-center justify-center bg-mist-50/50 p-4 backdrop-blur-sm sm:p-8"
+          className="fixed inset-0 z-[90] flex items-center justify-center bg-mist-50/50 p-4 backdrop-blur-sm dark:bg-black/60 sm:p-8"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}

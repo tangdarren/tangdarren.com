@@ -1,49 +1,45 @@
 /** @type {import('tailwindcss').Config} */
-// Light theme palette. Token names (ink-*, mist-*, accent-*) are kept from the
-// prior version so downstream JSX can stay stable, but their values now map
-// to a bright, professional design:
-//   ink-*   → light surface backgrounds (bg / cards / hovers / borders)
-//   mist-*  → dark navy/charcoal text (primary → subtle)
-//   accent  → primary blue, plus sparingly-used cyan / green / lavender
+// Semantic palette via CSS variables (see src/index.css).
+// Token names stay stable; [data-mode="dark"] remaps the underlying RGB channels.
+//   ink-*   → surface backgrounds / borders
+//   mist-*  → text (primary → muted)
+//   accent  → primary blue + sparing cyan / green / lavender
 export default {
+  darkMode: ['selector', '[data-mode="dark"]'],
   content: ['./src/**/*.{ts,tsx}'],
   theme: {
     extend: {
       colors: {
-        // Surfaces (light)
         ink: {
-          950: '#FFFFFF', // Main page background
-          900: '#FFFFFF', // Card / panel background
-          850: '#F1F0EC', // Header strips inside panels
-          800: '#EBEAE6', // Secondary background, hover on cards
-          700: '#E2E0DB', // Subtle dividers
-          600: '#D8D6D0', // Standard border
-          500: '#C9C6BF', // Stronger border
+          950: 'rgb(var(--color-ink-950) / <alpha-value>)',
+          900: 'rgb(var(--color-ink-900) / <alpha-value>)',
+          850: 'rgb(var(--color-ink-850) / <alpha-value>)',
+          800: 'rgb(var(--color-ink-800) / <alpha-value>)',
+          700: 'rgb(var(--color-ink-700) / <alpha-value>)',
+          600: 'rgb(var(--color-ink-600) / <alpha-value>)',
+          500: 'rgb(var(--color-ink-500) / <alpha-value>)',
         },
-        // Text (dark navy / charcoal)
         mist: {
-          50: '#0B1220',  // Strongest heading
-          100: '#172033', // Primary text
-          200: '#293449', // Strong body text
-          300: '#526077', // Secondary text
-          400: '#6B7A91', // Muted labels
-          500: '#94A3B8', // Placeholders / very muted
+          50: 'rgb(var(--color-mist-50) / <alpha-value>)',
+          100: 'rgb(var(--color-mist-100) / <alpha-value>)',
+          200: 'rgb(var(--color-mist-200) / <alpha-value>)',
+          300: 'rgb(var(--color-mist-300) / <alpha-value>)',
+          400: 'rgb(var(--color-mist-400) / <alpha-value>)',
+          500: 'rgb(var(--color-mist-500) / <alpha-value>)',
         },
-        // Accents — primary blue, sparing cyan / green / lavender
         accent: {
-          cyan: '#2563EB',     // PRIMARY BLUE (repurposed from prior name)
-          blue: '#0891B2',     // Cyan accent (sparing use)
-          green: '#16A34A',    // Green accent (sparing use)
-          lavender: '#7C3AED', // Occasional lavender highlight
+          cyan: 'rgb(var(--color-accent-cyan) / <alpha-value>)',
+          blue: 'rgb(var(--color-accent-blue) / <alpha-value>)',
+          green: 'rgb(var(--color-accent-green) / <alpha-value>)',
+          lavender: 'rgb(var(--color-accent-lavender) / <alpha-value>)',
         },
-        // Semantic brand ramp — for gradients and tinted surfaces
         brand: {
-          50: '#EFF6FF',
-          100: '#DBEAFE',
-          200: '#BFDBFE',
-          500: '#2563EB',
-          600: '#1D4ED8',
-          700: '#1E40AF',
+          50: 'rgb(var(--color-brand-50) / <alpha-value>)',
+          100: 'rgb(var(--color-brand-100) / <alpha-value>)',
+          200: 'rgb(var(--color-brand-200) / <alpha-value>)',
+          500: 'rgb(var(--color-brand-500) / <alpha-value>)',
+          600: 'rgb(var(--color-brand-600) / <alpha-value>)',
+          700: 'rgb(var(--color-brand-700) / <alpha-value>)',
         },
       },
       fontFamily: {
@@ -67,13 +63,9 @@ export default {
         ],
       },
       boxShadow: {
-        // Light, natural shadows for cards on a bright background
-        panel:
-          '0 1px 2px 0 rgba(15, 23, 42, 0.04), 0 8px 24px -12px rgba(15, 23, 42, 0.10)',
-        card:
-          '0 1px 2px 0 rgba(15, 23, 42, 0.05), 0 12px 32px -16px rgba(37, 99, 235, 0.18)',
-        glow:
-          '0 0 0 1px rgba(37, 99, 235, 0.25), 0 10px 28px -14px rgba(37, 99, 235, 0.35)',
+        panel: 'var(--shadow-panel)',
+        card: 'var(--shadow-card)',
+        glow: 'var(--shadow-glow)',
       },
       keyframes: {
         'fade-in-up': {

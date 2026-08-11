@@ -79,7 +79,7 @@ export default function ProjectDetails({
     <AnimatePresence>
       {project && (
         <motion.div
-          className="fixed inset-0 z-[80] flex items-end justify-center bg-mist-50/40 backdrop-blur-sm sm:items-center"
+          className="fixed inset-0 z-[80] flex items-end justify-center bg-mist-50/40 backdrop-blur-sm dark:bg-black/50 sm:items-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}

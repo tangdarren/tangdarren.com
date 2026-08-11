@@ -1,5 +1,6 @@
 import type { ReactElement, ReactNode } from 'react';
 import { render, type RenderOptions } from '@testing-library/react';
+import { ThemeProvider } from 'next-themes';
 import { usePathname, useSearchParams } from 'next/navigation';
 
 import { nextRouterState } from '@/test/next-router-state';
@@ -25,10 +26,14 @@ interface ProvidersProps {
 
 function Providers({ children }: ProvidersProps) {
   return (
-    <>
+    <ThemeProvider
+      attribute="data-mode"
+      defaultTheme="light"
+      enableSystem={false}
+    >
       <LocationProbe />
       {children}
-    </>
+    </ThemeProvider>
   );
 }
 

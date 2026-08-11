@@ -9,13 +9,19 @@ import {
 
 type CareerTab = 'experience' | 'education';
 
+function formatIndex(index: number) {
+  return String(index + 1).padStart(2, '0');
+}
+
 function ExperienceItem({
+  index,
   role,
   company,
   type,
   dates,
   description,
 }: {
+  index: number;
   role: string;
   company: string;
   type: string;
@@ -23,48 +29,58 @@ function ExperienceItem({
   description: string;
 }) {
   return (
-    <li className="relative pb-8 pl-11 last:pb-0">
+    <li className="flex items-baseline gap-8 pb-8 last:pb-0">
       <span
         aria-hidden
-        className="absolute left-0 top-1.5 z-10 h-2 w-2 -translate-x-1/2 rounded-full bg-accent-cyan"
-      />
-      <p className="text-base font-normal tracking-tight text-mist-50">{role}</p>
-      <p className="mt-0.5 text-sm text-mist-300">
-        {company} · {type}
-      </p>
-      <p className="mt-0.5 text-sm text-mist-400">{dates}</p>
-      <p className="mt-2 max-w-xl text-sm leading-relaxed text-mist-300">
-        {description}
-      </p>
+        className="w-7 shrink-0 text-base font-normal tabular-nums text-mist-50"
+      >
+        {formatIndex(index)}
+      </span>
+      <div className="min-w-0">
+        <p className="text-base font-normal tracking-tight text-mist-50">{role}</p>
+        <p className="mt-0.5 text-sm text-mist-300">
+          {company} · {type}
+        </p>
+        <p className="mt-0.5 text-sm text-mist-400">{dates}</p>
+        <p className="mt-2 max-w-xl text-sm leading-relaxed text-mist-300">
+          {description}
+        </p>
+      </div>
     </li>
   );
 }
 
 function EducationItem({
+  index,
   school,
   degree,
   dates,
   description,
 }: {
+  index: number;
   school: string;
   degree: string;
   dates: string;
   description: string;
 }) {
   return (
-    <li className="relative pb-8 pl-11 last:pb-0">
+    <li className="flex items-baseline gap-8 pb-8 last:pb-0">
       <span
         aria-hidden
-        className="absolute left-0 top-1.5 z-10 h-2 w-2 -translate-x-1/2 rounded-full bg-accent-cyan"
-      />
-      <p className="text-base font-medium tracking-tight text-mist-50">
-        {degree}
-      </p>
-      <p className="mt-0.5 text-sm text-mist-300">{school}</p>
-      <p className="mt-0.5 text-sm text-mist-400">{dates}</p>
-      <p className="mt-2 max-w-xl text-sm leading-relaxed text-mist-300">
-        {description}
-      </p>
+        className="w-7 shrink-0 text-base font-normal tabular-nums text-mist-50"
+      >
+        {formatIndex(index)}
+      </span>
+      <div className="min-w-0">
+        <p className="text-base font-normal tracking-tight text-mist-50">
+          {degree}
+        </p>
+        <p className="mt-0.5 text-sm text-mist-300">{school}</p>
+        <p className="mt-0.5 text-sm text-mist-400">{dates}</p>
+        <p className="mt-2 max-w-xl text-sm leading-relaxed text-mist-300">
+          {description}
+        </p>
+      </div>
     </li>
   );
 }
@@ -157,9 +173,9 @@ export default function ExperienceEducationSection() {
             aria-labelledby="home-experience-title"
             hidden={tab !== 'experience'}
           >
-            <ol className="relative ml-3 border-l border-ink-600">
-              {HOMEPAGE_EXPERIENCE.map((entry) => (
-                <ExperienceItem key={entry.id} {...entry} />
+            <ol className="list-none">
+              {HOMEPAGE_EXPERIENCE.map((entry, index) => (
+                <ExperienceItem key={entry.id} index={index} {...entry} />
               ))}
             </ol>
           </div>
@@ -170,9 +186,9 @@ export default function ExperienceEducationSection() {
             aria-labelledby={`${baseId}-tab-education`}
             hidden={tab !== 'education'}
           >
-            <ol className="relative ml-3 border-l border-ink-600">
-              {HOMEPAGE_EDUCATION.map((entry) => (
-                <EducationItem key={entry.id} {...entry} />
+            <ol className="list-none">
+              {HOMEPAGE_EDUCATION.map((entry, index) => (
+                <EducationItem key={entry.id} index={index} {...entry} />
               ))}
             </ol>
           </div>

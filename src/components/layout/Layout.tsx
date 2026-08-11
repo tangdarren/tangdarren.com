@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 
 import { DesktopNav, MobileNav } from './Navbar';
 import { VerticalSeparator } from './Separator';
+import ThemeToggle from '@/components/theme/ThemeToggle';
 
 interface LayoutProps {
   children: ReactNode;
@@ -30,6 +31,10 @@ export default function Layout({ children }: LayoutProps) {
       </a>
 
       <MobileNav />
+
+      <div className="fixed left-2 top-2 z-50 hidden lg:left-3 lg:top-3 lg:block">
+        <ThemeToggle />
+      </div>
 
       <div className="flex min-h-screen justify-center">
         {isHome ? (

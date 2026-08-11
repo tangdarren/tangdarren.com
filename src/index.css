@@ -7,6 +7,86 @@
   --gutter: clamp(1rem, 3vw, 2rem);
   /* Side inset from centering max-w-7xl (80rem). Doubling left inset uses this. */
   --page-side-inset: max(0px, calc((100vw - 80rem) / 2));
+
+  /* Surfaces */
+  --color-ink-950: 255 255 255;
+  --color-ink-900: 255 255 255;
+  --color-ink-850: 241 240 236;
+  --color-ink-800: 235 234 230;
+  --color-ink-700: 226 224 219;
+  --color-ink-600: 216 214 208;
+  --color-ink-500: 201 198 191;
+
+  /* Text */
+  --color-mist-50: 11 18 32;
+  --color-mist-100: 23 32 51;
+  --color-mist-200: 41 52 73;
+  --color-mist-300: 82 96 119;
+  --color-mist-400: 107 122 145;
+  --color-mist-500: 148 163 184;
+
+  /* Accents — keep identity across modes */
+  --color-accent-cyan: 37 99 235;
+  --color-accent-blue: 8 145 178;
+  --color-accent-green: 22 163 74;
+  --color-accent-lavender: 124 58 237;
+
+  /* Brand tints */
+  --color-brand-50: 239 246 255;
+  --color-brand-100: 219 234 254;
+  --color-brand-200: 191 219 254;
+  --color-brand-500: 37 99 235;
+  --color-brand-600: 29 78 216;
+  --color-brand-700: 30 64 175;
+
+  --shadow-panel: 0 1px 2px 0 rgba(15, 23, 42, 0.04),
+    0 8px 24px -12px rgba(15, 23, 42, 0.1);
+  --shadow-card: 0 1px 2px 0 rgba(15, 23, 42, 0.05),
+    0 12px 32px -16px rgba(37, 99, 235, 0.18);
+  --shadow-glow: 0 0 0 1px rgba(37, 99, 235, 0.25),
+    0 10px 28px -14px rgba(37, 99, 235, 0.35);
+}
+
+[data-mode='dark'] {
+  color-scheme: dark;
+
+  /* Surfaces — neutral charcoal (Tailwind neutral-900 family), no blue hue */
+  --color-ink-950: 23 23 23; /* neutral-900 #171717 — page background */
+  --color-ink-900: 38 38 38; /* neutral-800 #262626 — cards / elevated */
+  --color-ink-850: 32 32 32; /* between 900–800 — inset wells */
+  --color-ink-800: 38 38 38; /* neutral-800 */
+  --color-ink-700: 46 46 46;
+  --color-ink-600: 64 64 64; /* neutral-700 #404040 — borders */
+  --color-ink-500: 82 82 82; /* neutral-600 */
+
+  /* Text — neutral grays (no slate/blue) */
+  --color-mist-50: 245 245 245; /* neutral-100 */
+  --color-mist-100: 229 229 229; /* neutral-200 */
+  --color-mist-200: 212 212 212; /* neutral-300 */
+  --color-mist-300: 163 163 163; /* neutral-400 */
+  --color-mist-400: 115 115 115; /* neutral-500 */
+  --color-mist-500: 82 82 82; /* neutral-600 */
+
+  /* Accents — keep blue identity so it pops on neutral charcoal */
+  --color-accent-cyan: 59 130 246; /* blue-500 */
+  --color-accent-blue: 34 211 238;
+  --color-accent-green: 74 222 128;
+  --color-accent-lavender: 167 139 250;
+
+  /* Brand tints — neutral hover/wells (blue only via accent-* / brand-500+) */
+  --color-brand-50: 38 38 38; /* neutral-800 */
+  --color-brand-100: 64 64 64; /* neutral-700 */
+  --color-brand-200: 82 82 82;
+  --color-brand-500: 59 130 246;
+  --color-brand-600: 96 165 250;
+  --color-brand-700: 147 197 253;
+
+  --shadow-panel: 0 1px 2px 0 rgba(0, 0, 0, 0.4),
+    0 8px 24px -12px rgba(0, 0, 0, 0.5);
+  --shadow-card: 0 1px 2px 0 rgba(0, 0, 0, 0.45),
+    0 12px 32px -16px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 0 1px rgba(59, 130, 246, 0.35),
+    0 10px 28px -14px rgba(59, 130, 246, 0.4);
 }
 
 html,
@@ -41,7 +121,11 @@ body {
 /* Selection */
 ::selection {
   background: rgba(37, 99, 235, 0.18);
-  color: #0B1220;
+  color: rgb(var(--color-mist-50));
+}
+
+[data-mode='dark'] ::selection {
+  background: rgba(59, 130, 246, 0.28);
 }
 
 /* Scrollbar (webkit) */
@@ -50,11 +134,11 @@ body {
   height: 10px;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(82, 96, 119, 0.28);
+  background: rgb(var(--color-mist-300) / 0.28);
   border-radius: 8px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(82, 96, 119, 0.44);
+  background: rgb(var(--color-mist-300) / 0.44);
 }
 ::-webkit-scrollbar-track {
   background: transparent;
@@ -144,6 +228,36 @@ body {
     color: var(--pg-ink);
   }
 
+  [data-mode='dark'] .projects-gallery {
+    --pg-sky-top: #171717;
+    --pg-sky-mid: #1a1a1a;
+    --pg-cream: #1f1f1f;
+    --pg-parchment: #262626;
+    --pg-parchment-deep: #2e2e2e;
+    --pg-wood: #d6b48a;
+    --pg-wood-mid: #c4a06a;
+    --pg-wood-light: #e8d4b0;
+    --pg-wood-border: #8a6a42;
+    --pg-ink: #f5f5f5;
+    --pg-muted: #a3a3a3;
+    --pg-moss: #86a86a;
+    --pg-highlight: #e0b040;
+
+    background:
+      radial-gradient(
+        900px 420px at 12% -6%,
+        rgb(255 255 255 / 0.03),
+        transparent 55%
+      ),
+      linear-gradient(
+        180deg,
+        var(--pg-sky-top) 0%,
+        var(--pg-sky-mid) 28%,
+        var(--pg-cream) 62%,
+        var(--pg-parchment) 100%
+      );
+  }
+
   .projects-gallery-title {
     @apply font-display text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl;
     color: var(--pg-wood);
@@ -167,10 +281,21 @@ body {
     box-shadow: 0 1px 0 rgb(91 58 34 / 0.28);
   }
 
+  [data-mode='dark'] .projects-filter-chip {
+    border-color: rgb(163 163 163 / 0.35);
+    background: rgb(38 38 38 / 0.95);
+    box-shadow: 0 1px 0 rgb(0 0 0 / 0.35);
+  }
+
   .projects-filter-chip:hover {
     background: #fff;
     transform: translateY(-1px);
     box-shadow: 0 2px 0 rgb(91 58 34 / 0.3);
+  }
+
+  [data-mode='dark'] .projects-filter-chip:hover {
+    background: #2e2e2e;
+    box-shadow: 0 2px 0 rgb(0 0 0 / 0.4);
   }
 
   .projects-filter-chip:active {
@@ -269,6 +394,11 @@ body {
     color: var(--pg-wood-mid);
   }
 
+  [data-mode='dark'] .projects-card-tag {
+    border-color: rgb(163 163 163 / 0.35);
+    background: rgb(38 38 38 / 0.9);
+  }
+
   .projects-card-action {
     @apply inline-flex items-center gap-1.5 border px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.16em] transition-[transform,background-color,box-shadow] duration-150 ease-out;
     border-color: var(--pg-wood-border);
@@ -277,10 +407,18 @@ body {
     box-shadow: 0 2px 0 var(--pg-wood);
   }
 
+  [data-mode='dark'] .projects-card-action {
+    background: #2e2e2e;
+  }
+
   .projects-card-action:hover {
     background: #fff;
     transform: translateY(-1px);
     box-shadow: 0 3px 0 var(--pg-wood);
+  }
+
+  [data-mode='dark'] .projects-card-action:hover {
+    background: #3a3a3a;
   }
 
   .projects-card-action:active {
@@ -328,6 +466,34 @@ body {
         var(--rv-parchment) 100%
       );
     color: var(--rv-ink);
+  }
+
+  [data-mode='dark'] .resume-viewer {
+    --rv-sky-top: #171717;
+    --rv-sky-mid: #1a1a1a;
+    --rv-cream: #1f1f1f;
+    --rv-parchment: #262626;
+    --rv-wood: #d6b48a;
+    --rv-wood-mid: #c4a06a;
+    --rv-wood-border: #8a6a42;
+    --rv-ink: #f5f5f5;
+    --rv-muted: #a3a3a3;
+    --rv-moss: #86a86a;
+    --rv-highlight: #e0b040;
+
+    background:
+      radial-gradient(
+        900px 420px at 12% -6%,
+        rgb(255 255 255 / 0.03),
+        transparent 55%
+      ),
+      linear-gradient(
+        180deg,
+        var(--rv-sky-top) 0%,
+        var(--rv-sky-mid) 28%,
+        var(--rv-cream) 62%,
+        var(--rv-parchment) 100%
+      );
   }
 
   /*
@@ -400,12 +566,20 @@ body {
     min-height: 800px;
   }
 
+  [data-mode='dark'] .resume-viewer-frame {
+    background: #1f1f1f;
+  }
+
   .resume-pdf-embed {
     display: block;
     width: 100%;
     height: 800px;
     border: none;
     background: #fff;
+  }
+
+  [data-mode='dark'] .resume-pdf-embed {
+    background: #171717;
   }
 
   @media (max-width: 768px) {
