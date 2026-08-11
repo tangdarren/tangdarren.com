@@ -41,9 +41,18 @@ describe('HomePage', () => {
       within(intro).getByText('Software Engineer', { selector: 'p' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(
-        /Based in San Francisco, I build Full Stack applications\s*and learn along the way./i,
-      ),
+      screen.getByText((_, node) => {
+        const text = node?.textContent?.replace(/\s+/g, ' ').trim() ?? '';
+        return (
+          node?.tagName === 'P' &&
+          /Based in San Francisco, I build Full Stack applications and learn along the way\./i.test(
+            text,
+          )
+        );
+      }),
+    ).toBeInTheDocument();
+    expect(
+      document.querySelector('img[src="/easter-egg/sfbridge.png"]'),
     ).toBeInTheDocument();
     expect(
       screen.queryByText(/full-stack products/i),

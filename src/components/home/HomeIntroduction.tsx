@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 
 import DarrenWalker from '@/components/easter-egg/DarrenWalker';
+import GoldenGateBridgeEasterEgg from '@/components/easter-egg/GoldenGateBridgeEasterEgg';
 import { useEasterEgg } from '@/components/easter-egg/EasterEggContext';
 import SocialBrandIcon, {
   type SocialBrandId,
@@ -76,7 +77,7 @@ export default function HomeIntroduction() {
     <section aria-label="Introduction">
       <div className="flex items-start justify-between gap-6 sm:gap-10">
         <div>
-          <div ref={wrapRef} className="relative">
+          <div ref={wrapRef} className="relative z-20">
             <h1 className="text-lg font-semibold tracking-tight text-[rgb(0,100,250)] sm:text-xl">
               <span ref={startRef}>H</span>i, I&apos;m Darre
               <span ref={endRef}>n</span>
@@ -108,8 +109,12 @@ export default function HomeIntroduction() {
       </div>
 
       <p className="mt-5 text-lg font-normal text-mist-300 sm:mt-6 sm:text-xl lg:mt-7">
-        Based in San Francisco, I build Full Stack applications and learn along
-        the way.
+        Based in{' '}
+        <span className="relative inline-block">
+          <span className="relative z-[1]">San Francisco</span>
+          <GoldenGateBridgeEasterEgg />
+        </span>
+        , I build Full Stack applications and learn along the way.
       </p>
     </section>
   );

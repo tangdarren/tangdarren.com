@@ -415,20 +415,7 @@ export function MobileNav() {
   return (
     <header className="sticky top-0 z-50 border-b border-ink-600 bg-ink-950 lg:hidden">
       <div className="flex h-14 items-center justify-between px-[var(--gutter)]">
-        <div className="flex items-center gap-2">
-          <TopCornerControls showEgg />
-          <Link
-            href="/"
-            className="text-sm font-medium text-mist-50"
-            aria-label="Darren Tang — Home"
-            onClick={() => {
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-              closeMenu();
-            }}
-          >
-            Darren Tang
-          </Link>
-        </div>
+        <TopCornerControls showEgg />
 
         <button
           type="button"
