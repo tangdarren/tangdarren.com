@@ -76,26 +76,50 @@ function navLabelClass(active: boolean): string {
     : 'group-hover:underline group-hover:decoration-ink-500 group-hover:underline-offset-4';
 }
 
+type HomeSectionScrollOptions = {
+  /**
+   * Close the mobile menu (or otherwise mutate layout) before scrolling so
+   * `scrollIntoView` uses the final sticky-header geometry.
+   */
+  beforeScroll?: () => void;
+};
+
 /** Smooth-scrolls in-page section links while on the homepage. */
 function scrollToHomeSection(
   event: { preventDefault: () => void },
   pathname: string,
   href: string,
+  options?: HomeSectionScrollOptions,
 ) {
   if (pathname !== '/') return;
 
-  if (href === '/') {
-    event.preventDefault();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    return;
-  }
+  const isHomeTop = href === '/';
+  const isHomeSection = href.startsWith('/#');
+  if (!isHomeTop && !isHomeSection) return;
 
-  if (href.startsWith('/#')) {
-    event.preventDefault();
+  event.preventDefault();
+
+  const runScroll = () => {
+    if (isHomeTop) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
     document
       .getElementById(href.slice(2))
       ?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  if (options?.beforeScroll) {
+    options.beforeScroll();
+    // Double rAF: first frame applies the closed-menu layout, second scrolls.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(runScroll);
+    });
+    return;
   }
+
+  runScroll();
 }
 
 export function NavLinks({
@@ -125,6 +149,18 @@ export function NavLinks({
               aria-current={isActive ? 'page' : undefined}
               className={className}
               onClick={(event) => {
+                const isInPageHomeLink =
+                  pathname === '/' &&
+                  (item.to === '/' || item.to.startsWith('/#'));
+
+                if (isInPageHomeLink && onNavigate) {
+                  // Mobile: close the expanded menu before measuring scroll.
+                  scrollToHomeSection(event, pathname, item.to, {
+                    beforeScroll: onNavigate,
+                  });
+                  return;
+                }
+
                 scrollToHomeSection(event, pathname, item.to);
                 onNavigate?.();
               }}

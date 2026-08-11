@@ -1,6 +1,6 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import Layout from '@/components/layout/Layout';
 import { DesktopNav, MobileNav, NavLinks } from '@/components/layout/Navbar';
@@ -84,7 +84,53 @@ describe('MobileNav', () => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
   });
+
+  it('keeps Experience and Projects as hash links and closes before scrolling', async () => {
+    const user = userEvent.setup();
+    const pendingFrames: FrameRequestCallback[] = [];
+    const rafSpy = vi
+      .spyOn(window, 'requestAnimationFrame')
+      .mockImplementation((cb) => {
+        pendingFrames.push(cb);
+        return pendingFrames.length;
+      });
+
+    const target = document.createElement('section');
+    target.id = 'experience';
+    const scrollIntoView = vi.fn();
+    target.scrollIntoView = scrollIntoView;
+    document.body.appendChild(target);
+
+    try {
+      renderWithProviders(<MobileNav />, { initialPath: '/' });
+
+      await user.click(screen.getByRole('button', { name: /open menu/i }));
+      const experience = screen.getByRole('link', { name: 'Experience' });
+      expect(experience).toHaveAttribute('href', '/#experience');
+      expect(screen.getByRole('link', { name: 'Projects' })).toHaveAttribute(
+        'href',
+        '/#projects',
+      );
+
+      await user.click(experience);
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(scrollIntoView).not.toHaveBeenCalled();
+
+      // Flush the deferred double-rAF scroll after the menu has collapsed.
+      const firstPass = pendingFrames.splice(0);
+      firstPass.forEach((cb) => cb(0));
+      const secondPass = pendingFrames.splice(0);
+      secondPass.forEach((cb) => cb(0));
+
+      expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth' });
+    } finally {
+      rafSpy.mockRestore();
+      target.remove();
+    }
+  });
 });
+
 
 describe('Layout', () => {
   it('keeps the document scrollable and exposes primary navigation on non-home routes', () => {

@@ -44,18 +44,18 @@ export default function ProjectsSection() {
   const projects =
     filter === 'featured'
       ? HOMEPAGE_PROJECTS.filter((project) => project.featured)
-      : HOMEPAGE_PROJECTS;
+      : [...HOMEPAGE_PROJECTS].sort((a, b) => a.name.localeCompare(b.name));
 
   return (
     <section
       id="projects"
       aria-labelledby="projects-heading"
-      className="w-full scroll-mt-20 lg:pl-4"
+      className="w-full scroll-mt-16 lg:scroll-mt-20 lg:pl-4"
     >
       <div className="flex flex-wrap items-end justify-between gap-4">
         <h2
           id="projects-heading"
-          className="text-base font-medium tracking-tight text-mist-50 sm:text-lg"
+          className="scroll-mt-16 text-base font-medium tracking-tight text-mist-50 sm:text-lg lg:scroll-mt-20"
         >
           Projects
         </h2>

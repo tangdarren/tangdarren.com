@@ -167,13 +167,16 @@ describe('HomePage', () => {
       'SafeCall Web',
       'Water Reminder',
     ];
+    const allNamesAlphabetical = [...HOMEPAGE_PROJECTS]
+      .map((project) => project.name)
+      .sort((a, b) => a.localeCompare(b));
 
-    const allNames = [...featuredNames, ...allOnlyNames];
-
-    // Every project shows by default; Featured narrows the list.
-    for (const name of allNames) {
-      expect(screen.getByText(name)).toBeInTheDocument();
-    }
+    // Every project shows by default (All), alphabetically; Featured narrows the list.
+    const projects = screen.getByRole('region', { name: 'Projects' });
+    const list = within(projects).getByRole('list');
+    expect(
+      [...list.querySelectorAll('li p.font-display')].map((el) => el.textContent),
+    ).toEqual(allNamesAlphabetical);
 
     await user.click(screen.getByRole('button', { name: 'Featured' }));
     for (const name of featuredNames) {
@@ -185,14 +188,12 @@ describe('HomePage', () => {
 
     await user.click(screen.getByRole('button', { name: 'All' }));
 
-    expect(HOMEPAGE_PROJECTS.map((project) => project.name)).toEqual(allNames);
     expect(HOMEPAGE_PROJECTS.filter((project) => project.featured).map((p) => p.name)).toEqual(
       featuredNames,
     );
-
-    for (const name of allNames) {
-      expect(screen.getByText(name)).toBeInTheDocument();
-    }
+    expect(
+      [...list.querySelectorAll('li p.font-display')].map((el) => el.textContent),
+    ).toEqual(allNamesAlphabetical);
 
     expect(screen.getByRole('link', { name: 'Tempest on GitHub' })).toHaveAttribute(
       'href',

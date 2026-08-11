@@ -115,7 +115,7 @@ export default function ExperienceEducationSection() {
     <section
       id="experience"
       aria-labelledby="experience-education-heading"
-      className="scroll-mt-20 lg:pl-3"
+      className="scroll-mt-16 lg:scroll-mt-20 lg:pl-3"
     >
       <h2 id="experience-education-heading" className="sr-only">
         Experience and Education
@@ -135,7 +135,7 @@ export default function ExperienceEducationSection() {
           tabIndex={tab === 'experience' ? 0 : -1}
           onClick={() => setTab('experience')}
           className={[
-            'scroll-mt-20 border-b pb-1 text-base transition-colors sm:text-lg',
+            'scroll-mt-16 border-b pb-1 text-base transition-colors sm:text-lg lg:scroll-mt-20',
             tab === 'experience'
               ? 'border-accent-cyan font-medium text-mist-50'
               : 'border-transparent text-mist-400 hover:text-mist-200',
