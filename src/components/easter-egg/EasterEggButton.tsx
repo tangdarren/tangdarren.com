@@ -6,7 +6,7 @@ import { Egg } from 'lucide-react';
 
 import { useEasterEggOptional } from '@/components/easter-egg/EasterEggContext';
 
-function clearMotionStyles(el: HTMLElement | SVGElement) {
+function clearMotionStyles(el: HTMLElement) {
   el.style.opacity = '';
   el.style.transform = '';
 }
@@ -21,7 +21,8 @@ export default function EasterEggButton({
 }) {
   const egg = useEasterEggOptional();
   const reduce = useReducedMotion();
-  const iconRef = useRef<SVGSVGElement>(null);
+  /** Motion target — keeps the Egg's CSS opacity untouched so respawn can't look darker. */
+  const motionRef = useRef<HTMLSpanElement>(null);
   const wasRunningRef = useRef(false);
   const busyRef = useRef(false);
 
@@ -38,8 +39,8 @@ export default function EasterEggButton({
 
     if (!wasRunning || isRunning) return;
 
-    const icon = iconRef.current;
-    if (!icon) {
+    const target = motionRef.current;
+    if (!target) {
       setHatched(false);
       return;
     }
@@ -48,12 +49,12 @@ export default function EasterEggButton({
 
     if (reduce) {
       const controls = animate(
-        icon,
+        target,
         { opacity: [0, 1], scale: 1, rotate: 0 },
         {
           duration: 0.2,
           onComplete: () => {
-            clearMotionStyles(icon);
+            clearMotionStyles(target);
             busyRef.current = false;
             setHatched(false);
           },
@@ -63,7 +64,7 @@ export default function EasterEggButton({
     }
 
     const controls = animate(
-      icon,
+      target,
       {
         scale: [0.7, 1.08, 1],
         opacity: [0, 1],
@@ -73,7 +74,7 @@ export default function EasterEggButton({
         duration: 0.22,
         ease: 'easeOut',
         onComplete: () => {
-          clearMotionStyles(icon);
+          clearMotionStyles(target);
           busyRef.current = false;
           setHatched(false);
         },
@@ -91,22 +92,22 @@ export default function EasterEggButton({
 
         egg?.trigger();
 
-        const icon = iconRef.current;
-        if (!icon) {
+        const target = motionRef.current;
+        if (!target) {
           setHatched(true);
           return;
         }
 
         if (reduce) {
-          icon.style.opacity = '0';
-          icon.style.transform = 'scale(0)';
+          target.style.opacity = '0';
+          target.style.transform = 'scale(0)';
           setHatched(true);
           return;
         }
 
         busyRef.current = true;
         animate(
-          icon,
+          target,
           {
             rotate: [0, -10, 10, -7, 7, 0],
             scale: [1, 1.12, 1.12, 1.12, 1.12, 0],
@@ -138,7 +139,7 @@ export default function EasterEggButton({
               'pointer-events-auto translate-y-0 cursor-pointer opacity-100',
               'hover:border-ink-500 hover:bg-brand-50 hover:text-mist-300',
               'dark:hover:border-ink-500 dark:hover:bg-brand-50 dark:hover:text-mist-200',
-              '[&:hover_svg]:opacity-75 dark:[&_svg]:opacity-70 dark:[&:hover_svg]:opacity-90',
+              '[&:hover_svg]:opacity-70 dark:[&_svg]:opacity-70 dark:[&:hover_svg]:opacity-90',
             ].join(' ')
           : visible
             ? 'pointer-events-none translate-y-0 cursor-default opacity-100'
@@ -148,12 +149,13 @@ export default function EasterEggButton({
         .filter(Boolean)
         .join(' ')}
     >
-      <Egg
-        ref={iconRef}
-        className="h-5 w-5 fill-current opacity-60 dark:fill-none dark:opacity-45"
-        strokeWidth={2}
-        aria-hidden
-      />
+      <span ref={motionRef} className="inline-flex">
+        <Egg
+          className="h-5 w-5 fill-current opacity-55 dark:fill-none dark:opacity-45"
+          strokeWidth={2}
+          aria-hidden
+        />
+      </span>
     </button>
   );
 }
