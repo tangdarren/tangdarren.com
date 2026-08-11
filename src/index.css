@@ -5,8 +5,11 @@
 :root {
   color-scheme: light;
   --gutter: clamp(1rem, 3vw, 2rem);
-  /* Side inset from centering max-w-7xl (80rem). Doubling left inset uses this. */
-  --page-side-inset: max(0px, calc((100vw - 80rem) / 2));
+  /*
+   * SignatureFooter uses `3vw - 2 * var(--page-side-inset)` to center itself.
+   * Stay at 0 with a full-bleed home shell so that math yields equal 3vw margins.
+   */
+  --page-side-inset: 0px;
 
   /* Surfaces */
   --color-ink-950: 255 255 255;

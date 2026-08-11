@@ -7,7 +7,7 @@ import { DesktopNav } from '@/components/layout/Navbar';
 
 /** Shared content inset — matches Home, Experience, and Projects. */
 const CONTENT_COLUMN =
-  'min-w-0 w-full flex-1 px-[var(--gutter)] lg:pl-9 lg:pr-8 xl:pl-12';
+  'min-w-0 px-[var(--gutter)] lg:pl-9 lg:pr-8 xl:pl-12';
 
 /** Midpoint between max-w-2xl (42rem) and max-w-3xl (48rem). */
 const CONTENT_WIDTH = 'w-full max-w-[45rem]';
@@ -31,7 +31,8 @@ function HomeProfile() {
 export default function HomePage() {
   return (
     <>
-      <div className="lg:flex lg:items-start">
+      {/* Shrink-wrap and center nav + content so side margins stay equal. */}
+      <div className="lg:mx-auto lg:flex lg:w-fit lg:max-w-full lg:items-start">
         {/* Invisible rail slot + fixed nav/divider */}
         <DesktopNav />
 

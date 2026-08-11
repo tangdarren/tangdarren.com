@@ -13,7 +13,7 @@ interface LayoutProps {
 
 /**
  * Site shell modeled on Filyys FullContent:
- * centered max-width container; desktop = nav | short separator | main.
+ * desktop = nav | short separator | main, centered as a composition.
  * Homepage owns its first-viewport row so Projects can sit below the fold
  * without vertically centering the nav against the full document height.
  */
@@ -38,13 +38,13 @@ export default function Layout({ children }: LayoutProps) {
 
       <div className="flex min-h-screen justify-center">
         {isHome ? (
-          <div className="w-full max-w-7xl lg:pl-[var(--page-side-inset)]">
+          <div className="w-full">
             <main id="main-content" className="w-full">
               {children}
             </main>
           </div>
         ) : (
-          <div className="flex w-full max-w-7xl flex-col lg:min-h-dvh lg:flex-row lg:items-center lg:pl-[var(--page-side-inset)]">
+          <div className="flex w-full max-w-7xl flex-col lg:min-h-dvh lg:flex-row lg:items-center">
             <DesktopNav />
             <div aria-hidden className="hidden w-9 shrink-0 lg:block xl:w-12" />
             <VerticalSeparator />
