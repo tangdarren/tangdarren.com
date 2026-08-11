@@ -5,7 +5,6 @@ import SiteShell from '@/components/layout/SiteShell';
 import ThemeProvider from '@/components/theme/ThemeProvider';
 import {
   SITE_DEFAULT_DESCRIPTION,
-  SITE_DEFAULT_OG_IMAGE,
   SITE_NAME,
   getSiteUrl,
 } from '@/config/site';
@@ -35,13 +34,7 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     title: `${SITE_NAME} — Full-Stack & AI Agent Engineer`,
     description: SITE_DEFAULT_DESCRIPTION,
-    images: [{ url: SITE_DEFAULT_OG_IMAGE }],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: `${SITE_NAME} — Full-Stack & AI Agent Engineer`,
-    description: SITE_DEFAULT_DESCRIPTION,
-    images: [SITE_DEFAULT_OG_IMAGE],
+    url: '/',
   },
 };
 

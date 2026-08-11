@@ -7,8 +7,8 @@ export const SITE_NAME = 'Darren Christopher Tang';
 export const SITE_DEFAULT_DESCRIPTION =
   'Portfolio of Darren Christopher Tang — a full-stack and AI agent engineer building practical applications, automation systems, and financial tools.';
 
-/** Default social-preview image (site-relative path under `public/`). */
-export const SITE_DEFAULT_OG_IMAGE = '/og-image.svg';
+/** Default social-preview image (App Router opengraph-image file convention). */
+export const SITE_DEFAULT_OG_IMAGE = '/opengraph-image.png';
 
 /** Static app routes included in the sitemap (excluding the 404 catch-all). */
 export const SITE_STATIC_ROUTES = [

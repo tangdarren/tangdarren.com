@@ -24,8 +24,8 @@ describe('createPageMetadata', () => {
     expect(metadata.alternates?.canonical).toBe('/projects/demo');
     expect(metadata.openGraph?.url).toBe('/projects/demo');
     expect(metadata.openGraph?.images).toEqual([{ url: imagePath }]);
-    expect(metadata.twitter?.images).toEqual([imagePath]);
     expect(metadata.openGraph?.siteName).toBe(SITE_NAME);
+    expect(metadata.twitter).toBeUndefined();
 
     // Relative paths resolve against the configured site origin at runtime.
     expect(toAbsoluteUrl(siteUrl, '/projects/demo')).toBe(
@@ -43,7 +43,7 @@ describe('createPageMetadata', () => {
     expect(metadata.openGraph?.images).toEqual([
       { url: SITE_DEFAULT_OG_IMAGE },
     ]);
-    expect(metadata.twitter?.images).toEqual([SITE_DEFAULT_OG_IMAGE]);
+    expect(metadata.twitter).toBeUndefined();
   });
 
   it('marks pages as noindex when requested', () => {

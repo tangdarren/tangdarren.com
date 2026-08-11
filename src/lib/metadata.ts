@@ -46,12 +46,6 @@ export function createPageMetadata({
       url: path,
       images: [{ url: socialImage }],
     },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description: finalDescription,
-      images: [socialImage],
-    },
     ...(noindex ? { robots: 'noindex, nofollow' } : {}),
   };
 }

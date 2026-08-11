@@ -5,7 +5,12 @@ import { ThemeProvider as NextThemesProvider } from 'next-themes';
 
 export default function ThemeProvider({ children }: { children: ReactNode }) {
   return (
-    <NextThemesProvider attribute="data-mode" enableSystem disableTransitionOnChange>
+    <NextThemesProvider
+      attribute="data-mode"
+      defaultTheme="light"
+      enableSystem
+      disableTransitionOnChange
+    >
       {children}
     </NextThemesProvider>
   );
