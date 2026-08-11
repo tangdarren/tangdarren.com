@@ -3,7 +3,6 @@ import type { Metadata } from 'next';
 import {
   SITE_DEFAULT_DESCRIPTION,
   SITE_DEFAULT_OG_IMAGE,
-  SITE_NAME,
 } from '@/config/site';
 import type { Project } from '@/data/projects';
 
@@ -40,7 +39,6 @@ export function createPageMetadata({
     },
     openGraph: {
       type: 'website',
-      siteName: SITE_NAME,
       title,
       description: finalDescription,
       url: path,

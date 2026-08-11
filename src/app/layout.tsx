@@ -31,7 +31,6 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: 'website',
-    siteName: SITE_NAME,
     title: `${SITE_NAME} — Full-Stack & AI Agent Engineer`,
     description: SITE_DEFAULT_DESCRIPTION,
     url: '/',

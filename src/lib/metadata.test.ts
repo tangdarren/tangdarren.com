@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest';
 import {
   CANONICAL_SITE_URL,
   SITE_DEFAULT_OG_IMAGE,
-  SITE_NAME,
   getSitemapPaths,
   resolveSiteUrl,
 } from '@/config/site';
@@ -45,7 +44,7 @@ describe('createPageMetadata', () => {
     expect(metadata.alternates?.canonical).toBe('/projects/demo');
     expect(metadata.openGraph?.url).toBe('/projects/demo');
     expect(metadata.openGraph?.images).toEqual([{ url: imagePath }]);
-    expect(metadata.openGraph?.siteName).toBe(SITE_NAME);
+    expect(metadata.openGraph?.siteName).toBeUndefined();
     expect(metadata.twitter).toBeUndefined();
 
     // Relative paths resolve against the configured site origin at runtime.
@@ -63,6 +62,7 @@ describe('createPageMetadata', () => {
 
     expect(metadata.title).toEqual({ absolute: 'Darren Tang Portfolio' });
     expect(metadata.openGraph?.title).toBe('Darren Tang Portfolio');
+    expect(metadata.openGraph?.siteName).toBeUndefined();
     expect(metadata.alternates?.canonical).toBe('/');
     expect(metadata.openGraph?.url).toBe('/');
     expect(metadata.openGraph?.images).toEqual([
@@ -78,6 +78,7 @@ describe('createPageMetadata', () => {
       path: '/',
     });
 
+    expect(metadata.openGraph?.siteName).toBeUndefined();
     const images = metadata.openGraph?.images;
     const imageList = Array.isArray(images) ? images : images ? [images] : [];
     const firstImage = imageList[0];
