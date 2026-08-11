@@ -40,14 +40,32 @@ describe('Portfolio pages', () => {
       initialPath: '/this-route-does-not-exist',
     });
 
+    expect(screen.getByText('404')).toBeInTheDocument();
     expect(
-      await screen.findByRole('heading', { name: /page not found/i }),
+      await screen.findByRole('heading', {
+        level: 1,
+        name: /i think we might be lost/i,
+      }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('link', { name: /back to home/i }),
-    ).toHaveAttribute('href', '/');
+      screen.getByText(/the page you're looking for doesn't exist/i),
+    ).toBeInTheDocument();
     expect(
-      screen.getByRole('link', { name: /browse projects/i }),
-    ).toHaveAttribute('href', '/projects');
+      screen.getByRole('link', { name: /let's go home/i }),
+    ).toHaveAttribute('href', '/');
+    const images = screen.getAllByRole('presentation', { hidden: true });
+    expect(
+      images.some(
+        (img) => img.getAttribute('src') === '/easter-egg/darren-character.png',
+      ),
+    ).toBe(true);
+    expect(
+      images.some(
+        (img) => img.getAttribute('src') === '/easter-egg/confusedmark.png',
+      ),
+    ).toBe(true);
   });
 });
+
+
+
