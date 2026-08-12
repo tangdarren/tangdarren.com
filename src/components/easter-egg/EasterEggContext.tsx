@@ -13,7 +13,7 @@ import {
 type EasterEggContextValue = {
   trigger: () => void;
   isRunning: boolean;
-  /** Bridge rises only while true — set by the walker during the fall phase. */
+  /** Bridge rises only while true — set by the walker while the sequence is active. */
   bridgeActive: boolean;
   setBridgeActive: (active: boolean) => void;
   runId: number;

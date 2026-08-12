@@ -133,7 +133,7 @@ export const HOMEPAGE_EXPERIENCE: HomepageExperience[] = [
     type: 'Internship',
     dates: 'Jun 2026 – Present',
     description:
-      'Built AI-powered workflow automation for internal operations.',
+      'Building AI workflow tools for automation, including QC flagging, order summarization, and Salesforce-to-TRAF automation targeting 25–40% efficiency improvements.',
   },
   {
     id: 'dataannotation',
@@ -142,7 +142,7 @@ export const HOMEPAGE_EXPERIENCE: HomepageExperience[] = [
     type: 'Contract',
     dates: 'Jan 2026 – May 2026',
     description:
-      'Evaluated AI coding tools including Claude Code, Claude Cowork, Codex, and Gemini.',
+      'Developed and evaluated containerized LLM workflows using Docker, Kubernetes, MCP tools, and A/B testing across 50+ model outputs.',
   },
   {
     id: 'sonic',
@@ -151,7 +151,7 @@ export const HOMEPAGE_EXPERIENCE: HomepageExperience[] = [
     type: 'Internship',
     dates: 'May 2025 – Aug 2025',
     description:
-      'Built inventory software and automated CNC manufacturing workflows.',
+      'Built Java inventory automation for CNC operations through Azure DevOps CI/CD, reducing delayed reorders by 50%.',
   },
 ];
 
@@ -162,13 +162,14 @@ export const HOMEPAGE_EDUCATION: HomepageEducation[] = [
     degree: 'Master of Science, Computer Science and Engineering',
     dates: 'Sep 2025 – Mar 2027',
     description:
-      'Coursework in algorithms, AI, data mining, systems, and application development.',
+      'Relevant coursework: Advanced Algorithms, Advanced Operating Systems, Data Mining, Object-Oriented Programming, Mobile App Development, Technology Entrepreneurship.',
   },
   {
     id: 'uw-madison',
     school: 'University of Wisconsin–Madison',
     degree: 'Bachelor of Science, Computer Science',
     dates: 'Sep 2021 – May 2025',
-    description: 'Lumen Scholarship recipient.',
+    description:
+      'Lumen Scholarship Fund Scholar, $40,000 merit-based scholarship.',
   },
 ];

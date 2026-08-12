@@ -117,12 +117,22 @@ describe('HomePage', () => {
     expect(screen.getByText('Jun 2026 – Present')).toBeInTheDocument();
     expect(
       screen.getByText(
-        'Built AI-powered workflow automation for internal operations.',
+        'Building AI workflow tools for automation, including QC flagging, order summarization, and Salesforce-to-TRAF automation targeting 25–40% efficiency improvements.',
       ),
     ).toBeInTheDocument();
     expect(screen.getByText('DataAnnotation · Contract')).toBeInTheDocument();
     expect(
+      screen.getByText(
+        'Developed and evaluated containerized LLM workflows using Docker, Kubernetes, MCP tools, and A/B testing across 50+ model outputs.',
+      ),
+    ).toBeInTheDocument();
+    expect(
       screen.getByText('Sonic Engineering Inc. · Internship'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Built Java inventory automation for CNC operations through Azure DevOps CI/CD, reducing delayed reorders by 50%.',
+      ),
     ).toBeInTheDocument();
 
     expect(screen.getByRole('tab', { name: 'Experience' })).toHaveAttribute(
@@ -145,11 +155,20 @@ describe('HomePage', () => {
       screen.getByText('Master of Science, Computer Science and Engineering'),
     ).toBeVisible();
     expect(screen.getByText('Sep 2025 – Mar 2027')).toBeVisible();
+    expect(
+      screen.getByText(
+        'Relevant coursework: Advanced Algorithms, Advanced Operating Systems, Data Mining, Object-Oriented Programming, Mobile App Development, Technology Entrepreneurship.',
+      ),
+    ).toBeVisible();
     expect(screen.getByText('University of Wisconsin–Madison')).toBeVisible();
     expect(
       screen.getByText('Bachelor of Science, Computer Science'),
     ).toBeVisible();
-    expect(screen.getByText('Lumen Scholarship recipient.')).toBeVisible();
+    expect(
+      screen.getByText(
+        'Lumen Scholarship Fund Scholar, $40,000 merit-based scholarship.',
+      ),
+    ).toBeVisible();
     expect(
       screen.getByText('AI Agent Development Intern'),
     ).not.toBeVisible();

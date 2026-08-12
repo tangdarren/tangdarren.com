@@ -21,16 +21,12 @@ const FEET_Y = 354;
 const VISIBLE_H_DESKTOP = 36;
 const VISIBLE_H_MOBILE = 28;
 
-/** Roadway sits near the lower portion of the bridge art. */
-const BRIDGE_DECK_FROM_TOP = 0.72;
-
 const WALK_MS = 1800;
 const PRE_JUMP_PAUSE_MS = 280;
-/** Single continuous airborne arc from final n → bridge deck. */
-const FLIGHT_MS = 1000;
-const ARC_HEIGHT_DESKTOP = 60;
-const ARC_HEIGHT_MOBILE = 44;
-const FLIGHT_SAMPLES = 11;
+const JUMP_UP_MS = 280;
+const JUMP_DOWN_MS = 420;
+const JUMP_HEIGHT_DESKTOP = 18;
+const JUMP_HEIGHT_MOBILE = 14;
 const SPAWN_MS = 450;
 const POST_SPAWN_PAUSE_MS = 250;
 const SHAKE_MS = 550;
@@ -39,29 +35,11 @@ const STAND_MS = 1800;
 const CHAR_FADE_MS = 200;
 const BRIDGE_EXIT_MS = 300;
 
-function arcHeightPx() {
+function jumpHeightPx() {
   return typeof window !== 'undefined' &&
     window.matchMedia('(max-width: 639px)').matches
-    ? ARC_HEIGHT_MOBILE
-    : ARC_HEIGHT_DESKTOP;
-}
-
-/** Sample a continuous parabolic jump from takeoff → landing (Y down). */
-function parabolicFlight(
-  startX: number,
-  startY: number,
-  landX: number,
-  landY: number,
-  height: number,
-): { x: number[]; y: number[] } {
-  const x: number[] = [];
-  const y: number[] = [];
-  for (let i = 0; i < FLIGHT_SAMPLES; i++) {
-    const t = i / (FLIGHT_SAMPLES - 1);
-    x.push(startX + (landX - startX) * t);
-    y.push(startY + (landY - startY) * t - 4 * height * t * (1 - t));
-  }
-  return { x, y };
+    ? JUMP_HEIGHT_MOBILE
+    : JUMP_HEIGHT_DESKTOP;
 }
 
 function displaySize() {
@@ -94,28 +72,8 @@ function poseAboveLetter(
   };
 }
 
-/** Landing transform relative to the walker's startPose (left/top). */
-function landingTransform(
-  startPose: Pose,
-  size: ReturnType<typeof displaySize>,
-  container: HTMLElement,
-): { x: number; y: number } | null {
-  const bridge = document.querySelector('[data-easter-egg-bridge]');
-  if (!(bridge instanceof HTMLElement)) return null;
-
-  const bRect = bridge.getBoundingClientRect();
-  const cRect = container.getBoundingClientRect();
-  const deckY = bRect.top + bRect.height * BRIDGE_DECK_FROM_TOP - cRect.top;
-  const feetX = bRect.left + bRect.width / 2 - cRect.left;
-
-  return {
-    x: feetX - size.feetOffsetX - startPose.left,
-    y: deckY - size.feetOffsetY - startPose.top,
-  };
-}
-
 /**
- * Pixel character that walks H → final n, then jumps onto the Golden Gate Bridge.
+ * Pixel character that walks H → final n, then jumps straight up in place.
  */
 export default function DarrenWalker({
   containerRef,
@@ -198,6 +156,7 @@ export default function DarrenWalker({
       const endPose = poseAboveLetter(end.getBoundingClientRect(), cRect, size);
       const dx = endPose.left - startPose.left;
       const dy = endPose.top - startPose.top;
+      const peakY = dy - jumpHeightPx();
 
       el.style.left = `${startPose.left}px`;
       el.style.top = `${startPose.top}px`;
@@ -260,22 +219,19 @@ export default function DarrenWalker({
       await wait(PRE_JUMP_PAUSE_MS);
       if (cancelled) return;
 
-      const land = landingTransform(startPose, size, container) ?? {
-        x: dx,
-        y: dy + 120,
-      };
-      const flight = parabolicFlight(dx, dy, land.x, land.y, arcHeightPx());
-
-      // PHASE 5 — Continuous parabolic jump onto the bridge
+      // PHASE 5 — Jump straight up and land on the same spot (slow descent)
+      const jumpMs = JUMP_UP_MS + JUMP_DOWN_MS;
       await runAnim(
         {
-          x: flight.x,
-          y: flight.y,
+          x: [dx, dx, dx],
+          y: [dy, peakY, dy],
           rotate: 0,
-          scaleX: 1,
-          scaleY: 1,
         },
-        { duration: FLIGHT_MS / 1000, ease: 'linear' },
+        {
+          duration: jumpMs / 1000,
+          ease: 'linear',
+          times: [0, JUMP_UP_MS / jumpMs, 1],
+        },
       );
       if (cancelled) return;
 
@@ -289,7 +245,7 @@ export default function DarrenWalker({
       );
       if (cancelled) return;
 
-      // PHASE 7 — Stand on the bridge
+      // PHASE 7 — Brief hold
       await wait(STAND_MS);
       if (cancelled) return;
 

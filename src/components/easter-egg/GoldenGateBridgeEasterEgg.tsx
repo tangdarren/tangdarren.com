@@ -6,7 +6,7 @@ import { useEasterEgg } from '@/components/easter-egg/EasterEggContext';
 
 /**
  * Subtle Golden Gate Bridge that rises from behind "San Francisco"
- * while the walker is mid-fall (`bridgeActive`).
+ * while the walker sequence is active (`bridgeActive`).
  *
  * Sized to 100% of the text span; tucked slightly behind the letter tops.
  */
