@@ -22,25 +22,15 @@ const VISIBLE_H_DESKTOP = 36;
 const VISIBLE_H_MOBILE = 28;
 
 const WALK_MS = 1800;
-const PRE_JUMP_PAUSE_MS = 280;
-const JUMP_UP_MS = 280;
-const JUMP_DOWN_MS = 420;
-const JUMP_HEIGHT_DESKTOP = 18;
-const JUMP_HEIGHT_MOBILE = 14;
+const STOP_BEFORE_RATIO = 0.82;
+const PRE_WAVE_PAUSE_MS = 280;
+const WAVE_MS = 1000;
 const SPAWN_MS = 450;
 const POST_SPAWN_PAUSE_MS = 250;
 const SHAKE_MS = 550;
-const LANDING_SQUASH_MS = 150;
-const STAND_MS = 1800;
+const STAND_MS = 1200;
 const CHAR_FADE_MS = 200;
 const BRIDGE_EXIT_MS = 300;
-
-function jumpHeightPx() {
-  return typeof window !== 'undefined' &&
-    window.matchMedia('(max-width: 639px)').matches
-    ? JUMP_HEIGHT_MOBILE
-    : JUMP_HEIGHT_DESKTOP;
-}
 
 function displaySize() {
   const visibleH =
@@ -73,7 +63,7 @@ function poseAboveLetter(
 }
 
 /**
- * Pixel character that walks H → final n, then jumps straight up in place.
+ * Pixel character that walks H → final n, then waves in place.
  */
 export default function DarrenWalker({
   containerRef,
@@ -156,7 +146,7 @@ export default function DarrenWalker({
       const endPose = poseAboveLetter(end.getBoundingClientRect(), cRect, size);
       const dx = endPose.left - startPose.left;
       const dy = endPose.top - startPose.top;
-      const peakY = dy - jumpHeightPx();
+      const stopX = dx * STOP_BEFORE_RATIO;
 
       el.style.left = `${startPose.left}px`;
       el.style.top = `${startPose.top}px`;
@@ -205,10 +195,10 @@ export default function DarrenWalker({
       await wait(150);
       if (cancelled) return;
 
-      // PHASE 4 — Waddle H → n
+      // PHASE 4 — Waddle H → stop short of final n
       await runAnim(
         {
-          x: [0, dx],
+          x: [0, stopX],
           y: [0, -2, 0, -2, 0, -2, 0, -2, 0, dy],
           rotate: [-1.5, 1.5, -1.5, 1.5, -1.5, 1.5, -1.5, 1.5, -1.5, 0],
         },
@@ -216,40 +206,25 @@ export default function DarrenWalker({
       );
       if (cancelled) return;
 
-      await wait(PRE_JUMP_PAUSE_MS);
+      await wait(PRE_WAVE_PAUSE_MS);
       if (cancelled) return;
 
-      // PHASE 5 — Jump straight up and land on the same spot (slow descent)
-      const jumpMs = JUMP_UP_MS + JUMP_DOWN_MS;
+      // PHASE 5 — Friendly wave in place (no vertical movement)
       await runAnim(
         {
-          x: [dx, dx, dx],
-          y: [dy, peakY, dy],
-          rotate: 0,
+          x: stopX,
+          y: dy,
+          rotate: [0, 12, -8, 14, -6, 10, 0],
         },
-        {
-          duration: jumpMs / 1000,
-          ease: 'linear',
-          times: [0, JUMP_UP_MS / jumpMs, 1],
-        },
+        { duration: WAVE_MS / 1000, ease: 'easeInOut' },
       );
       if (cancelled) return;
 
-      // PHASE 6 — Tiny landing squash
-      await runAnim(
-        {
-          scaleX: [1, 1.05, 1],
-          scaleY: [1, 0.92, 1],
-        },
-        { duration: LANDING_SQUASH_MS / 1000, ease: 'easeOut' },
-      );
-      if (cancelled) return;
-
-      // PHASE 7 — Brief hold
+      // PHASE 6 — Brief hold
       await wait(STAND_MS);
       if (cancelled) return;
 
-      // PHASE 8 — Character fades, then bridge sinks
+      // PHASE 7 — Character fades, then bridge sinks
       await runAnim({ opacity: 0 }, { duration: CHAR_FADE_MS / 1000 });
       if (cancelled) return;
 
