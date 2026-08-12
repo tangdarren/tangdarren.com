@@ -229,14 +229,14 @@ describe('HomePage', () => {
     renderWithProviders(<HomePage />, { initialPath: '/' });
 
     expect(HOMEPAGE_TECH.map((tech) => tech.name)).toEqual([
-      'Java',
       'Python',
       'TypeScript',
       'PostgreSQL',
       'React',
-      'Next.js',
+      'Node.js',
       'Spring Boot',
       'Docker',
+      'AWS',
     ]);
 
     for (const tech of HOMEPAGE_TECH) {
@@ -246,7 +246,7 @@ describe('HomePage', () => {
 
     expect(screen.queryByText('JavaScript')).not.toBeInTheDocument();
     expect(screen.queryByText('FastAPI')).not.toBeInTheDocument();
-    expect(screen.queryByText('AWS')).not.toBeInTheDocument();
+    expect(screen.queryByText('Java')).not.toBeInTheDocument();
     expect(screen.queryByText('Azure DevOps')).not.toBeInTheDocument();
     expect(screen.queryByText('Jv')).not.toBeInTheDocument();
     expect(screen.queryByText('Cursor')).not.toBeInTheDocument();

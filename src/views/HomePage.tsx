@@ -7,10 +7,10 @@ import { DesktopNav } from '@/components/layout/Navbar';
 
 /** Shared content inset — matches Home, Experience, and Projects. */
 const CONTENT_COLUMN =
-  'min-w-0 px-[var(--gutter)] lg:pl-9 lg:pr-8 xl:pl-12';
+  'min-w-0 max-w-full px-[var(--gutter)] lg:pl-9 lg:pr-0 xl:pl-12';
 
 /** Midpoint between max-w-2xl (42rem) and max-w-3xl (48rem). */
-const CONTENT_WIDTH = 'w-full max-w-[45rem]';
+const CONTENT_WIDTH = 'w-full max-w-[45rem] lg:w-[45rem]';
 
 function HomeProfile() {
   return (
@@ -31,25 +31,27 @@ function HomeProfile() {
 export default function HomePage() {
   return (
     <>
-      {/* Shrink-wrap and center nav + content so side margins stay equal. */}
-      <div className="lg:mx-auto lg:flex lg:w-fit lg:max-w-full lg:items-start">
-        {/* Invisible rail slot + fixed nav/divider */}
-        <DesktopNav />
+      {/* Center the shrink-wrapped nav + content row for equal side margins. */}
+      <div className="lg:flex lg:justify-center">
+        <div className="min-w-0 lg:flex lg:max-w-full lg:items-start">
+          {/* Invisible rail slot + fixed nav/divider */}
+          <DesktopNav />
 
-        <div className={CONTENT_COLUMN}>
-          <div
-            id="home"
-            className="scroll-mt-20 py-8 lg:flex lg:h-dvh lg:items-center lg:py-0"
-          >
-            <div className={CONTENT_WIDTH}>
-              <HomeProfile />
+          <div className={CONTENT_COLUMN}>
+            <div
+              id="home"
+              className="scroll-mt-20 py-8 lg:flex lg:h-dvh lg:items-center lg:py-0"
+            >
+              <div className={CONTENT_WIDTH}>
+                <HomeProfile />
+              </div>
             </div>
-          </div>
 
-          <div className="border-t border-ink-600 pt-12 sm:pt-14 lg:border-t-0 lg:pt-4">
-            <div className={`${CONTENT_WIDTH} space-y-48 sm:space-y-64`}>
-              <ExperienceEducationSection />
-              <ProjectsSection />
+            <div className="border-t border-ink-600 pt-12 sm:pt-14 lg:border-t-0 lg:pt-4">
+              <div className={`${CONTENT_WIDTH} space-y-48 sm:space-y-64`}>
+                <ExperienceEducationSection />
+                <ProjectsSection />
+              </div>
             </div>
           </div>
         </div>

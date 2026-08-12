@@ -78,14 +78,14 @@ export const HOMEPAGE_PROJECTS: HomepageProject[] = [
 ];
 
 export type HomepageTechId =
-  | 'java'
   | 'python'
   | 'typescript'
   | 'postgresql'
   | 'react'
-  | 'nextjs'
+  | 'nodejs'
   | 'springboot'
-  | 'docker';
+  | 'docker'
+  | 'aws';
 
 export interface HomepageTech {
   id: HomepageTechId;
@@ -98,14 +98,14 @@ export interface HomepageTech {
  * Display order fills a 4×2 desktop grid row-first.
  */
 export const HOMEPAGE_TECH: HomepageTech[] = [
-  { id: 'java', name: 'Java', description: 'Backend language' },
-  { id: 'python', name: 'Python', description: 'Scripting' },
+  { id: 'python', name: 'Python', description: 'Automation' },
   { id: 'typescript', name: 'TypeScript', description: 'Typed JavaScript' },
-  { id: 'postgresql', name: 'PostgreSQL', description: 'Database' },
+  { id: 'postgresql', name: 'PostgreSQL', description: 'SQL Database' },
   { id: 'react', name: 'React', description: 'UI library' },
-  { id: 'nextjs', name: 'Next.js', description: 'React framework' },
+  { id: 'nodejs', name: 'Node.js', description: 'Server Runtime' },
   { id: 'springboot', name: 'Spring Boot', description: 'Java framework' },
   { id: 'docker', name: 'Docker', description: 'Containers' },
+  { id: 'aws', name: 'AWS', description: 'Cloud platform' },
 ];
 
 export interface HomepageExperience {

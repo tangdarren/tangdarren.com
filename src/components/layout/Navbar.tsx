@@ -193,20 +193,41 @@ function HomeSectionNavigator({
   anchorRef?: RefObject<HTMLSpanElement>;
 }) {
   const pathname = usePathname();
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [sizerWidth, setSizerWidth] = useState<number | null>(null);
   const activeIndex = Math.max(
     0,
     NAV_ITEMS.findIndex((item) => item.to === activeHref),
   );
 
+  useLayoutEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+
+    let maxWidth = 0;
+    root.querySelectorAll('a').forEach((link) => {
+      if (getComputedStyle(link).opacity === '0') return;
+      const label = link.querySelector(':scope > span');
+      if (!(label instanceof HTMLElement)) return;
+      const isActive = link.getAttribute('aria-current') === 'page';
+      maxWidth = Math.max(
+        maxWidth,
+        label.offsetWidth * (isActive ? 1 : PREVIEW_SCALE),
+      );
+    });
+    setSizerWidth(maxWidth > 0 ? maxWidth : null);
+  }, [activeHref]);
+
   return (
     /* Height stays equal to the active line so it centers on the viewport. */
-    <div className="relative flex flex-col items-end">
+    <div ref={rootRef} className="relative flex flex-col items-end">
       <div className="relative">
         {/* Sizer holds the width and pins the active label to one fixed line. */}
         <span
           ref={anchorRef}
           aria-hidden
-          className="invisible block whitespace-nowrap text-[2.125rem] font-medium leading-tight tracking-tight"
+          className="invisible block overflow-hidden whitespace-nowrap text-[2.125rem] font-medium leading-tight tracking-tight"
+          style={sizerWidth != null ? { width: sizerWidth } : undefined}
         >
           Experience
         </span>
@@ -291,8 +312,13 @@ export function DesktopNav() {
 
     syncLeft();
     window.addEventListener('resize', syncLeft);
-    return () => window.removeEventListener('resize', syncLeft);
-  }, [isHome]);
+    const observer = new ResizeObserver(syncLeft);
+    if (slotRef.current) observer.observe(slotRef.current);
+    return () => {
+      window.removeEventListener('resize', syncLeft);
+      observer.disconnect();
+    };
+  }, [isHome, activeHref]);
 
   useEffect(() => {
     if (!isHome) return;
