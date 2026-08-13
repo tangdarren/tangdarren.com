@@ -41,6 +41,14 @@ export const HOMEPAGE_PROJECTS: HomepageProject[] = [
     featured: true,
   },
   {
+    id: 'arc-gpt',
+    name: 'Arc GPT',
+    description: 'Build GPT from scratch to understand how Transformers work.',
+    label: 'Deep Learning',
+    githubUrl: 'https://github.com/tangdarren/arc-gpt',
+    featured: true,
+  },
+  {
     id: 'expensense',
     name: 'ExpenSense',
     description: 'Automate expense reviews with specialized AI agents.',

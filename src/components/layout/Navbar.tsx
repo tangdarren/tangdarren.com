@@ -204,32 +204,33 @@ function HomeSectionNavigator({
     const root = rootRef.current;
     if (!root) return;
 
-    let maxWidth = 0;
-    root.querySelectorAll('a').forEach((link) => {
-      if (getComputedStyle(link).opacity === '0') return;
-      const label = link.querySelector(':scope > span');
+    // Anchor the rail to Home's width. Longer labels stay right-aligned and
+    // overflow left so Experience/Projects never shift the centered slot.
+    const measure = () => {
+      const homeLink = root.querySelector('a[href="/"]');
+      const label = homeLink?.querySelector(':scope > span');
       if (!(label instanceof HTMLElement)) return;
-      const isActive = link.getAttribute('aria-current') === 'page';
-      maxWidth = Math.max(
-        maxWidth,
-        label.offsetWidth * (isActive ? 1 : PREVIEW_SCALE),
-      );
-    });
-    setSizerWidth(maxWidth > 0 ? maxWidth : null);
-  }, [activeHref]);
+      setSizerWidth(label.offsetWidth > 0 ? label.offsetWidth : null);
+    };
+
+    measure();
+    window.addEventListener('resize', measure);
+    document.fonts?.ready.then(measure).catch(() => {});
+    return () => window.removeEventListener('resize', measure);
+  }, []);
 
   return (
     /* Height stays equal to the active line so it centers on the viewport. */
     <div ref={rootRef} className="relative flex flex-col items-end">
       <div className="relative">
-        {/* Sizer holds the width and pins the active label to one fixed line. */}
+        {/* Sizer locks to Home width and pins the active label line. */}
         <span
           ref={anchorRef}
           aria-hidden
           className="invisible block overflow-hidden whitespace-nowrap text-[2.125rem] font-medium leading-tight tracking-tight"
           style={sizerWidth != null ? { width: sizerWidth } : undefined}
         >
-          Experience
+          Home
         </span>
 
         {NAV_ITEMS.map((item, index) => {
@@ -318,7 +319,7 @@ export function DesktopNav() {
       window.removeEventListener('resize', syncLeft);
       observer.disconnect();
     };
-  }, [isHome, activeHref]);
+  }, [isHome]);
 
   useEffect(() => {
     if (!isHome) return;

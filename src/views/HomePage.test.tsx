@@ -178,7 +178,13 @@ describe('HomePage', () => {
     const user = userEvent.setup();
     renderWithProviders(<HomePage />, { initialPath: '/' });
 
-    const featuredNames = ['Tempest', 'SafeCall', 'SQL Detective', 'TensorDigits'];
+    const featuredNames = [
+      'Tempest',
+      'SafeCall',
+      'SQL Detective',
+      'TensorDigits',
+      'Arc GPT',
+    ];
     const allOnlyNames = [
       'ExpenSense',
       'MusicBloom',
