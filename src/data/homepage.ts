@@ -90,7 +90,7 @@ export type HomepageTechId =
   | 'typescript'
   | 'postgresql'
   | 'react'
-  | 'nodejs'
+  | 'nextjs'
   | 'springboot'
   | 'docker'
   | 'aws';
@@ -110,7 +110,7 @@ export const HOMEPAGE_TECH: HomepageTech[] = [
   { id: 'typescript', name: 'TypeScript', description: 'Typed JavaScript' },
   { id: 'postgresql', name: 'PostgreSQL', description: 'SQL Database' },
   { id: 'react', name: 'React', description: 'UI library' },
-  { id: 'nodejs', name: 'Node.js', description: 'Server Runtime' },
+  { id: 'nextjs', name: 'Next.js', description: 'React framework' },
   { id: 'springboot', name: 'Spring Boot', description: 'Java framework' },
   { id: 'docker', name: 'Docker', description: 'Containers' },
   { id: 'aws', name: 'AWS', description: 'Cloud platform' },

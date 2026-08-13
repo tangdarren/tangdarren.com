@@ -21,7 +21,7 @@ function TechCard({
       </span>
       <div className="whitespace-nowrap py-2 pr-3.5 leading-tight">
         <p className="text-sm text-mist-50">{name}</p>
-        <p className="text-xs font-extralight leading-tight text-mist-400">
+        <p className="text-xs leading-tight text-mist-300">
           {description}
         </p>
       </div>

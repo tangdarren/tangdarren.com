@@ -258,7 +258,7 @@ describe('HomePage', () => {
       'TypeScript',
       'PostgreSQL',
       'React',
-      'Node.js',
+      'Next.js',
       'Spring Boot',
       'Docker',
       'AWS',
@@ -269,6 +269,7 @@ describe('HomePage', () => {
       expect(screen.getByText(tech.description)).toBeInTheDocument();
     }
 
+    expect(screen.queryByText('Node.js')).not.toBeInTheDocument();
     expect(screen.queryByText('JavaScript')).not.toBeInTheDocument();
     expect(screen.queryByText('FastAPI')).not.toBeInTheDocument();
     expect(screen.queryByText('Java')).not.toBeInTheDocument();

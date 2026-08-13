@@ -21,7 +21,7 @@ function ProjectRow({ project }: { project: HomepageProject }) {
             {project.description}
           </p>
         </div>
-        <div className="flex shrink-0 items-baseline gap-3 text-xs text-mist-400 sm:pt-1 sm:justify-end">
+        <div className="flex shrink-0 items-baseline gap-3 text-xs text-mist-300 sm:pt-1 sm:justify-end">
           <p>{project.label}</p>
           <a
             href={project.githubUrl}
@@ -63,7 +63,7 @@ export default function ProjectsSection() {
         <div
           role="group"
           aria-label="Project filter"
-          className="flex items-center gap-2 text-base font-medium tracking-tight text-mist-400 sm:text-lg"
+          className="flex items-center gap-2 text-base font-medium tracking-tight text-mist-300 sm:text-lg"
         >
           <button
             type="button"

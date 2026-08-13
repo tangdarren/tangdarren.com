@@ -41,7 +41,7 @@ function ExperienceItem({
         <p className="mt-0.5 text-sm text-mist-300">
           {company} · {type}
         </p>
-        <p className="mt-0.5 text-sm text-mist-400">{dates}</p>
+        <p className="mt-0.5 text-sm text-mist-300">{dates}</p>
         <p className="mt-2 max-w-xl text-sm leading-relaxed text-mist-300">
           {description}
         </p>
@@ -76,7 +76,7 @@ function EducationItem({
           {degree}
         </p>
         <p className="mt-0.5 text-sm text-mist-300">{school}</p>
-        <p className="mt-0.5 text-sm text-mist-400">{dates}</p>
+        <p className="mt-0.5 text-sm text-mist-300">{dates}</p>
         <p className="mt-2 max-w-xl text-sm leading-relaxed text-mist-300">
           {description}
         </p>
@@ -138,7 +138,7 @@ export default function ExperienceEducationSection() {
             'scroll-mt-16 border-b pb-1 text-base transition-colors sm:text-lg lg:scroll-mt-20',
             tab === 'experience'
               ? 'border-accent-cyan font-medium text-mist-50'
-              : 'border-transparent text-mist-400 hover:text-mist-200',
+              : 'border-transparent text-mist-300 hover:text-mist-200',
           ].join(' ')}
         >
           Experience
@@ -155,7 +155,7 @@ export default function ExperienceEducationSection() {
             'border-b pb-1 text-base transition-colors sm:text-lg',
             tab === 'education'
               ? 'border-accent-cyan font-medium text-mist-50'
-              : 'border-transparent text-mist-400 hover:text-mist-200',
+              : 'border-transparent text-mist-300 hover:text-mist-200',
           ].join(' ')}
         >
           Education
