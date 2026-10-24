@@ -20,9 +20,9 @@ const HEADSHOT_ALT =
 
 /** Shared control styles — taller touch targets on mobile. */
 const INTRO_ACTION =
-  'inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md border px-3.5 text-sm font-medium tracking-wide transition-colors focus-visible:outline-none sm:min-h-9 sm:text-[15px]';
+  'inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md border px-3.5 text-[15px] font-medium tracking-wide transition-colors focus-visible:outline-none sm:min-h-10 sm:text-base';
 
-const INTRO_ICON_CLASS = 'h-3.5 w-3.5 shrink-0';
+const INTRO_ICON_CLASS = 'h-4 w-4 shrink-0';
 
 interface IntroLink {
   label: string;
@@ -98,12 +98,18 @@ function Portrait({ className }: { className?: string }) {
 export default function HomeIntroduction() {
   const { registerAnchors } = useEasterEgg();
   const wrapRef = useRef<HTMLDivElement>(null);
-  const startRef = useRef<HTMLSpanElement>(null);
-  const endRef = useRef<HTMLSpanElement>(null);
+  const hiRef = useRef<HTMLSpanElement>(null);
+  const amRef = useRef<HTMLSpanElement>(null);
+  const darrenRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    registerAnchors(startRef.current, endRef.current);
-    return () => registerAnchors(null, null);
+    registerAnchors({
+      hi: hiRef.current,
+      am: amRef.current,
+      darren: darrenRef.current,
+    });
+    return () =>
+      registerAnchors({ hi: null, am: null, darren: null });
   }, [registerAnchors]);
 
   return (
@@ -115,10 +121,11 @@ export default function HomeIntroduction() {
             <div className="min-w-0 flex-1">
               <div ref={wrapRef} className="relative z-20">
                 <p className="home-greeting">
-                  <span ref={startRef}>H</span>i, I am
+                  <span ref={hiRef}>Hi</span>, I{' '}
+                  <span ref={amRef}>am</span>
                 </p>
                 <h1 className="home-name">
-                  Darren Tan<span ref={endRef}>g</span>
+                  <span ref={darrenRef}>Darren</span> Tang
                 </h1>
                 <DarrenWalker containerRef={wrapRef} />
               </div>
@@ -126,7 +133,7 @@ export default function HomeIntroduction() {
               <p className="home-role">Software Engineer</p>
               <p className="home-location">
                 <span className="relative inline-block">
-                  <span className="relative z-[1]">San Francisco</span>
+                  San Francisco
                   <GoldenGateBridgeEasterEgg />
                 </span>
               </p>
@@ -141,7 +148,7 @@ export default function HomeIntroduction() {
 
           <ul className="mt-6 grid grid-cols-2 gap-2.5 sm:mt-8 sm:inline-grid sm:grid-cols-4 lg:mt-9">
             {CONTACT_ACTIONS.map((link) => (
-              <li key={link.label} className="min-w-0 sm:w-[8rem]">
+              <li key={link.label} className="min-w-0 sm:w-[8.75rem]">
                 <a
                   href={link.href}
                   {...(link.external

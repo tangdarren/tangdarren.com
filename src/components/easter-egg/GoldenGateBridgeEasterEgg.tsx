@@ -5,10 +5,8 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { useEasterEgg } from '@/components/easter-egg/EasterEggContext';
 
 /**
- * Subtle Golden Gate Bridge that rises from behind "San Francisco"
+ * Golden Gate Bridge that rises directly beside "San Francisco"
  * while the walker sequence is active (`bridgeActive`).
- *
- * Sized to 100% of the text span; tucked slightly behind the letter tops.
  */
 export default function GoldenGateBridgeEasterEgg() {
   const { bridgeActive } = useEasterEgg();
@@ -18,13 +16,13 @@ export default function GoldenGateBridgeEasterEgg() {
     <span
       aria-hidden
       data-easter-egg-bridge
-      className="pointer-events-none absolute bottom-[calc(100%-6px)] left-0 z-0 w-full select-none overflow-hidden bg-transparent"
+      className="pointer-events-none absolute bottom-[0.12em] left-full z-0 ml-2.5 h-[1.85em] w-[4.25em] select-none overflow-hidden bg-transparent"
     >
       <motion.img
         src="/easter-egg/sfbridge.png"
         alt=""
         draggable={false}
-        className="block h-auto w-full max-w-none bg-transparent"
+        className="block h-full w-full max-w-none bg-transparent object-contain object-left-bottom"
         style={{
           imageRendering: 'pixelated',
           background: 'transparent',
@@ -35,17 +33,17 @@ export default function GoldenGateBridgeEasterEgg() {
             ? { opacity: bridgeActive ? 1 : 0, y: '0%' }
             : bridgeActive
               ? { y: '0%', opacity: 1 }
-              : { y: '100%', opacity: 0 }
+              : { y: '110%', opacity: 0 }
         }
         transition={
           reduce
-            ? { duration: 0.2, ease: 'easeOut' }
+            ? { duration: 0.12, ease: 'easeOut' }
             : bridgeActive
               ? {
-                  y: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
-                  opacity: { duration: 0.22, ease: 'easeOut' },
+                  y: { duration: 0.35, ease: [0.22, 1, 0.36, 1] },
+                  opacity: { duration: 0.12, ease: 'easeOut' },
                 }
-              : { duration: 0.3, ease: 'easeIn' }
+              : { duration: 0.18, ease: 'easeIn' }
         }
       />
     </span>

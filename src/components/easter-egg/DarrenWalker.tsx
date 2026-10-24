@@ -21,15 +21,23 @@ const FEET_Y = 354;
 const VISIBLE_H_DESKTOP = 36;
 const VISIBLE_H_MOBILE = 28;
 
-const WALK_MS = 2200;
-const SPAWN_MS = 450;
-const POST_SPAWN_PAUSE_MS = 250;
-const SHAKE_MS = 550;
-const JUMP_MS = 1400;
-const JUMP_HEIGHT_PX = 5;
-const POST_JUMP_PAUSE_MS = 200;
-const CHAR_FADE_MS = 200;
-const BRIDGE_EXIT_MS = 300;
+/** Keep clear of letter tops so feet never "touch" the text. */
+const CLEARANCE_PX = 10;
+
+const SPAWN_MS = 260;
+const TINY_HOP_MS = 240;
+const TINY_HOP_PX = 3;
+const WALK_TO_AM_MS = 780;
+const JUMP_OFF_MS = 780;
+const LAND_PAUSE_MS = 700;
+const CHAR_FADE_MS = 150;
+const BRIDGE_EXIT_MS = 180;
+/** Small forward nudge so the hop never goes backward. */
+const LAND_FORWARD_MIN_PX = 14;
+/** Peak height of the semicircle above the straight line between am → land. */
+const JUMP_ARC_PX = 18;
+/** Samples along the arc (more = smoother). */
+const JUMP_ARC_STEPS = 20;
 
 function displaySize() {
   const visibleH =
@@ -47,22 +55,62 @@ function displaySize() {
 }
 
 type Pose = { left: number; top: number };
+type Size = ReturnType<typeof displaySize>;
 
+/** Feet on a letter's top edge (+ optional clearance). `xRatio` 0=left, 1=right. */
 function poseAboveLetter(
   letter: DOMRect,
   container: DOMRect,
-  size: ReturnType<typeof displaySize>,
+  size: Size,
+  clearance = 0,
+  xRatio = 0.5,
 ): Pose {
-  const feetX = letter.left + letter.width / 2 - container.left;
-  const feetY = letter.top - container.top;
+  const feetX = letter.left + letter.width * xRatio - container.left;
+  const feetY = letter.top - container.top - clearance;
   return {
     left: feetX - size.feetOffsetX,
     top: feetY - size.feetOffsetY,
   };
 }
 
+/** Semicircle path from start → end (bulges upward on screen). */
+function semicircleArc(
+  x0: number,
+  y0: number,
+  x1: number,
+  y1: number,
+  height: number,
+  steps: number,
+): { x: number[]; y: number[]; rotate: number[] } {
+  const x: number[] = [];
+  const y: number[] = [];
+  const rotate: number[] = [];
+
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    const chordX = x0 + (x1 - x0) * t;
+    const chordY = y0 + (y1 - y0) * t;
+    // sin(πt) peaks at mid — classic semicircle offset from the chord
+    const lift = Math.sin(Math.PI * t) * height;
+    x.push(chordX);
+    y.push(chordY - lift);
+
+    // Slight lean following the arc tangent
+    const nextT = Math.min(1, t + 1 / steps);
+    const nextLift = Math.sin(Math.PI * nextT) * height;
+    const nextX = x0 + (x1 - x0) * nextT;
+    const nextY = y0 + (y1 - y0) * nextT - nextLift;
+    const angle = (Math.atan2(nextY - (chordY - lift), nextX - chordX) * 180) / Math.PI;
+    rotate.push(Math.max(-12, Math.min(12, angle * 0.35)));
+  }
+
+  rotate[rotate.length - 1] = 0;
+  return { x, y, rotate };
+}
+
 /**
- * Pixel character that walks H → g in "Tang", hops once, then exits.
+ * Spawns above Hi → tiny hop → walks above am (never touches) →
+ * jumps off onto Darren → fades out.
  */
 export default function DarrenWalker({
   containerRef,
@@ -79,21 +127,15 @@ export default function DarrenWalker({
     if (runId === 0) return;
 
     const container = containerRef.current;
-    const { start, end } = getAnchors();
-    if (!container || !start || !end) {
+    const { hi, am, darren } = getAnchors();
+    if (!container || !hi || !am || !darren) {
       notifyComplete();
       return;
     }
 
     const size = displaySize();
     const cRect = container.getBoundingClientRect();
-    const startPose = poseAboveLetter(
-      start.getBoundingClientRect(),
-      cRect,
-      size,
-    );
-
-    setPose(startPose);
+    setPose(poseAboveLetter(hi.getBoundingClientRect(), cRect, size));
     setActive(true);
   }, [runId, containerRef, getAnchors, notifyComplete]);
 
@@ -102,12 +144,17 @@ export default function DarrenWalker({
 
     const el = imgRef.current;
     const container = containerRef.current;
-    const { start, end } = getAnchors();
-    if (!el || !container || !start || !end || !pose) return;
+    const { hi, am, darren } = getAnchors();
+    if (!el || !container || !hi || !am || !darren || !pose) return;
 
     let cancelled = false;
+    let settled = false;
     const stoppers: Array<{ stop: () => void }> = [];
-    let bridgeLeadTimer: number | undefined;
+
+    /** Keep opacity under imperative control so React re-renders can't flash him back. */
+    const lockHidden = () => {
+      el.style.opacity = '0';
+    };
 
     const runAnim = (
       keyframes: Parameters<typeof animate>[1],
@@ -127,7 +174,9 @@ export default function DarrenWalker({
       });
 
     const finish = () => {
-      if (cancelled) return;
+      if (cancelled || settled) return;
+      settled = true;
+      lockHidden();
       setBridgeActive(false);
       setActive(false);
       setPose(null);
@@ -137,89 +186,107 @@ export default function DarrenWalker({
     const run = async () => {
       const size = displaySize();
       const cRect = container.getBoundingClientRect();
-      const startPose = poseAboveLetter(
-        start.getBoundingClientRect(),
+
+      const hiPose = poseAboveLetter(hi.getBoundingClientRect(), cRect, size);
+      // Hover above am — clearance so feet never touch the letters.
+      const amPose = poseAboveLetter(
+        am.getBoundingClientRect(),
         cRect,
         size,
+        CLEARANCE_PX,
       );
-      const endPose = poseAboveLetter(end.getBoundingClientRect(), cRect, size);
-      const dx = endPose.left - startPose.left;
-      const dy = endPose.top - startPose.top;
+      // Prefer the right half of "Darren"; clamp so we never jump backward past am.
+      const landPose = poseAboveLetter(
+        darren.getBoundingClientRect(),
+        cRect,
+        size,
+        0,
+        0.7,
+      );
 
-      el.style.left = `${startPose.left}px`;
-      el.style.top = `${startPose.top}px`;
+      const amDx = amPose.left - hiPose.left;
+      const amDy = amPose.top - hiPose.top;
+      const landDx = Math.max(
+        landPose.left - hiPose.left,
+        amDx + LAND_FORWARD_MIN_PX,
+      );
+      const landDy = landPose.top - hiPose.top;
+
+      el.style.left = `${hiPose.left}px`;
+      el.style.top = `${hiPose.top}px`;
       el.style.width = `${size.width}px`;
       el.style.height = `${size.height}px`;
+      lockHidden();
 
       if (reduce) {
+        setBridgeActive(true);
         await runAnim(
           { opacity: [0, 1], scale: [0.9, 1] },
           { duration: 0.2 },
         );
         if (cancelled) return;
-        await wait(500);
+        await wait(400);
         if (cancelled) return;
-        await runAnim({ opacity: 0 }, { duration: 0.25 });
+        await runAnim({ opacity: 0 }, { duration: 0.2 });
+        lockHidden();
         finish();
         return;
       }
 
-      // PHASE 1 — Spawn
+      setBridgeActive(true);
+
+      // PHASE 1 — Spawn above Hi
       await runAnim(
         {
           opacity: [0, 1],
-          scale: [0.85, 1.05, 1],
-          y: [4, -2, 0],
+          scale: [0.9, 1.04, 1],
+          y: [3, 0],
         },
         { duration: SPAWN_MS / 1000, ease: 'easeOut' },
       );
       if (cancelled) return;
 
-      await wait(POST_SPAWN_PAUSE_MS);
-      if (cancelled) return;
-
-      // PHASE 2 — Shake; bridge starts rising at mid-shake
-      bridgeLeadTimer = window.setTimeout(() => {
-        if (!cancelled) setBridgeActive(true);
-      }, SHAKE_MS / 2);
-
+      // PHASE 2 — Very tiny hop on Hi
       await runAnim(
-        { rotate: [0, -4, 4, -3, 3, 0] },
-        { duration: SHAKE_MS / 1000, ease: 'easeInOut' },
+        { y: [0, -TINY_HOP_PX, 0] },
+        { duration: TINY_HOP_MS / 1000, ease: 'easeInOut' },
       );
       if (cancelled) return;
 
-      // PHASE 3 — Brief pause before the walk
-      await wait(150);
-      if (cancelled) return;
-
-      // PHASE 4 — Waddle H → g in "Tang"
+      // PHASE 3 — Walk to hover above am (clearance kept)
       await runAnim(
         {
-          x: [0, dx],
-          y: [0, -1.5, 0, -1.5, 0, -1.5, 0, -1.5, 0, dy],
-          rotate: [-1, 1, -1, 1, -1, 1, -1, 1, -1, 0],
+          x: [0, amDx],
+          y: [0, -1.2, 0, -1.2, 0, amDy],
+          rotate: [-1, 1, -1, 1, -1, 0],
         },
-        { duration: WALK_MS / 1000, ease: 'linear' },
+        { duration: WALK_TO_AM_MS / 1000, ease: 'linear' },
       );
       if (cancelled) return;
 
-      // PHASE 5 — Tiny, slow hop on the g
+      // PHASE 4 — Smooth semicircle arc onto Darren
+      const arc = semicircleArc(
+        amDx,
+        amDy,
+        landDx,
+        landDy,
+        JUMP_ARC_PX,
+        JUMP_ARC_STEPS,
+      );
       await runAnim(
-        {
-          x: dx,
-          y: [dy, dy - JUMP_HEIGHT_PX, dy],
-        },
-        { duration: JUMP_MS / 1000, ease: 'easeInOut' },
+        { x: arc.x, y: arc.y, rotate: arc.rotate },
+        { duration: JUMP_OFF_MS / 1000, ease: 'linear' },
       );
       if (cancelled) return;
 
-      await wait(POST_JUMP_PAUSE_MS);
+      await wait(LAND_PAUSE_MS);
       if (cancelled) return;
 
-      // PHASE 6 — Character fades, then bridge sinks
-      await runAnim({ opacity: 0 }, { duration: CHAR_FADE_MS / 1000 });
+      // PHASE 5 — Fade out; bridge exits
+      await runAnim({ opacity: [1, 0] }, { duration: CHAR_FADE_MS / 1000 });
       if (cancelled) return;
+      // Lock hidden BEFORE stopping animations / unmount — stop() can snap opacity back to 1.
+      lockHidden();
 
       setBridgeActive(false);
       await wait(BRIDGE_EXIT_MS);
@@ -230,11 +297,11 @@ export default function DarrenWalker({
 
     return () => {
       cancelled = true;
-      if (bridgeLeadTimer !== undefined) {
-        window.clearTimeout(bridgeLeadTimer);
-      }
+      lockHidden();
       stoppers.forEach((c) => c.stop());
-      setBridgeActive(false);
+      // Re-assert after stop() — framer-motion may restore pre-animation opacity.
+      lockHidden();
+      if (!settled) setBridgeActive(false);
     };
   }, [
     active,
@@ -267,7 +334,8 @@ export default function DarrenWalker({
         width: size.width,
         height: size.height,
         imageRendering: 'pixelated',
-        opacity: 0,
+        // Opacity is owned by the animation effect — putting it here made React
+        // re-apply `0`/`1` fights with framer-motion and caused an end flicker.
         transformOrigin: '50% 85%',
       }}
     />
