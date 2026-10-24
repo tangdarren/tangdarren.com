@@ -21,14 +21,13 @@ const FEET_Y = 354;
 const VISIBLE_H_DESKTOP = 36;
 const VISIBLE_H_MOBILE = 28;
 
-const WALK_MS = 1800;
-const STOP_BEFORE_RATIO = 0.82;
-const PRE_WAVE_PAUSE_MS = 280;
-const WAVE_MS = 1000;
+const WALK_MS = 2200;
 const SPAWN_MS = 450;
 const POST_SPAWN_PAUSE_MS = 250;
 const SHAKE_MS = 550;
-const STAND_MS = 1200;
+const JUMP_MS = 1400;
+const JUMP_HEIGHT_PX = 5;
+const POST_JUMP_PAUSE_MS = 200;
 const CHAR_FADE_MS = 200;
 const BRIDGE_EXIT_MS = 300;
 
@@ -63,7 +62,7 @@ function poseAboveLetter(
 }
 
 /**
- * Pixel character that walks H → final n, then waves in place.
+ * Pixel character that walks H → g in "Tang", hops once, then exits.
  */
 export default function DarrenWalker({
   containerRef,
@@ -146,7 +145,6 @@ export default function DarrenWalker({
       const endPose = poseAboveLetter(end.getBoundingClientRect(), cRect, size);
       const dx = endPose.left - startPose.left;
       const dy = endPose.top - startPose.top;
-      const stopX = dx * STOP_BEFORE_RATIO;
 
       el.style.left = `${startPose.left}px`;
       el.style.top = `${startPose.top}px`;
@@ -195,36 +193,31 @@ export default function DarrenWalker({
       await wait(150);
       if (cancelled) return;
 
-      // PHASE 4 — Waddle H → stop short of final n
+      // PHASE 4 — Waddle H → g in "Tang"
       await runAnim(
         {
-          x: [0, stopX],
-          y: [0, -2, 0, -2, 0, -2, 0, -2, 0, dy],
-          rotate: [-1.5, 1.5, -1.5, 1.5, -1.5, 1.5, -1.5, 1.5, -1.5, 0],
+          x: [0, dx],
+          y: [0, -1.5, 0, -1.5, 0, -1.5, 0, -1.5, 0, dy],
+          rotate: [-1, 1, -1, 1, -1, 1, -1, 1, -1, 0],
         },
         { duration: WALK_MS / 1000, ease: 'linear' },
       );
       if (cancelled) return;
 
-      await wait(PRE_WAVE_PAUSE_MS);
-      if (cancelled) return;
-
-      // PHASE 5 — Friendly wave in place (no vertical movement)
+      // PHASE 5 — Tiny, slow hop on the g
       await runAnim(
         {
-          x: stopX,
-          y: dy,
-          rotate: [0, 12, -8, 14, -6, 10, 0],
+          x: dx,
+          y: [dy, dy - JUMP_HEIGHT_PX, dy],
         },
-        { duration: WAVE_MS / 1000, ease: 'easeInOut' },
+        { duration: JUMP_MS / 1000, ease: 'easeInOut' },
       );
       if (cancelled) return;
 
-      // PHASE 6 — Brief hold
-      await wait(STAND_MS);
+      await wait(POST_JUMP_PAUSE_MS);
       if (cancelled) return;
 
-      // PHASE 7 — Character fades, then bridge sinks
+      // PHASE 6 — Character fades, then bridge sinks
       await runAnim({ opacity: 0 }, { duration: CHAR_FADE_MS / 1000 });
       if (cancelled) return;
 

@@ -115,7 +115,7 @@ export default function ExperienceEducationSection() {
     <section
       id="experience"
       aria-labelledby="experience-education-heading"
-      className="scroll-mt-16 lg:scroll-mt-20 lg:pl-3"
+      className="home-scroll-target"
     >
       <h2 id="experience-education-heading" className="sr-only">
         Experience and Education
@@ -135,10 +135,10 @@ export default function ExperienceEducationSection() {
           tabIndex={tab === 'experience' ? 0 : -1}
           onClick={() => setTab('experience')}
           className={[
-            'scroll-mt-16 border-b pb-1 text-base transition-colors sm:text-lg lg:scroll-mt-20',
+            'home-scroll-target border-b pb-1 transition-colors',
             tab === 'experience'
-              ? 'border-accent-cyan font-medium text-mist-50'
-              : 'border-transparent text-mist-300 hover:text-mist-200',
+              ? 'home-section-title border-accent-cyan'
+              : 'home-section-title-muted border-transparent',
           ].join(' ')}
         >
           Experience
@@ -152,10 +152,10 @@ export default function ExperienceEducationSection() {
           tabIndex={tab === 'education' ? 0 : -1}
           onClick={() => setTab('education')}
           className={[
-            'border-b pb-1 text-base transition-colors sm:text-lg',
+            'border-b pb-1 transition-colors',
             tab === 'education'
-              ? 'border-accent-cyan font-medium text-mist-50'
-              : 'border-transparent text-mist-300 hover:text-mist-200',
+              ? 'home-section-title border-accent-cyan'
+              : 'home-section-title-muted border-transparent',
           ].join(' ')}
         >
           Education

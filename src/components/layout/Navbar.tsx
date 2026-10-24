@@ -1,38 +1,37 @@
 'use client';
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import type { RefObject } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ArrowDown, ArrowUp, Menu, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 
+import EasterEggButton from '@/components/easter-egg/EasterEggButton';
 import TopCornerControls from '@/components/easter-egg/TopCornerControls';
-import { NAV_ITEMS } from '@/data/navigation';
+import ThemeToggle from '@/components/theme/ThemeToggle';
+import { NAV_ITEMS, SITE_CONTENT_MAX_CLASS } from '@/data/navigation';
 
-/** `lead` = px a title may still sit below the anchor and already take over. */
+/** Sticky header height (h-14). */
+export const SITE_HEADER_HEIGHT_PX = 56;
+
+/**
+ * Space kept between the header and section titles when scrolling / spy-switching.
+ * Matches `.home-scroll-target` scroll-margin-top (3.5rem + 2rem).
+ */
+export const SECTION_SCROLL_GAP_PX = 32;
+
+/** Titles watched for homepage scroll-spy (trigger at header + gap). */
 const HOME_SCROLL_SECTIONS = [
-  { href: '/', id: 'home', lead: 0 },
-  { href: '/#experience', id: 'home-experience-title', lead: 160 },
-  { href: '/#projects', id: 'projects-heading', lead: 96 },
+  { href: '/', id: 'home' },
+  { href: '/#experience', id: 'home-experience-title' },
+  { href: '/#projects', id: 'projects-heading' },
 ] as const;
 
 /**
- * Screen line the active nav label sits on. It is derived from the viewport
- * rather than measured, because the page transition's transform turns the rail
- * into a page-relative box while it runs, which would place the line mid-page.
+ * Active section = last section whose title has reached the same line
+ * scroll-margin leaves below the sticky header (so underline and click-scroll match).
  */
-function getAnchorLineTop(anchor: HTMLElement | null): number {
-  if (!anchor) return window.innerHeight * 0.35;
-  return (window.innerHeight - anchor.offsetHeight) / 2;
-}
-
-/**
- * Active section = last section whose content title top has reached the fixed
- * anchor line where the active nav label sits.
- */
-function getActiveHrefFromAnchor(anchor: HTMLElement | null): string {
-  const anchorTop = getAnchorLineTop(anchor);
-
+function getActiveHrefFromScroll(): string {
+  const probe = SITE_HEADER_HEIGHT_PX + SECTION_SCROLL_GAP_PX;
   let nextActive: string = '/';
 
   for (const section of HOME_SCROLL_SECTIONS) {
@@ -41,7 +40,7 @@ function getActiveHrefFromAnchor(anchor: HTMLElement | null): string {
     const title = document.getElementById(section.id);
     if (!title) continue;
 
-    if (title.getBoundingClientRect().top <= anchorTop + section.lead) {
+    if (title.getBoundingClientRect().top <= probe) {
       nextActive = section.href;
     }
   }
@@ -62,25 +61,7 @@ function isNavItemActive(
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-function navLinkClass(active: boolean, compact: boolean): string {
-  return [
-    'group inline-flex items-baseline gap-2.5 transition-colors',
-    compact ? 'py-0.5 text-[15px]' : 'py-1 text-xl lg:text-2xl',
-    active ? 'text-mist-50' : 'text-mist-300 hover:text-mist-50',
-  ].join(' ');
-}
-
-function navLabelClass(active: boolean): string {
-  return active
-    ? 'underline decoration-accent-cyan/70 underline-offset-4'
-    : 'group-hover:underline group-hover:decoration-ink-500 group-hover:underline-offset-4';
-}
-
 type HomeSectionScrollOptions = {
-  /**
-   * Close the mobile menu (or otherwise mutate layout) before scrolling so
-   * `scrollIntoView` uses the final sticky-header geometry.
-   */
   beforeScroll?: () => void;
 };
 
@@ -112,7 +93,6 @@ function scrollToHomeSection(
 
   if (options?.beforeScroll) {
     options.beforeScroll();
-    // Double rAF: first frame applies the closed-menu layout, second scrolls.
     requestAnimationFrame(() => {
       requestAnimationFrame(runScroll);
     });
@@ -125,400 +105,301 @@ function scrollToHomeSection(
 export function NavLinks({
   onNavigate,
   className,
-  compact = false,
   activeHref = null,
+  variant = 'horizontal',
 }: {
   onNavigate?: () => void;
   className?: string;
-  compact?: boolean;
   /** Scroll-spy override for homepage section highlighting. */
   activeHref?: string | null;
+  /** Horizontal underline indicator only for the desktop bar. */
+  variant?: 'horizontal' | 'vertical';
 }) {
   const pathname = usePathname();
+  const listRef = useRef<HTMLUListElement>(null);
+  const [indicator, setIndicator] = useState<{
+    left: number;
+    width: number;
+  } | null>(null);
+
+  useLayoutEffect(() => {
+    if (variant !== 'horizontal') {
+      setIndicator(null);
+      return;
+    }
+
+    const list = listRef.current;
+    if (!list) return;
+
+    const measure = () => {
+      const activeLink = list.querySelector<HTMLElement>(
+        'a[aria-current="page"]',
+      );
+      const item = activeLink?.closest('li');
+      if (!(item instanceof HTMLElement)) {
+        setIndicator(null);
+        return;
+      }
+
+      // Measure the flex item so gap + larger type stay aligned.
+      setIndicator({
+        left: item.offsetLeft,
+        width: item.offsetWidth,
+      });
+    };
+
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(list);
+    list.querySelectorAll('li').forEach((item) => ro.observe(item));
+    document.fonts?.ready.then(measure).catch(() => {});
+    window.addEventListener('resize', measure);
+
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, [pathname, activeHref, variant]);
 
   return (
-    <ul className={className}>
+    <ul
+      ref={listRef}
+      className={['relative', className].filter(Boolean).join(' ')}
+    >
       {NAV_ITEMS.map((item) => {
         const isActive = isNavItemActive(pathname, item.to, activeHref);
-        const className = navLinkClass(isActive, compact);
+        const linkClass = [
+          'inline-flex transition-colors',
+          variant === 'vertical'
+            ? 'w-full py-2.5 text-base'
+            : 'relative py-1 text-lg',
+          isActive ? 'text-mist-50' : 'text-mist-300 hover:text-mist-50',
+        ].join(' ');
 
         return (
           <li key={item.to}>
-            <Link
-              href={item.to}
-              aria-current={isActive ? 'page' : undefined}
-              className={className}
-              onClick={(event) => {
-                const isInPageHomeLink =
-                  pathname === '/' &&
-                  (item.to === '/' || item.to.startsWith('/#'));
+            {item.external ? (
+              <a
+                href={item.to}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={linkClass}
+                onClick={() => onNavigate?.()}
+              >
+                {item.label}
+              </a>
+            ) : (
+              <Link
+                href={item.to}
+                aria-current={isActive ? 'page' : undefined}
+                className={linkClass}
+                onClick={(event) => {
+                  const isInPageHomeLink =
+                    pathname === '/' &&
+                    (item.to === '/' || item.to.startsWith('/#'));
 
-                if (isInPageHomeLink && onNavigate) {
-                  // Mobile: close the expanded menu before measuring scroll.
-                  scrollToHomeSection(event, pathname, item.to, {
-                    beforeScroll: onNavigate,
-                  });
-                  return;
-                }
+                  if (isInPageHomeLink && onNavigate) {
+                    scrollToHomeSection(event, pathname, item.to, {
+                      beforeScroll: onNavigate,
+                    });
+                    return;
+                  }
 
-                scrollToHomeSection(event, pathname, item.to);
-                onNavigate?.();
-              }}
-            >
-              <span className={navLabelClass(isActive)}>{item.label}</span>
-            </Link>
+                  scrollToHomeSection(event, pathname, item.to);
+                  onNavigate?.();
+                }}
+              >
+                {item.label}
+              </Link>
+            )}
           </li>
         );
       })}
+
+      {variant === 'horizontal' && indicator && (
+        <span
+          aria-hidden
+          className="pointer-events-none absolute bottom-0 h-px bg-accent-cyan/70 transition-[left,width] duration-300 ease-out motion-reduce:transition-none"
+          style={{ left: indicator.left, width: indicator.width }}
+        />
+      )}
     </ul>
   );
 }
 
-/** Share of the divider taken up by the scroll marker. */
-const RAIL_MARKER_PCT = 16;
-
-/** Vertical travel between the active line and its adjacent previews. */
-const PREVIEW_STEP_REM = 3;
-const PREVIEW_SCALE = 0.62;
-
 /**
- * Homepage desktop nav — the active section always sits on one fixed line,
- * with the adjacent sections as small previews above and below it.
+ * Persistent top bar — desktop editorial links; mobile Menu + theme.
  */
-function HomeSectionNavigator({
-  activeHref,
-  anchorRef,
-}: {
-  activeHref: string;
-  anchorRef?: RefObject<HTMLSpanElement>;
-}) {
-  const pathname = usePathname();
-  const rootRef = useRef<HTMLDivElement>(null);
-  const [sizerWidth, setSizerWidth] = useState<number | null>(null);
-  const activeIndex = Math.max(
-    0,
-    NAV_ITEMS.findIndex((item) => item.to === activeHref),
-  );
-
-  useLayoutEffect(() => {
-    const root = rootRef.current;
-    if (!root) return;
-
-    // Anchor the rail to Home's width. Longer labels stay right-aligned and
-    // overflow left so Experience/Projects never shift the centered slot.
-    const measure = () => {
-      const homeLink = root.querySelector('a[href="/"]');
-      const label = homeLink?.querySelector(':scope > span');
-      if (!(label instanceof HTMLElement)) return;
-      setSizerWidth(label.offsetWidth > 0 ? label.offsetWidth : null);
-    };
-
-    measure();
-    window.addEventListener('resize', measure);
-    document.fonts?.ready.then(measure).catch(() => {});
-    return () => window.removeEventListener('resize', measure);
-  }, []);
-
-  return (
-    /* Height stays equal to the active line so it centers on the viewport. */
-    <div ref={rootRef} className="relative flex flex-col items-end">
-      <div className="relative">
-        {/* Sizer locks to Home width and pins the active label line. */}
-        <span
-          ref={anchorRef}
-          aria-hidden
-          className="invisible block overflow-hidden whitespace-nowrap text-[2.125rem] font-medium leading-tight tracking-tight"
-          style={sizerWidth != null ? { width: sizerWidth } : undefined}
-        >
-          Home
-        </span>
-
-        {NAV_ITEMS.map((item, index) => {
-          const offset = index - activeIndex;
-          const isActive = offset === 0;
-          const isVisible = Math.abs(offset) <= 1;
-
-          return (
-            <Link
-              key={item.to}
-              href={item.to}
-              aria-current={isActive ? 'page' : undefined}
-              onClick={(event) => scrollToHomeSection(event, pathname, item.to)}
-              style={{
-                transform: `translateY(${offset * PREVIEW_STEP_REM}rem) scale(${
-                  isActive ? 1 : PREVIEW_SCALE
-                })`,
-              }}
-              className={[
-                'absolute right-0 top-0 inline-flex origin-right items-center whitespace-nowrap text-[2.125rem] leading-tight tracking-tight',
-                'transition-[transform,opacity,color] duration-300 ease-out motion-reduce:transition-none',
-                isActive
-                  ? 'font-medium text-mist-50'
-                  : 'font-normal text-mist-400 hover:text-mist-200 focus-visible:text-mist-200',
-                isVisible
-                  ? 'opacity-100'
-                  : 'pointer-events-none opacity-0 focus-visible:opacity-100',
-              ].join(' ')}
-            >
-              <span>{item.label}</span>
-              {/* Sits outside the text box so every label shares one right edge. */}
-              {offset !== 0 && (
-                <span className="absolute left-full top-1/2 ml-2 -translate-y-1/2">
-                  {offset === -1 ? (
-                    <ArrowUp
-                      aria-hidden
-                      className="h-[0.75em] w-[0.75em]"
-                      strokeWidth={2.25}
-                    />
-                  ) : (
-                    <ArrowDown
-                      aria-hidden
-                      className="h-[0.75em] w-[0.75em]"
-                      strokeWidth={2.25}
-                    />
-                  )}
-                </span>
-              )}
-            </Link>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-/**
- * Desktop nav — on the homepage the nav + divider stay fixed in their initial
- * screen position while scrolling, hide over the footer, and underline the
- * active section.
- */
-export function DesktopNav() {
+export function SiteHeader() {
   const pathname = usePathname();
   const isHome = pathname === '/';
-  const slotRef = useRef<HTMLDivElement>(null);
-  const anchorRef = useRef<HTMLSpanElement>(null);
-  const [left, setLeft] = useState<number | null>(null);
   const [activeHref, setActiveHref] = useState('/');
-  const [progress, setProgress] = useState(0);
-  const [hiddenByFooter, setHiddenByFooter] = useState(false);
-
-  useLayoutEffect(() => {
-    if (!isHome) return;
-
-    const syncLeft = () => {
-      const slot = slotRef.current;
-      if (!slot) return;
-      setLeft(slot.getBoundingClientRect().left);
-    };
-
-    syncLeft();
-    window.addEventListener('resize', syncLeft);
-    const observer = new ResizeObserver(syncLeft);
-    if (slotRef.current) observer.observe(slotRef.current);
-    return () => {
-      window.removeEventListener('resize', syncLeft);
-      observer.disconnect();
-    };
-  }, [isHome]);
+  const [scrolled, setScrolled] = useState(false);
+  const [pastHero, setPastHero] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    if (!isHome) return;
+    const update = () => {
+      setScrolled(window.scrollY > 24);
+      setPastHero(window.scrollY > window.innerHeight * 0.55);
 
-    const updateScrollState = () => {
-      setActiveHref(getActiveHrefFromAnchor(anchorRef.current));
-
-      const scrollable =
-        document.documentElement.scrollHeight - window.innerHeight;
-      const ratio = scrollable > 0 ? window.scrollY / scrollable : 0;
-      // Quantized so scrolling only re-renders on meaningful movement.
-      setProgress(Math.round(Math.min(1, Math.max(0, ratio)) * 200) / 200);
-
-      const footer = document.getElementById('contact');
-      if (footer) {
-        const footerTop = footer.getBoundingClientRect().top;
-        setHiddenByFooter(footerTop < window.innerHeight * 0.85);
+      if (pathname === '/') {
+        setActiveHref(getActiveHrefFromScroll());
       }
     };
 
-    updateScrollState();
+    update();
 
-    /* Section heights aren't final on first paint (fonts/images still settling),
-       so re-measure once layout is stable or the browser restores scroll. */
     const raf = requestAnimationFrame(() =>
-      requestAnimationFrame(updateScrollState),
+      requestAnimationFrame(update),
     );
-    window.addEventListener('load', updateScrollState);
-    document.fonts?.ready.then(updateScrollState).catch(() => {});
+    window.addEventListener('load', update);
+    document.fonts?.ready.then(update).catch(() => {});
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
 
-    window.addEventListener('scroll', updateScrollState, { passive: true });
-    window.addEventListener('resize', updateScrollState);
     return () => {
       cancelAnimationFrame(raf);
-      window.removeEventListener('load', updateScrollState);
-      window.removeEventListener('scroll', updateScrollState);
-      window.removeEventListener('resize', updateScrollState);
+      window.removeEventListener('load', update);
+      window.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
     };
-  }, [isHome]);
-
-  const railExtras = (
-    <>
-      <div aria-hidden className="w-9 shrink-0 xl:w-12" />
-      <div
-        aria-hidden
-        className="relative h-[33vh] w-px shrink-0 bg-gradient-to-b from-transparent via-mist-300/35 to-transparent"
-      >
-        {/* Same gray, just solid — a short marker riding the line as you scroll. */}
-        <span
-          className="absolute inset-x-0 rounded-full bg-mist-300 transition-[top] duration-150 ease-out motion-reduce:transition-none"
-          style={{
-            height: `${RAIL_MARKER_PCT}%`,
-            top: `${progress * (100 - RAIL_MARKER_PCT)}%`,
-          }}
-        />
-      </div>
-    </>
-  );
-
-  if (!isHome) {
-    return (
-      <nav
-        aria-label="Primary"
-        className="hidden w-fit shrink-0 lg:block lg:pr-0.5 xl:pr-1"
-      >
-        <NavLinks className="flex flex-col items-end gap-1.5" />
-      </nav>
-    );
-  }
-
-  return (
-    <>
-      {/* Invisible slot preserves the original flex layout / horizontal position. */}
-      <div
-        ref={slotRef}
-        aria-hidden
-        className="invisible hidden shrink-0 items-center lg:flex"
-      >
-        <div className="w-fit shrink-0 lg:pr-0.5 xl:pr-1">
-          <HomeSectionNavigator activeHref={activeHref} />
-        </div>
-        {railExtras}
-      </div>
-
-      <div
-        className={[
-          'fixed top-1/2 z-40 hidden -translate-y-1/2 items-center lg:flex',
-          'transition-opacity duration-200',
-          hiddenByFooter
-            ? 'pointer-events-none opacity-0'
-            : 'pointer-events-auto opacity-100',
-        ].join(' ')}
-        style={left === null ? { visibility: 'hidden' } : { left }}
-      >
-        <nav aria-label="Primary" className="w-fit shrink-0 lg:pr-0.5 xl:pr-1">
-          <HomeSectionNavigator
-            activeHref={activeHref}
-            anchorRef={anchorRef}
-          />
-        </nav>
-        {railExtras}
-      </div>
-    </>
-  );
-}
-
-/** Compact top bar for tablet/mobile — does not keep the desktop sidebar. */
-export function MobileNav() {
-  const [open, setOpen] = useState(false);
-  const pathname = usePathname();
-  const [activeHref, setActiveHref] = useState('/');
+  }, [pathname]);
 
   useEffect(() => {
-    if (!open) return;
-    const original = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = original;
-    };
-  }, [open]);
+    setMenuOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!menuOpen) return;
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setOpen(false);
+      if (event.key === 'Escape') setMenuOpen(false);
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [open]);
+  }, [menuOpen]);
 
-  useEffect(() => {
-    if (pathname !== '/') return;
-
-    const updateActive = () => {
-      // Mobile has no side rail — activate when each section title reaches below the sticky header.
-      const probe = 72;
-      let nextActive: string = '/';
-      for (const section of HOME_SCROLL_SECTIONS) {
-        if (section.href === '/') continue;
-        const el = document.getElementById(section.id);
-        if (!el) continue;
-        if (el.getBoundingClientRect().top <= probe) {
-          nextActive = section.href;
-        }
-      }
-      setActiveHref(nextActive);
-    };
-
-    updateActive();
-    window.addEventListener('scroll', updateActive, { passive: true });
-    return () => window.removeEventListener('scroll', updateActive);
-  }, [pathname]);
-
-  const closeMenu = () => setOpen(false);
+  const closeMenu = () => setMenuOpen(false);
+  const homeActiveHref = isHome ? activeHref : null;
 
   return (
-    <header className="sticky top-0 z-50 border-b border-ink-600 bg-ink-950 lg:hidden">
-      <div className="flex h-14 items-center justify-between px-[var(--gutter)]">
-        <TopCornerControls showEgg />
-
-        <button
-          type="button"
-          className="btn-ghost"
-          aria-expanded={open}
-          aria-controls="mobile-navigation"
-          aria-label={open ? 'Close menu' : 'Open menu'}
-          onClick={() => setOpen((prev) => !prev)}
+    <header
+      className={[
+        'sticky top-0 z-50 border-b transition-[background-color,border-color,backdrop-filter] duration-300 ease-out motion-reduce:transition-none',
+        scrolled || menuOpen
+          ? 'border-ink-600/90 bg-ink-950/85 backdrop-blur-md'
+          : 'border-ink-600/40 bg-ink-950/70 backdrop-blur-sm',
+      ].join(' ')}
+    >
+      {/* Mobile — brand left; theme immediately left of Menu; egg hidden */}
+      <div className="flex h-14 items-center justify-between gap-3 px-[var(--gutter)] lg:hidden">
+        <Link
+          href="/"
+          aria-label="Darren Tang — home"
+          className={[
+            'min-w-0 truncate text-[15px] font-medium tracking-tight text-mist-50 transition-opacity',
+            isHome && !pastHero && !menuOpen
+              ? 'pointer-events-none opacity-0'
+              : 'opacity-100',
+          ].join(' ')}
+          onClick={(event) => {
+            closeMenu();
+            scrollToHomeSection(event, pathname, '/');
+          }}
+          tabIndex={isHome && !pastHero && !menuOpen ? -1 : undefined}
         >
-          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
+          Darren Tang
+        </Link>
+
+        <div className="flex shrink-0 items-center gap-2">
+          <ThemeToggle />
+          <button
+            type="button"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-ink-600 bg-transparent text-mist-200 transition-colors hover:border-ink-500 hover:bg-ink-850 hover:text-mist-50 focus-visible:outline-none"
+            aria-expanded={menuOpen}
+            aria-controls="mobile-navigation"
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            onClick={() => setMenuOpen((prev) => !prev)}
+          >
+            {menuOpen ? (
+              <X className="h-4 w-4 shrink-0" aria-hidden />
+            ) : (
+              <Menu className="h-4 w-4 shrink-0" aria-hidden />
+            )}
+          </button>
+        </div>
       </div>
 
-      {open && (
+      {/* In-flow panel — expands the sticky header and pushes page content down. */}
+      {menuOpen && (
         <div
           id="mobile-navigation"
-          role="dialog"
-          aria-modal="true"
-          className="border-t border-ink-600 bg-ink-950"
+          className="border-t border-ink-600 bg-ink-950 lg:hidden"
         >
-          <nav aria-label="Mobile" className="px-[var(--gutter)] py-4">
+          <nav aria-label="Primary" className="px-[var(--gutter)] py-3">
             <NavLinks
+              variant="vertical"
+              activeHref={homeActiveHref}
               onNavigate={closeMenu}
-              compact
-              activeHref={pathname === '/' ? activeHref : null}
-              className="flex flex-col gap-1"
+              className="flex flex-col"
             />
           </nav>
         </div>
       )}
+
+      {/*
+        Desktop — same shell as the home hero. Left slot: egg at top of home,
+        swaps to “Darren Tang” once you scroll past the hero. Theme stays right.
+      */}
+      <div className="hidden px-[var(--gutter)] lg:block">
+        <div
+          className={`mx-auto flex h-14 w-full items-center gap-4 ${SITE_CONTENT_MAX_CLASS}`}
+        >
+          <div className="relative z-10 flex h-9 min-w-[7.5rem] shrink-0 items-center">
+            {isHome && (
+              <div
+                className={[
+                  'absolute left-0 top-1/2 -translate-y-1/2 transition-opacity duration-300 motion-reduce:transition-none',
+                  pastHero
+                    ? 'pointer-events-none opacity-0'
+                    : 'opacity-100',
+                ].join(' ')}
+              >
+                <EasterEggButton visible={!pastHero} />
+              </div>
+            )}
+            <Link
+              href="/"
+              aria-label="Darren Tang — home"
+              className={[
+                'text-lg font-medium tracking-tight text-mist-50 transition-opacity duration-300 motion-reduce:transition-none',
+                isHome && !pastHero
+                  ? 'pointer-events-none opacity-0'
+                  : 'opacity-100',
+              ].join(' ')}
+              onClick={(event) => {
+                scrollToHomeSection(event, pathname, '/');
+              }}
+              tabIndex={isHome && !pastHero ? -1 : undefined}
+            >
+              Darren Tang
+            </Link>
+          </div>
+
+          <nav aria-label="Primary" className="min-w-0 flex-1 overflow-x-auto">
+            <NavLinks
+              activeHref={homeActiveHref}
+              className="flex items-center justify-center gap-5 md:gap-7 lg:gap-8"
+            />
+          </nav>
+
+          <div className="relative z-10 shrink-0">
+            <TopCornerControls />
+          </div>
+        </div>
+      </div>
     </header>
   );
 }
 
-/** @deprecated Prefer DesktopNav / MobileNav — kept for existing test imports. */
-export default function Navbar() {
-  return (
-    <>
-      <DesktopNav />
-      <MobileNav />
-    </>
-  );
-}
+export default SiteHeader;

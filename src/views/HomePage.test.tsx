@@ -13,47 +13,46 @@ describe('HomePage', () => {
 
     const intro = screen.getByRole('region', { name: 'Introduction' });
     expect(
-      within(intro).getByRole('heading', { level: 1, name: /hi, i'm darren/i }),
-    ).toBeInTheDocument();
-    expect(
-      within(intro).getByRole('link', {
-        name: /linkedin: linkedin\.com\/in\/tang-darren/i,
+      within(intro).getByText((_, node) => {
+        const text = node?.textContent?.replace(/\s+/g, ' ').trim() ?? '';
+        return node?.tagName === 'P' && /^Hi, I'm$/i.test(text);
       }),
     ).toBeInTheDocument();
     expect(
-      within(intro).getByRole('link', {
-        name: /github: github\.com\/tangdarren/i,
+      within(intro).getByRole('heading', {
+        level: 1,
+        name: /darren tang/i,
       }),
     ).toBeInTheDocument();
     expect(
-      within(intro).getByRole('link', {
-        name: /email: tang\.darren@gmail\.com/i,
-      }),
-    ).toBeInTheDocument();
+      within(intro).getByRole('link', { name: /linkedin profile/i }),
+    ).toHaveAttribute('href', 'https://linkedin.com/in/tang-darren');
+    expect(
+      within(intro).getByRole('link', { name: /github profile/i }),
+    ).toHaveAttribute('href', 'https://github.com/tangdarren');
+    expect(
+      within(intro).getByRole('link', { name: /email darren tang/i }),
+    ).toHaveAttribute('href', 'mailto:tang.darren@gmail.com');
 
-    const resume = within(intro).getByRole('link', {
-      name: /resume: resume\.pdf/i,
-    });
+    const resume = within(intro).getByRole('link', { name: /^resume$/i });
     expect(resume).toHaveAttribute('href', RESUME_PDF_PATH);
     expect(resume).toHaveAttribute('target', '_blank');
 
     expect(
       within(intro).getByText('Software Engineer', { selector: 'p' }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByText((_, node) => {
-        const text = node?.textContent?.replace(/\s+/g, ' ').trim() ?? '';
-        return (
-          node?.tagName === 'P' &&
-          /Based in San Francisco, I build Full Stack applications and learn along the way\./i.test(
-            text,
-          )
-        );
-      }),
-    ).toBeInTheDocument();
+    expect(within(intro).getByText('San Francisco')).toBeInTheDocument();
+    const portraits = within(intro).getAllByRole('img', {
+      name: /professional headshot of darren tang/i,
+    });
+    expect(portraits.length).toBeGreaterThan(0);
+    expect(portraits[0]).toHaveAttribute('src', '/images/darren-headshot.png');
     expect(
       document.querySelector('img[src="/easter-egg/sfbridge.png"]'),
     ).toBeInTheDocument();
+    expect(
+      screen.queryByText(/based in san francisco/i),
+    ).not.toBeInTheDocument();
     expect(
       screen.queryByText(/full-stack products/i),
     ).not.toBeInTheDocument();
@@ -63,9 +62,6 @@ describe('HomePage', () => {
 
     expect(
       screen.queryByRole('heading', { name: /- find me at/i }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole('img', { name: 'Darren Tang' }),
     ).not.toBeInTheDocument();
     expect(
       screen.queryByRole('heading', { name: /- tech i know and use/i }),
@@ -96,14 +92,28 @@ describe('HomePage', () => {
     expect(document.getElementById('contact')).toBeTruthy();
   });
 
-  it('uses a desktop flex composition with nav before the profile content', () => {
+  it('keeps home, experience, and projects in one shared content column', () => {
     renderWithProviders(<HomePage />, { initialPath: '/' });
 
+    // Primary nav lives in Layout's SiteHeader, not on the page itself.
     expect(
-      screen.getByRole('navigation', { name: 'Primary' }),
-    ).toBeInTheDocument();
+      screen.queryByRole('navigation', { name: 'Primary' }),
+    ).not.toBeInTheDocument();
+
+    const home = document.getElementById('home');
+    const experience = document.getElementById('experience');
+    const projects = document.getElementById('projects');
+    expect(home).toBeTruthy();
+    expect(experience).toBeTruthy();
+    expect(projects).toBeTruthy();
     expect(document.getElementById('tech')).toBeTruthy();
-    expect(document.getElementById('projects')).toBeTruthy();
+
+    // Experience and Projects share the same content-width column.
+    expect(experience?.parentElement).toBe(projects?.parentElement);
+    // That column sits under the same page gutter wrapper as Home.
+    expect(home?.parentElement).toBe(
+      experience?.parentElement?.parentElement?.parentElement,
+    );
   });
 
   it('renders experience timeline and switches to education', async () => {
@@ -250,8 +260,12 @@ describe('HomePage', () => {
     );
   });
 
-  it('renders curated tech cards with exact descriptions and no abbreviation marks', () => {
+  it('renders curated tech cards with names only and a Technical skills heading', () => {
     renderWithProviders(<HomePage />, { initialPath: '/' });
+
+    expect(
+      screen.getByRole('heading', { name: 'Technical skills' }),
+    ).toBeInTheDocument();
 
     expect(HOMEPAGE_TECH.map((tech) => tech.name)).toEqual([
       'Python',
@@ -266,7 +280,7 @@ describe('HomePage', () => {
 
     for (const tech of HOMEPAGE_TECH) {
       expect(screen.getByText(tech.name)).toBeInTheDocument();
-      expect(screen.getByText(tech.description)).toBeInTheDocument();
+      expect(screen.queryByText(tech.description)).not.toBeInTheDocument();
     }
 
     expect(screen.queryByText('Node.js')).not.toBeInTheDocument();

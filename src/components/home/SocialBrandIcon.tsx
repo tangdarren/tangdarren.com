@@ -1,6 +1,9 @@
 /**
  * Official brand marks (Simple Icons) for intro social links, plus a matching
  * filled document glyph for the resume (which has no brand mark).
+ *
+ * All icons share a 24×24 viewBox and render into the same square so button
+ * rows stay optically aligned.
  */
 export type SocialBrandId = 'github' | 'linkedin' | 'gmail' | 'resume';
 
@@ -12,7 +15,7 @@ export default function SocialBrandIcon({
   className?: string;
 }) {
   const props = {
-    className,
+    className: ['block shrink-0', className].filter(Boolean).join(' '),
     viewBox: '0 0 24 24',
     fill: 'currentColor' as const,
     'aria-hidden': true as const,
@@ -39,10 +42,11 @@ export default function SocialBrandIcon({
         </svg>
       );
     case 'resume':
+      // Same optical weight as Simple Icons marks — inset slightly in the 24 box.
       return (
         <svg {...props} fillRule="evenodd" clipRule="evenodd">
-          <path d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8h-5a1 1 0 0 1-1-1V2H6Zm1.4 6.4h4.2V10H7.4V8.4Zm0 3.6h9.2v1.6H7.4V12Zm0 3.6h9.2v1.6H7.4v-1.6Zm0 3.6h6.4v1.6H7.4v-1.6Z" />
-          <path d="M14.6 2.9l4.5 4.5h-4.5V2.9Z" />
+          <path d="M7 3.5A1.5 1.5 0 0 0 5.5 5v14A1.5 1.5 0 0 0 7 20.5h10a1.5 1.5 0 0 0 1.5-1.5V9h-4A1.5 1.5 0 0 1 13 7.5v-4H7Zm1.25 5.25h3.5v1.25h-3.5V8.75Zm0 3h7.5v1.25h-7.5V11.75Zm0 3h7.5v1.25h-7.5V14.75Zm0 3h5.25v1.25H8.25V17.75Z" />
+          <path d="M14.25 3.85 19.15 8.75h-3.4A1.5 1.5 0 0 1 14.25 7.25V3.85Z" />
         </svg>
       );
     default:

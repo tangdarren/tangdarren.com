@@ -3,21 +3,24 @@ import HomeIntroduction from '@/components/home/HomeIntroduction';
 import ProjectsSection from '@/components/home/ProjectsSection';
 import SignatureFooter from '@/components/home/SignatureFooter';
 import TechSection from '@/components/home/TechSection';
-import { DesktopNav } from '@/components/layout/Navbar';
+import { SITE_CONTENT_MAX_CLASS } from '@/data/navigation';
 
-/** Shared content inset — matches Home, Experience, and Projects. */
-const CONTENT_COLUMN =
-  'min-w-0 max-w-full px-[var(--gutter)] lg:pl-9 lg:pr-0 xl:pl-12';
+/** Shared content inset — ~20–24px on mobile via --gutter. */
+const CONTENT_COLUMN = 'min-w-0 max-w-full px-[var(--gutter)]';
 
-/** Midpoint between max-w-2xl (42rem) and max-w-3xl (48rem). */
-const CONTENT_WIDTH = 'w-full max-w-[45rem] lg:w-[45rem]';
+/** Hero width — matches sticky header content. */
+const HERO_WIDTH = `w-full ${SITE_CONTENT_MAX_CLASS}`;
+
+/** Reading column for Experience / Projects. */
+const SECTION_WIDTH = 'w-full max-w-[45rem] lg:w-[45rem]';
 
 function HomeProfile() {
   return (
     <div className="w-full">
       <HomeIntroduction />
 
-      <div className="py-6" />
+      {/* ~32–40px between intro and skills on mobile; tighter on desktop */}
+      <div className="mt-8 sm:mt-9 lg:mt-6" />
 
       <TechSection />
     </div>
@@ -25,34 +28,26 @@ function HomeProfile() {
 }
 
 /**
- * Desktop: fixed nav + divider, then one shared content column so Home,
- * Experience, and Projects share the same left edge and max width.
+ * Mobile: natural flow under the sticky header (no forced hero height).
+ * Desktop: pull under the header and vertically center in the viewport.
  */
 export default function HomePage() {
   return (
     <>
-      {/* Center the shrink-wrapped nav + content row for equal side margins. */}
-      <div className="lg:flex lg:justify-center">
-        <div className="min-w-0 lg:flex lg:max-w-full lg:items-start">
-          {/* Invisible rail slot + fixed nav/divider */}
-          <DesktopNav />
+      <div className={CONTENT_COLUMN}>
+        <div
+          id="home"
+          className="home-scroll-target flex justify-center py-8 sm:py-10 lg:-mt-14 lg:min-h-dvh lg:items-center lg:py-0"
+        >
+          <div className={`${HERO_WIDTH} w-full lg:py-16`}>
+            <HomeProfile />
+          </div>
+        </div>
 
-          <div className={CONTENT_COLUMN}>
-            <div
-              id="home"
-              className="scroll-mt-20 py-8 lg:flex lg:h-dvh lg:items-center lg:py-0"
-            >
-              <div className={CONTENT_WIDTH}>
-                <HomeProfile />
-              </div>
-            </div>
-
-            <div className="border-t border-ink-600 pt-12 sm:pt-14 lg:border-t-0 lg:pt-4">
-              <div className={`${CONTENT_WIDTH} space-y-48 sm:space-y-64`}>
-                <ExperienceEducationSection />
-                <ProjectsSection />
-              </div>
-            </div>
+        <div className="mt-10 flex justify-center border-t border-ink-600 pt-10 sm:mt-12 sm:pt-12 lg:mt-0 lg:border-t-0 lg:pt-8">
+          <div className={`${SECTION_WIDTH} space-y-16 sm:space-y-24 lg:space-y-48 xl:space-y-64`}>
+            <ExperienceEducationSection />
+            <ProjectsSection />
           </div>
         </div>
       </div>

@@ -50,13 +50,10 @@ export default function ProjectsSection() {
     <section
       id="projects"
       aria-labelledby="projects-heading"
-      className="w-full scroll-mt-16 lg:scroll-mt-20 lg:pl-4"
+      className="home-scroll-target w-full"
     >
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <h2
-          id="projects-heading"
-          className="scroll-mt-16 text-base font-medium tracking-tight text-mist-50 sm:text-lg lg:scroll-mt-20"
-        >
+        <h2 id="projects-heading" className="home-scroll-target home-section-title">
           Projects
         </h2>
 
