@@ -20,7 +20,7 @@ const HEADSHOT_ALT =
 
 /** Shared control styles — taller touch targets on mobile. */
 const INTRO_ACTION =
-  'inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md border px-3.5 text-sm font-medium tracking-wide transition-colors focus-visible:outline-none sm:min-h-9 sm:w-auto sm:text-[15px]';
+  'inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md border px-3.5 text-sm font-medium tracking-wide transition-colors focus-visible:outline-none sm:min-h-9 sm:text-[15px]';
 
 const INTRO_ICON_CLASS = 'h-3.5 w-3.5 shrink-0';
 
@@ -75,7 +75,7 @@ const CONTACT_ACTIONS: IntroLink[] = [
 function Portrait({ className }: { className?: string }) {
   return (
     <div className={className}>
-      <div className="aspect-[4/5] overflow-hidden rounded-lg border border-ink-600 bg-ink-850">
+      <div className="relative aspect-[4/5] overflow-hidden rounded-lg border border-ink-500 bg-ink-850">
         <img
           src={HEADSHOT_SRC}
           alt={HEADSHOT_ALT}
@@ -83,7 +83,12 @@ function Portrait({ className }: { className?: string }) {
           height={255}
           decoding="async"
           fetchPriority="high"
-          className="h-full w-full object-cover object-top"
+          className="h-full w-full object-cover object-top saturate-[0.85] brightness-[1.03]"
+        />
+        {/* Soften the darker left-side background in the headshot. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-gradient-to-r from-white/18 via-white/5 to-transparent mix-blend-soft-light"
         />
       </div>
     </div>
@@ -110,7 +115,7 @@ export default function HomeIntroduction() {
             <div className="min-w-0 flex-1">
               <div ref={wrapRef} className="relative z-20">
                 <p className="home-greeting">
-                  <span ref={startRef}>H</span>i, I&apos;m
+                  <span ref={startRef}>H</span>i, I am
                 </p>
                 <h1 className="home-name">
                   Darren Tan<span ref={endRef}>g</span>
@@ -134,9 +139,9 @@ export default function HomeIntroduction() {
             <Portrait className="hidden w-20 shrink-0 min-[340px]:block min-[380px]:w-24 sm:w-28 lg:hidden" />
           </div>
 
-          <ul className="mt-6 grid grid-cols-2 gap-2.5 sm:mt-8 sm:flex sm:flex-wrap sm:gap-2.5 lg:mt-9">
+          <ul className="mt-6 grid grid-cols-2 gap-2.5 sm:mt-8 sm:inline-grid sm:grid-cols-4 lg:mt-9">
             {CONTACT_ACTIONS.map((link) => (
-              <li key={link.label} className="min-w-0 sm:w-auto">
+              <li key={link.label} className="min-w-0 sm:w-[8rem]">
                 <a
                   href={link.href}
                   {...(link.external

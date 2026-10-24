@@ -15,7 +15,7 @@ describe('HomePage', () => {
     expect(
       within(intro).getByText((_, node) => {
         const text = node?.textContent?.replace(/\s+/g, ' ').trim() ?? '';
-        return node?.tagName === 'P' && /^Hi, I'm$/i.test(text);
+        return node?.tagName === 'P' && /^Hi, I am$/i.test(text);
       }),
     ).toBeInTheDocument();
     expect(

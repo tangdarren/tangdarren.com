@@ -355,9 +355,9 @@ export function SiteHeader() {
       */}
       <div className="hidden px-[var(--gutter)] lg:block">
         <div
-          className={`mx-auto flex h-14 w-full items-center gap-4 ${SITE_CONTENT_MAX_CLASS}`}
+          className={`relative mx-auto flex h-14 w-full items-center ${SITE_CONTENT_MAX_CLASS}`}
         >
-          <div className="relative z-10 flex h-9 min-w-[7.5rem] shrink-0 items-center">
+          <div className="relative z-10 flex h-9 min-w-0 flex-1 items-center">
             {isHome && (
               <div
                 className={[
@@ -388,14 +388,17 @@ export function SiteHeader() {
             </Link>
           </div>
 
-          <nav aria-label="Primary" className="min-w-0 flex-1 overflow-x-auto">
+          <nav
+            aria-label="Primary"
+            className="absolute left-1/2 top-1/2 z-0 -translate-x-1/2 -translate-y-1/2"
+          >
             <NavLinks
               activeHref={homeActiveHref}
-              className="flex items-center justify-center gap-5 md:gap-7 lg:gap-8"
+              className="flex items-center gap-5 md:gap-7 lg:gap-8"
             />
           </nav>
 
-          <div className="relative z-10 shrink-0">
+          <div className="relative z-10 flex min-w-0 flex-1 items-center justify-end">
             <TopCornerControls />
           </div>
         </div>

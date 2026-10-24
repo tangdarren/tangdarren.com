@@ -10,7 +10,7 @@ function TechCard({
   name: string;
 }) {
   return (
-    <li className="flex min-w-0 w-full items-center rounded-md border border-ink-600 bg-ink-850 p-3">
+    <li className="flex min-w-0 w-full items-center rounded-md border border-ink-600 bg-[#f8f7f4] p-3 dark:bg-ink-900">
       <span
         aria-hidden
         className="mr-2 flex h-5 w-5 shrink-0 items-center justify-center text-[#64748B] dark:text-slate-400 [&_svg]:h-full [&_svg]:w-full"

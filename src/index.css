@@ -201,7 +201,7 @@ body {
   }
 
   .home-location {
-    @apply mt-1.5 text-base font-normal tracking-normal text-[#64748B] dark:text-slate-400 sm:text-lg;
+    @apply mt-2.5 text-lg font-normal tracking-normal text-[#475569] dark:text-slate-300 sm:text-xl lg:mt-3;
   }
 
   .home-section-title {
