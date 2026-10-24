@@ -123,10 +123,9 @@ export function NavLinks({
   } | null>(null);
 
   useLayoutEffect(() => {
-    if (variant !== 'horizontal') {
-      setIndicator(null);
-      return;
-    }
+    // Vertical menus never render the underline; skip measurement entirely
+    // so we never reset indicator state from an effect.
+    if (variant !== 'horizontal') return;
 
     const list = listRef.current;
     if (!list) return;
@@ -237,6 +236,13 @@ export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [pastHero, setPastHero] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  // Track the pathname the menu was last reconciled with so back/forward
+  // (and any other route change) closes it without an effect-driven reset.
+  const [menuPathname, setMenuPathname] = useState(pathname);
+  if (pathname !== menuPathname) {
+    setMenuPathname(pathname);
+    setMenuOpen(false);
+  }
 
   useEffect(() => {
     const update = () => {
@@ -264,10 +270,6 @@ export function SiteHeader() {
       window.removeEventListener('scroll', update);
       window.removeEventListener('resize', update);
     };
-  }, [pathname]);
-
-  useEffect(() => {
-    setMenuOpen(false);
   }, [pathname]);
 
   useEffect(() => {
