@@ -245,30 +245,48 @@ export function SiteHeader() {
   }
 
   useEffect(() => {
-    const update = () => {
-      setScrolled(window.scrollY > 24);
-      setPastHero(window.scrollY > window.innerHeight * 0.55);
+    let rafId = 0;
+    let latestScrolled = false;
+    let latestPastHero = false;
+    let latestActiveHref = '/';
 
-      if (pathname === '/') {
-        setActiveHref(getActiveHrefFromScroll());
+    const apply = () => {
+      rafId = 0;
+      const nextScrolled = window.scrollY > 24;
+      const nextPastHero = window.scrollY > window.innerHeight * 0.55;
+      const nextActiveHref =
+        pathname === '/' ? getActiveHrefFromScroll() : latestActiveHref;
+
+      if (nextScrolled !== latestScrolled) {
+        latestScrolled = nextScrolled;
+        setScrolled(nextScrolled);
+      }
+      if (nextPastHero !== latestPastHero) {
+        latestPastHero = nextPastHero;
+        setPastHero(nextPastHero);
+      }
+      if (pathname === '/' && nextActiveHref !== latestActiveHref) {
+        latestActiveHref = nextActiveHref;
+        setActiveHref(nextActiveHref);
       }
     };
 
-    update();
+    const schedule = () => {
+      if (rafId !== 0) return;
+      rafId = requestAnimationFrame(apply);
+    };
 
-    const raf = requestAnimationFrame(() =>
-      requestAnimationFrame(update),
-    );
-    window.addEventListener('load', update);
-    document.fonts?.ready.then(update).catch(() => {});
-    window.addEventListener('scroll', update, { passive: true });
-    window.addEventListener('resize', update);
+    apply();
+    window.addEventListener('load', schedule);
+    document.fonts?.ready.then(schedule).catch(() => {});
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
 
     return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener('load', update);
-      window.removeEventListener('scroll', update);
-      window.removeEventListener('resize', update);
+      if (rafId !== 0) cancelAnimationFrame(rafId);
+      window.removeEventListener('load', schedule);
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', schedule);
     };
   }, [pathname]);
 
@@ -357,14 +375,18 @@ export function SiteHeader() {
         <div
           className={`relative mx-auto flex h-14 w-full items-center ${SITE_CONTENT_MAX_CLASS}`}
         >
-          <div className="relative z-10 flex h-9 min-w-0 flex-1 items-center">
+          {/*
+            Side columns are flex-1 and would cover the centered nav if they
+            stayed above it — keep them pointer-transparent except controls.
+          */}
+          <div className="relative z-10 flex h-9 min-w-0 flex-1 items-center pointer-events-none">
             {isHome && (
               <div
                 className={[
                   'absolute left-0 top-1/2 -translate-y-1/2 transition-opacity duration-300 motion-reduce:transition-none',
                   pastHero
                     ? 'pointer-events-none opacity-0'
-                    : 'opacity-100',
+                    : 'pointer-events-auto opacity-100',
                 ].join(' ')}
               >
                 <EasterEggButton visible={!pastHero} />
@@ -377,7 +399,7 @@ export function SiteHeader() {
                 'text-lg font-medium tracking-tight text-mist-50 transition-opacity duration-300 motion-reduce:transition-none',
                 isHome && !pastHero
                   ? 'pointer-events-none opacity-0'
-                  : 'opacity-100',
+                  : 'pointer-events-auto opacity-100',
               ].join(' ')}
               onClick={(event) => {
                 scrollToHomeSection(event, pathname, '/');
@@ -390,7 +412,7 @@ export function SiteHeader() {
 
           <nav
             aria-label="Primary"
-            className="absolute left-1/2 top-1/2 z-0 -translate-x-1/2 -translate-y-1/2"
+            className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2"
           >
             <NavLinks
               activeHref={homeActiveHref}
@@ -398,8 +420,10 @@ export function SiteHeader() {
             />
           </nav>
 
-          <div className="relative z-10 flex min-w-0 flex-1 items-center justify-end">
-            <TopCornerControls />
+          <div className="relative z-10 flex min-w-0 flex-1 items-center justify-end pointer-events-none">
+            <div className="pointer-events-auto">
+              <TopCornerControls />
+            </div>
           </div>
         </div>
       </div>

@@ -157,10 +157,27 @@ export default function HomeIntroduction() {
                   aria-label={link.ariaLabel}
                   className={`${INTRO_ACTION} border-ink-600 bg-transparent text-mist-200 hover:border-ink-500 hover:bg-ink-850 hover:text-mist-50`}
                 >
-                  <SocialBrandIcon
-                    id={link.brand}
-                    className={INTRO_ICON_CLASS}
-                  />
+                  {link.brand === 'resume' ? (
+                    // Fixed h-4 slot keeps the button box identical; icon draws larger inside.
+                    <span className="relative inline-flex h-4 w-4 shrink-0 items-center justify-center overflow-visible">
+                      <SocialBrandIcon
+                        id="resume"
+                        className="pointer-events-none absolute left-1/2 top-1/2 h-[21px] w-[21px] -translate-x-1/2 -translate-y-1/2"
+                      />
+                    </span>
+                  ) : link.brand === 'github' ? (
+                    <span className="relative inline-flex h-4 w-4 shrink-0 items-center justify-center overflow-visible">
+                      <SocialBrandIcon
+                        id="github"
+                        className="pointer-events-none absolute left-1/2 top-1/2 h-[1.125rem] w-[1.125rem] -translate-x-1/2 -translate-y-1/2"
+                      />
+                    </span>
+                  ) : (
+                    <SocialBrandIcon
+                      id={link.brand}
+                      className={INTRO_ICON_CLASS}
+                    />
+                  )}
                   <span>{link.label}</span>
                 </a>
               </li>
