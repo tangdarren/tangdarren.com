@@ -213,7 +213,7 @@ body {
   }
 
   .home-skill-name {
-    @apply text-sm font-normal tracking-normal text-[#1e293b] dark:text-slate-200 sm:text-base;
+    @apply text-sm font-normal tracking-normal text-black dark:text-white sm:text-base;
   }
 
   /*

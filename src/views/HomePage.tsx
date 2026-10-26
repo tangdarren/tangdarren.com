@@ -11,8 +11,14 @@ const CONTENT_COLUMN = 'min-w-0 max-w-full px-[var(--gutter)]';
 /** Hero width — matches sticky header content. */
 const HERO_WIDTH = `w-full ${SITE_CONTENT_MAX_CLASS}`;
 
-/** Reading column for Experience / Projects. */
-const SECTION_WIDTH = 'w-full max-w-[45rem] lg:w-[45rem]';
+/** Reading column for Experience. */
+const EXPERIENCE_WIDTH = 'w-full max-w-[45rem] lg:w-[45rem]';
+
+/**
+ * Projects sit inside the header shell, inset past the easter-egg and theme
+ * boxes (w-9) with a little extra breathing room.
+ */
+const PROJECTS_WIDTH = `w-full ${SITE_CONTENT_MAX_CLASS} lg:px-14`;
 
 function HomeProfile() {
   return (
@@ -44,9 +50,13 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="mt-10 flex justify-center border-t border-ink-600 pt-10 sm:mt-12 sm:pt-12 lg:mt-0 lg:border-t-0 lg:pt-8">
-          <div className={`${SECTION_WIDTH} space-y-16 sm:space-y-24 lg:space-y-48 xl:space-y-64`}>
+        <div className="mt-10 flex flex-col items-center border-t border-ink-600 pt-10 sm:mt-12 sm:pt-12 lg:mt-0 lg:border-t-0 lg:pt-8">
+          <div className={EXPERIENCE_WIDTH}>
             <ExperienceEducationSection />
+          </div>
+          <div
+            className={`${PROJECTS_WIDTH} mt-16 sm:mt-24 lg:mt-48 xl:mt-64`}
+          >
             <ProjectsSection />
           </div>
         </div>

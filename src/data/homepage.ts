@@ -99,6 +99,10 @@ export interface HomepageTech {
   id: HomepageTechId;
   name: string;
   description: string;
+  /** Homepage project shown when this skill is opened. */
+  projectId: string;
+  /** Stack labels shown on the skill project page. */
+  projectSkills: string[];
 }
 
 /**
@@ -106,16 +110,79 @@ export interface HomepageTech {
  * Display order fills a 4×2 desktop grid row-first.
  */
 export const HOMEPAGE_TECH: HomepageTech[] = [
-  { id: 'python', name: 'Python', description: 'Automation' },
-  { id: 'typescript', name: 'TypeScript', description: 'Typed JavaScript' },
-  { id: 'postgresql', name: 'PostgreSQL', description: 'SQL Database' },
-  { id: 'react', name: 'React', description: 'UI library' },
-  { id: 'nextjs', name: 'Next.js', description: 'React framework' },
-  { id: 'springboot', name: 'Spring Boot', description: 'Java framework' },
-  { id: 'docker', name: 'Docker', description: 'Containers' },
-  { id: 'aws', name: 'AWS', description: 'Cloud platform' },
+  {
+    id: 'python',
+    name: 'Python',
+    description: 'Automation',
+    projectId: 'tensor-digits',
+    projectSkills: ['Python', 'TensorFlow', 'Machine Learning'],
+  },
+  {
+    id: 'typescript',
+    name: 'TypeScript',
+    description: 'Typed JavaScript',
+    projectId: 'tempest',
+    projectSkills: ['TypeScript', 'React', 'Vite', 'FastAPI'],
+  },
+  {
+    id: 'postgresql',
+    name: 'PostgreSQL',
+    description: 'SQL Database',
+    projectId: 'musicbloom',
+    projectSkills: ['PostgreSQL', 'SQLAlchemy', 'FastAPI', 'Python'],
+  },
+  {
+    id: 'react',
+    name: 'React',
+    description: 'UI library',
+    projectId: 'musicbloom',
+    projectSkills: ['React', 'TypeScript', 'Vite', 'TanStack Query'],
+  },
+  {
+    id: 'nextjs',
+    name: 'Next.js',
+    description: 'React framework',
+    projectId: 'water-reminder',
+    projectSkills: ['Flutter', 'Dart', 'Mobile'],
+  },
+  {
+    id: 'springboot',
+    name: 'Spring Boot',
+    description: 'Java framework',
+    projectId: 'safecall',
+    projectSkills: ['Spring Boot', 'Java', 'React', 'WebSpatial'],
+  },
+  {
+    id: 'docker',
+    name: 'Docker',
+    description: 'Containers',
+    projectId: 'musicbloom',
+    projectSkills: ['Docker', 'Docker Compose', 'FastAPI', 'Python'],
+  },
+  {
+    id: 'aws',
+    name: 'AWS',
+    description: 'Cloud platform',
+    projectId: 'arc-gpt',
+    projectSkills: ['Python', 'PyTorch', 'Transformers', 'Deep Learning'],
+  },
 ];
 
+export function getHomepageProjectById(
+  id: string,
+): HomepageProject | undefined {
+  return HOMEPAGE_PROJECTS.find((project) => project.id === id);
+}
+
+export function getHomepageTechById(
+  id: string,
+): HomepageTech | undefined {
+  return HOMEPAGE_TECH.find((tech) => tech.id === id);
+}
+
+export function skillProjectPath(skillId: HomepageTechId): string {
+  return `/skills/${skillId}`;
+}
 export interface HomepageExperience {
   id: string;
   role: string;

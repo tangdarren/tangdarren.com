@@ -1,4 +1,9 @@
-import { HOMEPAGE_TECH } from '@/data/homepage';
+import Link from 'next/link';
+
+import {
+  HOMEPAGE_TECH,
+  skillProjectPath,
+} from '@/data/homepage';
 
 import TechIcon from '@/components/home/TechIcon';
 
@@ -10,14 +15,20 @@ function TechCard({
   name: string;
 }) {
   return (
-    <li className="flex min-w-0 w-full items-center rounded-md border border-ink-600 bg-[#fafafa] py-3 pl-6 pr-3 dark:bg-ink-900">
-      <span
-        aria-hidden
-        className="mr-3.5 flex h-5 w-5 shrink-0 items-center justify-center text-[#64748B] dark:text-slate-400 [&_svg]:h-full [&_svg]:w-full"
+    <li className="min-w-0 w-full">
+      <Link
+        href={skillProjectPath(id)}
+        aria-label={`${name} — view related project`}
+        className="flex w-full items-center rounded-md border border-ink-600 bg-[#fafafa] py-3 pl-6 pr-3 transition-colors hover:border-ink-500 hover:bg-ink-850 dark:bg-ink-900"
       >
-        <TechIcon id={id} />
-      </span>
-      <p className="home-skill-name min-w-0 leading-snug">{name}</p>
+        <span
+          aria-hidden
+          className="mr-3.5 flex h-5 w-5 shrink-0 items-center justify-center text-[#64748B] dark:text-slate-400 [&_svg]:h-full [&_svg]:w-full"
+        >
+          <TechIcon id={id} />
+        </span>
+        <p className="home-skill-name min-w-0 leading-snug">{name}</p>
+      </Link>
     </li>
   );
 }

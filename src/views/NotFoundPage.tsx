@@ -4,7 +4,7 @@ import NotFoundCharacter from '@/components/not-found/NotFoundCharacter';
 
 export default function NotFoundPage() {
   return (
-    <div className="flex min-h-[55vh] items-center justify-center py-8 lg:min-h-[60vh] lg:py-0">
+    <div className="flex min-h-[calc(100dvh-3.5rem)] items-center justify-center px-[var(--gutter)] py-8">
       <div className="mx-auto w-full max-w-sm text-center sm:max-w-md">
         <p className="font-display text-4xl font-semibold tracking-tight text-mist-50 sm:text-5xl">
           404

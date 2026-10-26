@@ -92,7 +92,7 @@ describe('HomePage', () => {
     expect(document.getElementById('contact')).toBeTruthy();
   });
 
-  it('keeps home, experience, and projects in one shared content column', () => {
+  it('keeps home, experience, and projects under the same page gutter', () => {
     renderWithProviders(<HomePage />, { initialPath: '/' });
 
     // Primary nav lives in Layout's SiteHeader, not on the page itself.
@@ -108,12 +108,13 @@ describe('HomePage', () => {
     expect(projects).toBeTruthy();
     expect(document.getElementById('tech')).toBeTruthy();
 
-    // Experience and Projects share the same content-width column.
-    expect(experience?.parentElement).toBe(projects?.parentElement);
-    // That column sits under the same page gutter wrapper as Home.
-    expect(home?.parentElement).toBe(
-      experience?.parentElement?.parentElement?.parentElement,
-    );
+    // Experience stays in a narrower reading column; Projects is wider.
+    expect(experience?.parentElement).not.toBe(projects?.parentElement);
+    // Both still sit under the same page gutter wrapper as Home.
+    const gutter = home?.parentElement;
+    const sections = experience?.parentElement?.parentElement;
+    expect(sections).toBe(projects?.parentElement?.parentElement);
+    expect(sections?.parentElement).toBe(gutter);
   });
 
   it('renders experience timeline and switches to education', async () => {
@@ -281,6 +282,11 @@ describe('HomePage', () => {
     for (const tech of HOMEPAGE_TECH) {
       expect(screen.getByText(tech.name)).toBeInTheDocument();
       expect(screen.queryByText(tech.description)).not.toBeInTheDocument();
+      expect(
+        screen.getByRole('link', {
+          name: `${tech.name} — view related project`,
+        }),
+      ).toHaveAttribute('href', `/skills/${tech.id}`);
     }
 
     expect(screen.queryByText('Node.js')).not.toBeInTheDocument();

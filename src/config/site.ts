@@ -1,5 +1,6 @@
 /** Shared site metadata for SEO, Open Graph, and sitemap generation. */
 
+import { HOMEPAGE_TECH } from '@/data/homepage';
 import { PROJECTS, hasCaseStudy } from '@/data/projects';
 import { isValidHttpUrl } from '@/lib/url';
 
@@ -51,10 +52,11 @@ export function resolveSiteUrl(envValue?: string | null): string {
   }
 }
 
-/** All indexable paths: static routes plus project case-study pages. */
+/** All indexable paths: static routes, skill project pages, and case studies. */
 export function getSitemapPaths(): string[] {
+  const skillPaths = HOMEPAGE_TECH.map((tech) => `/skills/${tech.id}`);
   const caseStudyPaths = PROJECTS.filter(hasCaseStudy).map(
     (project) => `/projects/${project.id}`,
   );
-  return [...SITE_STATIC_ROUTES, ...caseStudyPaths];
+  return [...SITE_STATIC_ROUTES, ...skillPaths, ...caseStudyPaths];
 }
