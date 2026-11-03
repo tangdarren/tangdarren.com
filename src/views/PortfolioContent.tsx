@@ -1,0 +1,70 @@
+import ExperienceEducationSection from '@/components/home/ExperienceEducationSection';
+import HomeIntroduction from '@/components/home/HomeIntroduction';
+import RetroIntroExperience from '@/components/home/retro-intro/RetroIntroExperience';
+import ProjectsSection from '@/components/home/ProjectsSection';
+import SignatureFooter from '@/components/home/SignatureFooter';
+import TechSection from '@/components/home/TechSection';
+import { SITE_CONTENT_MAX_CLASS } from '@/data/navigation';
+
+/** Shared content inset — ~20–24px on mobile via --gutter. */
+const CONTENT_COLUMN = 'min-w-0 max-w-full px-[var(--gutter)]';
+
+/** Hero width — matches sticky header content. */
+const HERO_WIDTH = `w-full ${SITE_CONTENT_MAX_CLASS}`;
+
+/** Reading column for Experience. */
+const EXPERIENCE_WIDTH = 'w-full max-w-[45rem] lg:w-[45rem]';
+
+/**
+ * Projects sit inside the header shell, inset past the easter-egg and theme
+ * boxes (w-9) with a little extra breathing room.
+ */
+const PROJECTS_WIDTH = `w-full ${SITE_CONTENT_MAX_CLASS} lg:px-14`;
+
+function HomeProfile() {
+  return (
+    <div className="w-full">
+      <HomeIntroduction />
+
+      {/* ~32–40px between intro and skills on mobile; tighter on desktop */}
+      <div className="mt-8 sm:mt-9 lg:mt-6" />
+
+      <TechSection />
+    </div>
+  );
+}
+
+/**
+ * Retro CRT assembly fills the first viewport, then the classic profile +
+ * sections continue below for the full portfolio scroll.
+ */
+export default function PortfolioContent() {
+  return (
+    <>
+      <div id="home" className="home-scroll-target">
+        <RetroIntroExperience />
+      </div>
+
+      <div className={CONTENT_COLUMN}>
+        <div className="flex justify-center py-10 sm:py-12 lg:py-16">
+          <div className={`${HERO_WIDTH} w-full`}>
+            <HomeProfile />
+          </div>
+        </div>
+
+        <div className="mt-10 flex flex-col items-center border-t border-ink-600 pt-10 sm:mt-12 sm:pt-12 lg:mt-0 lg:border-t-0 lg:pt-8">
+          <div className={EXPERIENCE_WIDTH}>
+            <ExperienceEducationSection />
+          </div>
+          <div
+            className={`${PROJECTS_WIDTH} mt-16 sm:mt-24 lg:mt-48 xl:mt-64`}
+          >
+            <ProjectsSection />
+          </div>
+        </div>
+      </div>
+
+      <SignatureFooter />
+    </>
+  );
+}

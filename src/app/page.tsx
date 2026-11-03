@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 
 import HomePage from '@/views/HomePage';
 import { createPageMetadata } from '@/lib/metadata';
@@ -9,6 +9,11 @@ export const metadata: Metadata = createPageMetadata({
     'Software engineer in San Francisco building reliable full-stack systems, backend services, automation, and intelligent applications.',
   path: '/',
 });
+
+export const viewport: Viewport = {
+  themeColor: '#1c1c1b',
+  colorScheme: 'dark',
+};
 
 export default function Page() {
   return <HomePage />;

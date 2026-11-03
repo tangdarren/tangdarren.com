@@ -4,7 +4,7 @@ My personal website and portfolio. A place to share who I am, what I've worked o
 
 **[tangdarren.com](https://tangdarren.com/)**
 
-![Darren Tang portfolio](docs/images/homepage.png)
+![Darren Tang portfolio](docs/images/homepage-v2.png)
 
 ## About
 
@@ -17,3 +17,13 @@ I designed the site around a clean white canvas with soft blue accents, keeping 
 I also wanted the site to have a bit of personality, so there are some easter eggs.
 
 I'll leave finding it to you.
+
+## Old Versions
+
+![Homepage v1](docs/images/homepage-v1.png)
+
+![Homepage v2](docs/images/homepage-v2.png)
+
+![Homepage v3](docs/images/homepage-v3.png)
+
+![Homepage v4](docs/images/homepage-v4.png)

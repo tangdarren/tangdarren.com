@@ -113,7 +113,7 @@ export default function HomeIntroduction() {
   }, [registerAnchors]);
 
   return (
-    <section aria-label="Introduction">
+    <section id="introduction" aria-label="Introduction">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between lg:gap-12">
         <div className="min-w-0 flex-1">
           {/* Mobile: text left + portrait right; desktop text only in this column */}

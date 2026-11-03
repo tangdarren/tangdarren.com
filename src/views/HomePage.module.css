@@ -1,0 +1,156 @@
+.hero {
+  --hero-ground: #1c1c1b;
+  --hero-ink: #f2efe7;
+  --hero-secondary: #b9b7b0;
+  --hero-cursor: #7cce99;
+  --hero-reveal-duration: 600ms;
+  --hero-move-duration: 900ms;
+  --hero-reveal-ease: cubic-bezier(0.65, 0, 0.35, 1);
+
+  display: flex;
+  align-items: center;
+  min-height: 100svh;
+  min-height: 100dvh;
+  padding: max(3rem, env(safe-area-inset-top))
+    max(clamp(1.5rem, 6.5vw, 7rem), env(safe-area-inset-right))
+    max(3rem, env(safe-area-inset-bottom))
+    max(clamp(1.5rem, 6.5vw, 7rem), env(safe-area-inset-left));
+  background: var(--hero-ground);
+  color: var(--hero-ink);
+  color-scheme: dark;
+}
+
+.content {
+  width: 100%;
+  min-width: 0;
+}
+
+.name {
+  position: relative;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0;
+  font-family: var(--font-dm-sans), sans-serif;
+  font-size: clamp(5rem, 13.4vw, 14rem);
+  font-weight: 500;
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+}
+
+.details {
+  margin-top: clamp(2rem, 3.5vw, 3.5rem);
+}
+
+.role {
+  margin: 0;
+  color: var(--hero-secondary);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    'Liberation Mono', monospace;
+  font-size: clamp(0.75rem, 0.9vw, 0.875rem);
+  font-weight: 400;
+  line-height: 1.75;
+  letter-spacing: 0.015em;
+}
+
+.description {
+  max-width: 28rem;
+  margin: 0.875rem 0 0;
+  font-size: clamp(1.0625rem, 1.4vw, 1.25rem);
+  font-weight: 400;
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+.hero ::selection {
+  background: var(--hero-ink);
+  color: var(--hero-ground);
+}
+
+.nameText {
+  display: block;
+}
+
+/* Keep browser overscroll on graphite while this intro is mounted. */
+:global(html):has(.hero),
+:global(body):has(.hero) {
+  background: #1c1c1b;
+}
+
+.word {
+  display: inline-block;
+  transform-origin: top left;
+}
+
+.loadingStatus {
+  display: none;
+}
+
+/* With no script or reduced motion, the default is the finished hero. */
+@media (prefers-reduced-motion: no-preference) and (scripting: enabled) {
+  .hero[data-phase='loading'] .name {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: max-content;
+    max-width: none;
+    font-size: clamp(2.25rem, 5vw, 5rem);
+    transform: translate(-50%, -50%);
+  }
+
+  .hero[data-phase='loading'] .details {
+    visibility: hidden;
+  }
+
+  .loadingStatus {
+    display: block;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .hero[data-phase='loading'] .nameText {
+    animation: reveal-name var(--hero-reveal-duration) var(--hero-reveal-ease) both;
+  }
+
+  .hero[data-phase='loading'] .name::after {
+    content: '';
+    position: absolute;
+    inset: 0 -0.05em 0 0;
+    border-right: 2px solid var(--hero-cursor);
+    pointer-events: none;
+    animation: sweep-cursor var(--hero-reveal-duration) var(--hero-reveal-ease) both;
+  }
+
+  .hero[data-phase='revealing'] .role {
+    animation: reveal-detail 240ms ease-out var(--hero-move-duration) both;
+  }
+
+  .hero[data-phase='revealing'] .description {
+    animation: reveal-detail 240ms ease-out 1050ms both;
+  }
+}
+
+@keyframes reveal-detail {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes reveal-name {
+  from { clip-path: inset(-0.15em 100% -0.15em -0.05em); }
+  to { clip-path: inset(-0.15em -0.05em -0.15em -0.05em); }
+}
+
+@keyframes sweep-cursor {
+  from { transform: translateX(-100%); opacity: 1; }
+  99.9% { opacity: 1; }
+  to { transform: translateX(0); opacity: 0; }
+}
+
+/* Keep the phone's two-line silhouette throughout the move. */
+@media (prefers-reduced-motion: no-preference) and (scripting: enabled) and (max-width: 600px) {
+  .hero[data-phase='loading'] .name {
+    width: min-content;
+  }
+}
