@@ -184,12 +184,12 @@ describe('Layout', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('renders a sticky header with brand and menu or primary links', () => {
+  it('renders a sticky header with brand and menu or primary links on non-home routes', () => {
     renderWithProviders(
       <Layout>
-        <div>Home content</div>
+        <div>Projects content</div>
       </Layout>,
-      { initialPath: '/' },
+      { initialPath: '/projects' },
     );
 
     expect(screen.getByRole('banner')).toBeInTheDocument();

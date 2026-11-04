@@ -3,7 +3,7 @@ import { render, type RenderOptions } from '@testing-library/react';
 import { ThemeProvider } from 'next-themes';
 import { usePathname, useSearchParams } from 'next/navigation';
 
-import { EasterEggProvider } from '@/components/easter-egg/EasterEggContext';
+import { EasterEggProvider } from '@/components/easter-egg/EasterEggProvider';
 import { nextRouterState } from '@/test/next-router-state';
 
 function LocationProbe() {

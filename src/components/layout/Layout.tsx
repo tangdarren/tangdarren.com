@@ -1,6 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
 
 import { SiteHeader } from './Navbar';
 
@@ -13,6 +14,8 @@ interface LayoutProps {
  * Content is full-width; page views own their own column width.
  */
 export default function Layout({ children }: LayoutProps) {
+  const isHomePrototype = usePathname() === '/';
+
   return (
     <div className="min-h-screen">
       <a
@@ -22,7 +25,7 @@ export default function Layout({ children }: LayoutProps) {
         Skip to main content
       </a>
 
-      <SiteHeader />
+      {!isHomePrototype && <SiteHeader />}
 
       <main id="main-content" className="w-full">
         {children}

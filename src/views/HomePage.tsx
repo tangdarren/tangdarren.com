@@ -1,68 +1,175 @@
-import ExperienceEducationSection from '@/components/home/ExperienceEducationSection';
-import HomeIntroduction from '@/components/home/HomeIntroduction';
-import ProjectsSection from '@/components/home/ProjectsSection';
-import SignatureFooter from '@/components/home/SignatureFooter';
-import TechSection from '@/components/home/TechSection';
-import { SITE_CONTENT_MAX_CLASS } from '@/data/navigation';
+'use client';
 
-/** Shared content inset — ~20–24px on mobile via --gutter. */
-const CONTENT_COLUMN = 'min-w-0 max-w-full px-[var(--gutter)]';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
-/** Hero width — matches sticky header content. */
-const HERO_WIDTH = `w-full ${SITE_CONTENT_MAX_CLASS}`;
+import Grainient from '@/components/home/Grainient';
 
-/** Reading column for Experience. */
-const EXPERIENCE_WIDTH = 'w-full max-w-[45rem] lg:w-[45rem]';
+import styles from './HomePage.module.css';
 
-/**
- * Projects sit inside the header shell, inset past the easter-egg and theme
- * boxes (w-9) with a little extra breathing room.
- */
-const PROJECTS_WIDTH = `w-full ${SITE_CONTENT_MAX_CLASS} lg:px-14`;
+type IntroPhase = 'loading' | 'revealing' | 'complete';
 
-function HomeProfile() {
-  return (
-    <div className="w-full">
-      <HomeIntroduction />
+/** Pause after the name finishes typing, before it moves into place. */
+const REVEAL_HOLD_MS = 300;
 
-      {/* ~32–40px between intro and skills on mobile; tighter on desktop */}
-      <div className="mt-8 sm:mt-9 lg:mt-6" />
+const DESCRIPTION = 'I build software and AI tools for real workflows.';
+/** When the cursor starts typing the description, after the name lands. */
+const TYPE_START_MS = 1150;
+const TYPE_CHAR_MS = 30;
 
-      <TechSection />
-    </div>
-  );
+/** Reads a CSS time variable in ms (production CSS may normalize 900ms to .9s). */
+function cssDurationMs(element: Element, name: string, fallback: number) {
+  const value = getComputedStyle(element).getPropertyValue(name).trim();
+  return parseFloat(value) * (value.endsWith('ms') ? 1 : 1000) || fallback;
 }
 
-/**
- * Mobile: natural flow under the sticky header (no forced hero height).
- * Desktop: pull under the header and vertically center in the viewport.
- */
+/** Name-first intro. The existing portfolio lives in PortfolioContent. */
 export default function HomePage() {
-  return (
-    <>
-      <div className={CONTENT_COLUMN}>
-        <div
-          id="home"
-          className="home-scroll-target flex justify-center py-8 sm:py-10 lg:-mt-14 lg:min-h-dvh lg:items-center lg:py-0"
-        >
-          <div className={`${HERO_WIDTH} w-full lg:py-16`}>
-            <HomeProfile />
-          </div>
-        </div>
+  const [phase, setPhase] = useState<IntroPhase>('loading');
+  const [typed, setTyped] = useState(0);
+  const words = useRef<(HTMLSpanElement | null)[]>([null, null]);
+  const startingRects = useRef<DOMRect[]>([]);
 
-        <div className="mt-10 flex flex-col items-center border-t border-ink-600 pt-10 sm:mt-12 sm:pt-12 lg:mt-0 lg:border-t-0 lg:pt-8">
-          <div className={EXPERIENCE_WIDTH}>
-            <ExperienceEducationSection />
-          </div>
-          <div
-            className={`${PROJECTS_WIDTH} mt-16 sm:mt-24 lg:mt-48 xl:mt-64`}
-          >
-            <ProjectsSection />
-          </div>
+  // Move the actual heading words from their loading positions into the hero.
+  // Per-word transforms let the phone layout wrap without a text swap.
+  useLayoutEffect(() => {
+    if (phase !== 'revealing') return;
+
+    const animations: Animation[] = [];
+    words.current.forEach((word, index) => {
+      const start = startingRects.current[index];
+      if (!word || !start || typeof word.animate !== 'function') return;
+      const end = word.getBoundingClientRect();
+      if (!end.width || !end.height) return;
+      const duration = cssDurationMs(word, '--hero-move-duration', 900);
+      animations.push(word.animate([
+        {
+          transform: `translate(${start.left - end.left}px, ${start.top - end.top}px) scale(${start.width / end.width}, ${start.height / end.height})`,
+        },
+        { transform: 'none' },
+      ], {
+        duration,
+        easing: 'cubic-bezier(0.65, 0, 0.35, 1)',
+        fill: 'both',
+      }));
+    });
+
+    const onResize = () => setPhase('complete');
+    window.addEventListener('resize', onResize);
+    return () => {
+      animations.forEach((animation) => animation.cancel());
+      window.removeEventListener('resize', onResize);
+    };
+  }, [phase]);
+
+  // The intro cursor carries on: it types the description, then stays as a caret.
+  useEffect(() => {
+    if (phase !== 'revealing') return;
+    let count = 0;
+    let timer = setTimeout(function step() {
+      count += 1;
+      setTyped(count);
+      if (count >= DESCRIPTION.length) setPhase('complete');
+      else timer = setTimeout(step, TYPE_CHAR_MS);
+    }, TYPE_START_MS);
+    return () => clearTimeout(timer);
+  }, [phase]);
+
+  useEffect(() => {
+    const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    let cancelled = false;
+    let finished = false;
+    let onLoad: (() => void) | undefined;
+
+    const finish = () => {
+      if (cancelled) return;
+      finished = true;
+      setPhase('complete');
+    };
+    const onMotionChange = () => {
+      if (motion.matches) finish();
+    };
+    motion.addEventListener('change', onMotionChange);
+
+    // CSS already shows the finished heading on the first reduced-motion frame.
+    if (motion.matches) {
+      queueMicrotask(finish);
+    } else {
+      const delay = (ms: number) => new Promise<void>((resolve) => {
+        timers.push(setTimeout(resolve, ms));
+      });
+      const pageReady = new Promise<void>((resolve) => {
+        if (document.readyState === 'complete') resolve();
+        else {
+          onLoad = resolve;
+          window.addEventListener('load', onLoad, { once: true });
+        }
+      });
+      const fontsReady = document.fonts?.ready.catch(() => undefined);
+      // Keep the opening legible, wait for real readiness, and bound failures.
+      const assetsReady = Promise.race([
+        Promise.all([pageReady, fontsReady]),
+        delay(6000),
+      ]);
+      // Let the typed name finish, then hold briefly before it moves.
+      const revealMs = words.current[0]
+        ? cssDurationMs(words.current[0], '--hero-reveal-duration', 600)
+        : 600;
+      Promise.all([assetsReady, delay(revealMs + REVEAL_HOLD_MS)]).then(() => {
+        if (cancelled || finished) return;
+        if (motion.matches) {
+          finish();
+          return;
+        }
+        startingRects.current = words.current.map((word) =>
+          word?.getBoundingClientRect() ?? new DOMRect(),
+        );
+        setPhase('revealing');
+        // Also complete if animation events are disabled or interrupted.
+        timers.push(setTimeout(finish, 4000));
+      });
+    }
+
+    return () => {
+      cancelled = true;
+      timers.forEach(clearTimeout);
+      if (onLoad) window.removeEventListener('load', onLoad);
+      motion.removeEventListener('change', onMotionChange);
+    };
+  }, []);
+
+  const shown = phase === 'complete' ? DESCRIPTION.length : typed;
+
+  return (
+    <section
+      id="home"
+      aria-labelledby="hero-name"
+      data-phase={phase}
+      className={styles.hero}
+    >
+      {phase !== 'complete' && (
+        <span className={styles.loadingStatus} role="status" aria-label="Loading portfolio">Loading portfolio</span>
+      )}
+      <Grainient className={styles.backdrop} />
+      <div className={styles.content}>
+        <h1 id="hero-name" className={styles.name}>
+          <span className={styles.nameText}>
+            <span className={styles.word} ref={(node) => { words.current[0] = node; }}>Darren</span>{' '}
+            <span className={styles.word} ref={(node) => { words.current[1] = node; }}>Tang</span>
+          </span>
+        </h1>
+        <div className={styles.details}>
+          <p className={styles.role}>Software Engineer · San Francisco</p>
+          <p className={styles.description}>
+            <span className={styles.srOnly}>{DESCRIPTION}</span>
+            <span aria-hidden="true">
+              {DESCRIPTION.slice(0, shown)}
+              <span className={styles.caret} />
+              <span className={styles.untyped}>{DESCRIPTION.slice(shown)}</span>
+            </span>
+          </p>
         </div>
       </div>
-
-      <SignatureFooter />
-    </>
+    </section>
   );
 }

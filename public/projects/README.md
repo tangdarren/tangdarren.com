@@ -10,4 +10,6 @@ public/projects/<project-id>/screen-01.png
 Then reference them from `src/data/projects.ts`:
 
 - `image` — card/thumbnail hero image
-- `screenshots` — `{ src, alt }[]` for the project details modal
+- `screenshots` or `caseStudy.screenshots` — `{ src, alt }[]` for project case studies
+
+Everything in `public/` is served directly. Only add images meant to be public.

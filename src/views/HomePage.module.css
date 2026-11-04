@@ -1,0 +1,214 @@
+.hero {
+  --hero-ground: #0d0c14;
+  --hero-ink: #f2efe7;
+  --hero-secondary: #b9b7b0;
+  --hero-cursor: #7cce99;
+  --hero-reveal-duration: 1400ms;
+  --hero-move-duration: 900ms;
+  --hero-reveal-ease: cubic-bezier(0.65, 0, 0.35, 1);
+
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  min-height: 100svh;
+  min-height: 100dvh;
+  padding: max(3rem, env(safe-area-inset-top))
+    max(clamp(1.5rem, 6.5vw, 7rem), env(safe-area-inset-right))
+    max(3rem, env(safe-area-inset-bottom))
+    max(clamp(1.5rem, 6.5vw, 7rem), env(safe-area-inset-left));
+  background: var(--hero-ground);
+  color: var(--hero-ink);
+  color-scheme: dark;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Animated grainy gradient (Grainient), same look as the stock dashboard hero. */
+.backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.name {
+  position: relative;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0;
+  font-family: var(--font-dm-sans), sans-serif;
+  font-size: clamp(5rem, 13.4vw, 14rem);
+  font-weight: 500;
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+}
+
+.details {
+  margin-top: clamp(2rem, 3.5vw, 3.5rem);
+}
+
+.role {
+  margin: 0;
+  color: var(--hero-secondary);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    'Liberation Mono', monospace;
+  font-size: clamp(0.9375rem, 1.25vw, 1.1875rem);
+  font-weight: 400;
+  line-height: 1.75;
+  letter-spacing: 0.015em;
+}
+
+.description {
+  max-width: 44rem;
+  margin: 1rem 0 0;
+  font-size: clamp(1.25rem, 2vw, 1.875rem);
+  font-weight: 400;
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+/*
+  The intro's typing cursor, kept as a caret at the end of the description.
+  Zero width so moving it never reflows the line; untyped text holds the space.
+*/
+.caret {
+  position: relative;
+  display: inline-block;
+  width: 0;
+  height: 1em;
+  vertical-align: -0.12em;
+}
+
+.caret::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0.12em;
+  width: 2px;
+  background: var(--hero-cursor);
+}
+
+.untyped {
+  color: transparent;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.hero ::selection {
+  background: var(--hero-ink);
+  color: var(--hero-ground);
+}
+
+.nameText {
+  display: block;
+}
+
+/* Keep browser overscroll on graphite while this intro is mounted. */
+:global(html):has(.hero),
+:global(body):has(.hero) {
+  background: #0d0c14;
+}
+
+.word {
+  display: inline-block;
+  transform-origin: top left;
+}
+
+.loadingStatus {
+  display: none;
+}
+
+/* With no script or reduced motion, the default is the finished hero. */
+@media (prefers-reduced-motion: no-preference) and (scripting: enabled) {
+  .hero[data-phase='loading'] .name {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: max-content;
+    max-width: none;
+    font-size: clamp(2.25rem, 5vw, 5rem);
+    transform: translate(-50%, -50%);
+  }
+
+  .hero[data-phase='loading'] .details {
+    visibility: hidden;
+  }
+
+  .loadingStatus {
+    display: block;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .hero[data-phase='loading'] .nameText {
+    animation: reveal-name var(--hero-reveal-duration) var(--hero-reveal-ease) both;
+  }
+
+  .hero[data-phase='loading'] .name::after {
+    content: '';
+    position: absolute;
+    inset: 0 -0.05em 0 0;
+    border-right: 2px solid var(--hero-cursor);
+    pointer-events: none;
+    animation: sweep-cursor var(--hero-reveal-duration) var(--hero-reveal-ease) both;
+  }
+
+  .hero[data-phase='revealing'] .role {
+    animation: reveal-detail 240ms ease-out var(--hero-move-duration) both;
+  }
+
+  .hero[data-phase='revealing'] .description {
+    animation: reveal-detail 240ms ease-out var(--hero-move-duration) both;
+  }
+
+  /* A few blinks once typing finishes, then a steady caret. */
+  .hero[data-phase='complete'] .caret::after {
+    animation: blink-caret 1s steps(1, end) 4;
+  }
+}
+
+@keyframes blink-caret {
+  50% { opacity: 0; }
+}
+
+@keyframes reveal-detail {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes reveal-name {
+  from { clip-path: inset(-0.15em 100% -0.15em -0.05em); }
+  to { clip-path: inset(-0.15em -0.05em -0.15em -0.05em); }
+}
+
+@keyframes sweep-cursor {
+  from { transform: translateX(-100%); opacity: 1; }
+  99.9% { opacity: 1; }
+  to { transform: translateX(0); opacity: 0; }
+}
+
+/* Keep the phone's two-line silhouette throughout the move. */
+@media (prefers-reduced-motion: no-preference) and (scripting: enabled) and (max-width: 600px) {
+  .hero[data-phase='loading'] .name {
+    width: min-content;
+  }
+}

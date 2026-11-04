@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-// Semantic palette via CSS variables (see src/index.css).
+// Semantic palette via CSS variables (see src/app/globals.css).
 // Token names stay stable; [data-mode="dark"] remaps the underlying RGB channels.
 //   ink-*   → surface backgrounds / borders
 //   mist-*  → text (primary → muted)
