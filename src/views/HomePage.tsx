@@ -161,7 +161,7 @@ export default function HomePage() {
           </span>
         </h1>
         <div className={styles.details}>
-          <p className={styles.role}>Software Engineer · San Francisco</p>
+          <p className={styles.role}>Software Engineer · Fremont</p>
           <p className={styles.description}>
             <span className={styles.srOnly}>{DESCRIPTION}</span>
             <span aria-hidden="true">

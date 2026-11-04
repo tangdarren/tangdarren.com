@@ -108,7 +108,7 @@ export const EDUCATION: EducationEntry[] = [
     },
   },
   {
-    school: 'University of Wisconsin–Madison',
+    school: 'University of Wisconsin, Madison',
     degree: 'Bachelor of Science in Computer Science',
     dates: 'September 2021 – May 2025',
     details: [

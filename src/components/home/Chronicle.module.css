@@ -243,7 +243,8 @@
 .asideOrg {
   margin: 1.5rem 0 0;
   color: var(--accent);
-  font-size: clamp(1.5rem, 2.4vw, 2.375rem);
+  font-size: clamp(1.75rem, 2.9vw, 2.875rem);
+  line-height: 1.15;
   letter-spacing: -0.015em;
   animation: roll-in 560ms cubic-bezier(0.22, 1, 0.36, 1) 80ms both;
 }
@@ -336,12 +337,6 @@
   font-weight: 500;
 }
 
-.org {
-  margin: 0.5rem 0 0;
-  color: var(--secondary);
-  font-size: 1rem;
-}
-
 .points,
 .point {
   max-width: 60ch;
@@ -358,19 +353,23 @@
   list-style: none;
 }
 
+/* Dots sit inside the text column: each dot lines up with the title's left
+   edge, and wrapped lines align with the text after the dot, not under it. */
 .points li {
-  position: relative;
+  display: grid;
+  grid-template-columns: 0.375rem minmax(0, 1fr);
+  column-gap: 0.875rem;
 }
 
-/* Hanging markers, so bullet text lines up with the title. */
 .points li::before {
   content: '';
-  position: absolute;
-  top: 0.85em;
-  left: -1.1em;
-  width: 0.4em;
-  height: 2px;
-  background: var(--secondary);
+  width: 0.375rem;
+  height: 0.375rem;
+  /* Centre on the first line: (line-height − dot) / 2. */
+  margin-top: calc((1.75em - 0.375rem) / 2);
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.75;
 }
 
 /* ── Projects ─────────────────────────────────────────────── */
