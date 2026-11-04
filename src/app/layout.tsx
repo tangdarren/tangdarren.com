@@ -9,7 +9,7 @@ import {
   getSiteUrl,
 } from '@/config/site';
 
-import '../index.css';
+import './globals.css';
 
 // No `weight` list — loads the variable font so in-between weights (e.g. 550) work.
 const dmSans = DM_Sans({

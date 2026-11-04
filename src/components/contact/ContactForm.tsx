@@ -34,7 +34,7 @@ const CONTACT_EMAIL = 'tang.darren@gmail.com';
 
 /**
  * Frontend contact form. Wire up a real provider by setting
- * NEXT_PUBLIC_CONTACT_ENDPOINT in .env.local. See .env.example. When the env
+ * NEXT_PUBLIC_CONTACT_ENDPOINT in .env. See .env.example. When the env
  * var is missing, a validated submit opens the visitor's email application via
  * mailto instead of claiming a message was sent.
  */

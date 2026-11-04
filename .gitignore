@@ -5,7 +5,10 @@ node_modules/
 
 # Production / tooling output
 dist/
+out/
 coverage/
+.vercel/
+.turbo/
 *.local
 
 # Next.js
@@ -13,11 +16,17 @@ coverage/
 next-env.d.ts
 
 # Environment
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env*
+!.env.example
+
+# Local credentials
+.aws/
+.ssh/
+.npmrc
+*.pem
+*.key
+*.p12
+*.pfx
 
 # Editor / OS
 .DS_Store
@@ -34,6 +43,7 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+*.log
 
 # TypeScript build info
 *.tsbuildinfo

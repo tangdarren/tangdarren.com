@@ -2,9 +2,20 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
+import DotPattern from '@/components/home/DotPattern';
+
 import styles from './HomePage.module.css';
 
 type IntroPhase = 'loading' | 'revealing' | 'complete';
+
+/** Pause after the name finishes typing, before it moves into place. */
+const REVEAL_HOLD_MS = 300;
+
+/** Reads a CSS time variable in ms (production CSS may normalize 900ms to .9s). */
+function cssDurationMs(element: Element, name: string, fallback: number) {
+  const value = getComputedStyle(element).getPropertyValue(name).trim();
+  return parseFloat(value) * (value.endsWith('ms') ? 1 : 1000) || fallback;
+}
 
 /** Name-first intro. The existing portfolio lives in PortfolioContent. */
 export default function HomePage() {
@@ -23,11 +34,7 @@ export default function HomePage() {
       if (!word || !start || typeof word.animate !== 'function') return;
       const end = word.getBoundingClientRect();
       if (!end.width || !end.height) return;
-      // Production CSS may normalize 900ms to .9s.
-      const cssDuration = getComputedStyle(word)
-        .getPropertyValue('--hero-move-duration').trim();
-      const duration = parseFloat(cssDuration)
-        * (cssDuration.endsWith('ms') ? 1 : 1000) || 900;
+      const duration = cssDurationMs(word, '--hero-move-duration', 900);
       animations.push(word.animate([
         {
           transform: `translate(${start.left - end.left}px, ${start.top - end.top}px) scale(${start.width / end.width}, ${start.height / end.height})`,
@@ -85,7 +92,11 @@ export default function HomePage() {
         Promise.all([pageReady, fontsReady]),
         delay(6000),
       ]);
-      Promise.all([assetsReady, delay(900)]).then(() => {
+      // Let the typed name finish, then hold briefly before it moves.
+      const revealMs = words.current[0]
+        ? cssDurationMs(words.current[0], '--hero-reveal-duration', 600)
+        : 600;
+      Promise.all([assetsReady, delay(revealMs + REVEAL_HOLD_MS)]).then(() => {
         if (cancelled || finished) return;
         if (motion.matches) {
           finish();
@@ -118,6 +129,7 @@ export default function HomePage() {
       {phase !== 'complete' && (
         <span className={styles.loadingStatus} role="status" aria-label="Loading portfolio">Loading portfolio</span>
       )}
+      <DotPattern className={styles.dots} width={14} height={14} cx={1} cy={1} cr={1} />
       <div className={styles.content}>
         <h1 id="hero-name" className={styles.name}>
           <span className={styles.nameText}>

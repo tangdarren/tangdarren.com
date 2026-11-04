@@ -82,16 +82,19 @@ export default function RetroIntroExperience() {
   }, [clearTimers]);
 
   useEffect(() => {
-    const skipMotion = prefersReducedMotion();
-    const seen = hasSeenIntro();
+    // Initialize from browser preferences after hydration; cancel on unmount.
+    const start = window.setTimeout(() => {
+      if (prefersReducedMotion() || hasSeenIntro()) {
+        finishAssembled({ animate: false });
+      } else {
+        beginAssembly();
+      }
+    }, 0);
 
-    if (skipMotion || seen) {
-      finishAssembled({ animate: false });
-      return;
-    }
-
-    beginAssembly();
-    return clearTimers;
+    return () => {
+      window.clearTimeout(start);
+      clearTimers();
+    };
   }, [beginAssembly, clearTimers, finishAssembled, replayToken]);
 
   const skipIntro = () => {

@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 
-import { EasterEggProvider } from '@/components/easter-egg/EasterEggContext';
+import { EasterEggProvider } from '@/components/easter-egg/EasterEggProvider';
 import Layout from '@/components/layout/Layout';
 import ScrollToTop from '@/components/layout/ScrollToTop';
 
