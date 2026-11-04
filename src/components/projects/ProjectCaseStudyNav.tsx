@@ -2,24 +2,14 @@ import Link from 'next/link';
 import { ArrowLeft, ArrowRight, GalleryHorizontalEnd } from 'lucide-react';
 
 import {
+  PROJECTS_LIST_PATH,
   getCaseStudyNeighbors,
   projectCaseStudyPath,
-  projectsGalleryPath,
   type Project,
-  type ProjectFilter,
 } from '@/data/projects';
 
-interface ProjectCaseStudyNavProps {
-  project: Project;
-  filter?: ProjectFilter;
-}
-
-export default function ProjectCaseStudyNav({
-  project,
-  filter = 'All',
-}: ProjectCaseStudyNavProps) {
-  const { previous, next } = getCaseStudyNeighbors(project.id, filter);
-  const galleryPath = projectsGalleryPath(filter);
+export default function ProjectCaseStudyNav({ project }: { project: Project }) {
+  const { previous, next } = getCaseStudyNeighbors(project.id);
 
   return (
     <nav
@@ -29,7 +19,7 @@ export default function ProjectCaseStudyNav({
       <div className="flex flex-col gap-4 sm:flex-row sm:items-stretch sm:justify-between">
         {previous ? (
           <Link
-            href={projectCaseStudyPath(previous.id, filter)}
+            href={projectCaseStudyPath(previous.id)}
             className="panel panel-hover flex min-w-0 flex-1 flex-col gap-1 p-4"
             aria-label={`Previous case study: ${previous.name}`}
           >
@@ -48,14 +38,14 @@ export default function ProjectCaseStudyNav({
           <div className="hidden flex-1 sm:block" aria-hidden />
         )}
 
-        <Link href={galleryPath} className="btn-secondary self-center shrink-0">
+        <Link href={PROJECTS_LIST_PATH} className="btn-secondary self-center shrink-0">
           <GalleryHorizontalEnd className="h-4 w-4" />
           Projects
         </Link>
 
         {next ? (
           <Link
-            href={projectCaseStudyPath(next.id, filter)}
+            href={projectCaseStudyPath(next.id)}
             className="panel panel-hover flex min-w-0 flex-1 flex-col gap-1 p-4 text-left sm:items-end sm:text-right"
             aria-label={`Next case study: ${next.name}`}
           >

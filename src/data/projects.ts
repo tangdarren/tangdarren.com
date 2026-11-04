@@ -363,7 +363,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: 'vr-first-responder-training',
-    name: 'SafeCall',
+    name: 'SafeCall VR',
     summary:
       'An immersive WebSpatial training experience for emergency-response scenarios on Apple Vision Pro.',
     description:
@@ -441,29 +441,13 @@ export function hasCaseStudy(project: Project): boolean {
   return Boolean(project.caseStudy);
 }
 
-export type ProjectFilter = ProjectCategory | 'All';
-
-export function isProjectFilter(
-  value: string | null | undefined,
-): value is ProjectFilter {
-  if (!value) return false;
-  return (PROJECT_FILTERS as readonly string[]).includes(value);
+/** Projects that have a dedicated case-study page, in list order. */
+export function getCaseStudyProjects(): Project[] {
+  return PROJECTS.filter(hasCaseStudy);
 }
 
-/** Projects that have a dedicated case-study page, optionally narrowed by gallery filter. */
-export function getCaseStudyProjects(filter: ProjectFilter = 'All'): Project[] {
-  return PROJECTS.filter((project) => {
-    if (!hasCaseStudy(project)) return false;
-    if (filter === 'All') return true;
-    return project.categories.includes(filter);
-  });
-}
-
-export function getCaseStudyNeighbors(
-  id: string,
-  filter: ProjectFilter = 'All',
-): { previous?: Project; next?: Project } {
-  const list = getCaseStudyProjects(filter);
+export function getCaseStudyNeighbors(id: string): { previous?: Project; next?: Project } {
+  const list = getCaseStudyProjects();
   const index = list.findIndex((project) => project.id === id);
   if (index === -1) return {};
   return {
@@ -472,157 +456,9 @@ export function getCaseStudyNeighbors(
   };
 }
 
-export function projectsGalleryPath(filter: ProjectFilter = 'All'): string {
-  if (filter === 'All') return '/projects';
-  return `/projects?category=${encodeURIComponent(filter)}`;
-}
+/** Case studies link back to the project list on the home page. */
+export const PROJECTS_LIST_PATH = '/#projects';
 
-export function projectCaseStudyPath(
-  id: string,
-  filter: ProjectFilter = 'All',
-): string {
-  if (filter === 'All') return `/projects/${id}`;
-  return `/projects/${id}?category=${encodeURIComponent(filter)}`;
-}
-
-export const PROJECT_FILTERS: readonly ProjectFilter[] = [
-  'All',
-  'Full-Stack',
-  'AI',
-  'Financial Technology',
-  'Extended Reality',
-  'Interactive Training',
-] as const;
-
-/** Known language identifiers (with optional version suffixes like "Java 21"). */
-const LANGUAGE_TECHNOLOGIES = new Set([
-  'TypeScript',
-  'JavaScript',
-  'Python',
-  'Java',
-  'SQL',
-  'Go',
-  'C',
-  'C++',
-  'Rust',
-  'Kotlin',
-  'Swift',
-]);
-
-/**
- * Broader, recruiter-recognizable tools that may appear as gallery filters.
- * More specific stack tags map into these via `TOOL_FILTER_ALIASES`.
- */
-const GALLERY_TOOL_FILTERS = [
-  'React',
-  'Spring Boot',
-  'FastAPI',
-  'Docker',
-  'Firebase',
-  'PostgreSQL',
-  'Vite',
-  'Azure DevOps',
-] as const;
-
-const GALLERY_TOOL_FILTER_SET = new Set<string>(GALLERY_TOOL_FILTERS);
-
-/**
- * Map implementation-detail tags onto a canonical gallery tool filter.
- * Unmapped non-language tags are omitted from the Tools filter list.
- */
-const TOOL_FILTER_ALIASES: Record<string, string> = {
-  React: 'React',
-  'Spring Boot': 'Spring Boot',
-  FastAPI: 'FastAPI',
-  Docker: 'Docker',
-  Firebase: 'Firebase',
-  Firestore: 'Firebase',
-  'Cloud Storage': 'Firebase',
-  PostgreSQL: 'PostgreSQL',
-  Vite: 'Vite',
-  'Azure DevOps': 'Azure DevOps',
-  'Azure Pipelines': 'Azure DevOps',
-};
-
-export type TechnologyKind = 'language' | 'tool';
-
-/** Strip trailing version tokens so "Java 21" matches language "Java". */
-export function normalizeTechnologyName(name: string): string {
-  return name.replace(/\s+\d+(?:\.\d+)*\b/g, '').trim();
-}
-
-export function getTechnologyKind(name: string): TechnologyKind {
-  const normalized = normalizeTechnologyName(name);
-  return LANGUAGE_TECHNOLOGIES.has(normalized) ? 'language' : 'tool';
-}
-
-/** Resolve a project technology tag to a gallery tool filter, if any. */
-export function toGalleryToolFilter(name: string): string | null {
-  const normalized = normalizeTechnologyName(name);
-  if (LANGUAGE_TECHNOLOGIES.has(normalized)) return null;
-
-  const mapped = TOOL_FILTER_ALIASES[normalized];
-  if (mapped && GALLERY_TOOL_FILTER_SET.has(mapped)) return mapped;
-
-  if (GALLERY_TOOL_FILTER_SET.has(normalized)) return normalized;
-  return null;
-}
-
-function collectProjectLanguages(project: Project): string[] {
-  return project.technologies
-    .map(normalizeTechnologyName)
-    .filter((name) => LANGUAGE_TECHNOLOGIES.has(name));
-}
-
-function collectProjectGalleryTools(project: Project): string[] {
-  return uniqueSorted(
-    project.technologies
-      .map(toGalleryToolFilter)
-      .filter((name): name is string => Boolean(name)),
-  );
-}
-
-function uniqueSorted(values: Iterable<string>): string[] {
-  return [...new Set(values)].sort((a, b) => a.localeCompare(b));
-}
-
-/** Languages that appear in at least one project's `technologies` list. */
-export function getGalleryLanguageFilters(): string[] {
-  return uniqueSorted(PROJECTS.flatMap(collectProjectLanguages));
-}
-
-/**
- * Canonical tool filters that appear (directly or via alias) in at least one
- * project's `technologies` list. Order follows `GALLERY_TOOL_FILTERS`.
- */
-export function getGalleryToolFilters(): string[] {
-  const used = new Set(PROJECTS.flatMap(collectProjectGalleryTools));
-  return GALLERY_TOOL_FILTERS.filter((tool) => used.has(tool));
-}
-
-export function projectHasLanguage(
-  project: Project,
-  language: string,
-): boolean {
-  const target = normalizeTechnologyName(language);
-  return collectProjectLanguages(project).includes(target);
-}
-
-export function projectHasGalleryTool(project: Project, tool: string): boolean {
-  const target = normalizeTechnologyName(tool);
-  return collectProjectGalleryTools(project).includes(target);
-}
-
-/**
- * Gallery matching: optional single language + multi-select tools (AND).
- * Pass `language` as null/undefined when no language filter is active.
- */
-export function projectMatchesTechnologyFilters(
-  project: Project,
-  language: string | null | undefined,
-  tools: readonly string[],
-): boolean {
-  if (!language && tools.length === 0) return true;
-  if (language && !projectHasLanguage(project, language)) return false;
-  return tools.every((tool) => projectHasGalleryTool(project, tool));
+export function projectCaseStudyPath(id: string): string {
+  return `/projects/${id}`;
 }

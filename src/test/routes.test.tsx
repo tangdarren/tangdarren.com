@@ -2,12 +2,8 @@ import type { ReactElement } from 'react';
 import { screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import AboutPage from '@/views/AboutPage';
-import ContactPage from '@/views/ContactPage';
 import HomePage from '@/views/HomePage';
 import NotFoundPage from '@/views/NotFoundPage';
-import ProjectsPage from '@/views/ProjectsPage';
-import ResumePage from '@/views/ResumePage';
 import { renderWithProviders } from '@/test/render';
 
 describe('Portfolio pages', () => {
@@ -18,10 +14,6 @@ describe('Portfolio pages', () => {
       heading: string | RegExp;
     }> = [
       { path: '/', ui: <HomePage />, heading: /Darren Tang/i },
-      { path: '/about', ui: <AboutPage />, heading: 'About Me' },
-      { path: '/projects', ui: <ProjectsPage />, heading: 'Projects' },
-      { path: '/resume', ui: <ResumePage />, heading: 'Resume Viewer' },
-      { path: '/contact', ui: <ContactPage />, heading: 'Get in Touch' },
     ];
 
     for (const route of routes) {
@@ -56,12 +48,12 @@ describe('Portfolio pages', () => {
     const images = screen.getAllByRole('presentation', { hidden: true });
     expect(
       images.some(
-        (img) => img.getAttribute('src') === '/easter-egg/darren-character.png',
+        (img) => img.getAttribute('src') === '/not-found/darren-character.png',
       ),
     ).toBe(true);
     expect(
       images.some(
-        (img) => img.getAttribute('src') === '/easter-egg/confusedmark.png',
+        (img) => img.getAttribute('src') === '/not-found/confusedmark.png',
       ),
     ).toBe(true);
   });

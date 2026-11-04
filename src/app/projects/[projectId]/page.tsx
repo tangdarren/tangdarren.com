@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { Suspense } from 'react';
 
 import {
   PROJECTS,
@@ -43,20 +42,6 @@ export async function generateMetadata({
   });
 }
 
-function CaseStudyFallback() {
-  return (
-    <div
-      className="flex min-h-[50vh] items-center justify-center text-mist-300"
-      aria-live="polite"
-      aria-busy="true"
-    >
-      <span className="font-mono text-xs uppercase tracking-[0.2em]">
-        Loading<span className="animate-blink">_</span>
-      </span>
-    </div>
-  );
-}
-
 export default async function Page({ params }: ProjectPageProps) {
   const { projectId } = await params;
   const project = getProjectById(projectId);
@@ -65,9 +50,5 @@ export default async function Page({ params }: ProjectPageProps) {
     notFound();
   }
 
-  return (
-    <Suspense fallback={<CaseStudyFallback />}>
-      <ProjectCaseStudyPage project={project} />
-    </Suspense>
-  );
+  return <ProjectCaseStudyPage project={project} />;
 }

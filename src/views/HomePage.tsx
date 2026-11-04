@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
+import Chronicle from '@/components/home/Chronicle';
 import Grainient from '@/components/home/Grainient';
 
 import styles from './HomePage.module.css';
@@ -141,6 +142,7 @@ export default function HomePage() {
   const shown = phase === 'complete' ? DESCRIPTION.length : typed;
 
   return (
+    <>
     <section
       id="home"
       aria-labelledby="hero-name"
@@ -170,6 +172,14 @@ export default function HomePage() {
           </p>
         </div>
       </div>
+      <a href="#education" className={styles.scrollHint} aria-label="Scroll to education and experience">
+        <span>Scroll</span>
+        <svg viewBox="0 0 16 24" width="16" height="24" aria-hidden="true">
+          <path d="M8 2v19M2 15l6 6 6-6" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </a>
     </section>
+    <Chronicle />
+    </>
   );
 }

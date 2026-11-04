@@ -1,0 +1,667 @@
+.root {
+  --ground: #17161f;
+  --field: #1f1e28;
+  --field-hover: #292833;
+  --ink: #f2efe7;
+  /* Entry text: one quiet voice, so the pinned year leads. */
+  --body: #d4d1c9;
+  --secondary: #a9a6a0;
+  --accent: #7cce99;
+  --gutter: clamp(1.5rem, 6.5vw, 7rem);
+  --section-gap: clamp(7rem, 14vw, 13rem);
+
+  background: var(--ground);
+  color: var(--ink);
+  color-scheme: dark;
+  font-family: var(--font-dm-sans), sans-serif;
+}
+
+.heading {
+  margin: 0;
+  font-size: clamp(2.5rem, 5.6vw, 5.25rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+
+/* ── Timeline ─────────────────────────────────────────────── */
+
+.timeline {
+  --col-gap: clamp(3rem, 6vw, 6rem);
+  --year-size: clamp(6rem, 15vw, 15rem);
+  /* The widest year ("2025"–"2027") is ~2.24em; this block holds the heading,
+     year and place on one shared left edge, centred in the year column. */
+  --year-block: calc(var(--year-size) * 2.26);
+  padding: clamp(5rem, 10vw, 9rem) var(--gutter) 0;
+}
+
+/* The heading starts on the year's left edge. */
+.timeline > .heading {
+  padding-left: max(0px, ((100% - var(--col-gap)) / 2 - var(--year-block)) / 2);
+}
+
+/* Experience sits half a section gap below the line that closes Education. */
+.timeline + .timeline {
+  padding-top: calc(var(--section-gap) / 2);
+  padding-bottom: var(--section-gap);
+}
+
+.group {
+  --spine-pad: clamp(2.5rem, 4.5vw, 4.5rem);
+  display: grid;
+  margin-top: clamp(4rem, 8vw, 7rem);
+  /* Even halves, so both timelines share the same centre line. */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--col-gap);
+}
+
+/* Experience mirrors Education: entries left, spine and year on the right. */
+
+.group[data-side='right'] .aside {
+  order: 2;
+}
+
+.group[data-side='right'] .entries {
+  padding: 0 var(--spine-pad) 0 0;
+}
+
+.group[data-side='right'] .entries::before,
+.group[data-side='right'] .entries::after {
+  left: auto;
+  right: 0;
+}
+
+.group[data-side='right'] .entry::before {
+  left: auto;
+  right: calc(-1 * var(--spine-pad));
+  transform-origin: right;
+}
+
+.groupTitle {
+  display: none;
+}
+
+/* The year stays pinned while its entries pass on the right. */
+.aside {
+  position: relative;
+}
+
+/* Year and place share one left edge in a block centred in their half. */
+.asideInner {
+  position: sticky;
+  top: 12vh;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: min(100%, var(--year-block));
+  margin-inline: auto;
+}
+
+.entryPhoto {
+  display: flex;
+  width: 100%;
+  max-width: 36rem;
+  margin-top: clamp(1.75rem, 3vw, 2.5rem);
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  background: var(--field);
+}
+
+.entryPhoto img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/*
+  The turn after Education: the spine drops a little further, then becomes a
+  horizontal line from margin to margin. A dim track shows the shape; the
+  green fill draws over it (--down, then --across, both 0–1).
+*/
+.turn {
+  --down: 0;
+  --across: 0;
+  position: relative;
+  height: clamp(4rem, 8vw, 7rem);
+}
+
+.turnDown,
+.turnAcross {
+  position: absolute;
+  background: rgb(242 239 231 / 0.12);
+}
+
+.turnDown {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+}
+
+.turnAcross {
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+}
+
+.turnDown::after,
+.turnAcross::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+}
+
+.turnDown::after {
+  transform-origin: top;
+  transform: scaleY(var(--down));
+}
+
+/* Spreads out both ways from where the spine comes down. */
+.turnAcross::after {
+  transform-origin: center;
+  transform: scaleX(var(--across));
+}
+
+/* After the last timeline: one clear way into the "More photos" gallery. */
+.photosCta {
+  display: flex;
+  justify-content: center;
+  margin-top: clamp(5rem, 10vw, 9rem);
+}
+
+.morePhotos {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.75rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--field);
+  color: var(--ink);
+  font: inherit;
+  font-size: clamp(1.0625rem, 1.4vw, 1.25rem);
+  cursor: pointer;
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
+.morePhotos:hover,
+.morePhotos:focus-visible {
+  background: var(--field-hover);
+  color: var(--accent);
+}
+
+.morePhotos:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.morePhotosCount {
+  color: var(--secondary);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Empty until a photo is supplied: shows the space it will fill. */
+.photoSlot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  color: var(--secondary);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.photoSlot span + span {
+  font-size: 0.8125rem;
+  opacity: 0.7;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.year {
+  margin: 0;
+  font-size: var(--year-size);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  animation: roll-in 560ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.asideOrg {
+  margin: 1.5rem 0 0;
+  color: var(--accent);
+  font-size: clamp(1.5rem, 2.4vw, 2.375rem);
+  letter-spacing: -0.015em;
+  animation: roll-in 560ms cubic-bezier(0.22, 1, 0.36, 1) 80ms both;
+}
+
+/*
+  The spine: the hero's caret, stretched down the list. --spine (0–1) eases
+  toward the scroll position each frame, so it glides rather than steps.
+*/
+.entries {
+  --spine: 1;
+  position: relative;
+  /* Pull the spine into the middle of the column gap: the page's centre line.
+     The padding grows by the same amount, so the text stays put. */
+  margin: 0 0 0 calc(var(--col-gap) / -2);
+  padding: 0 0 0 calc(var(--spine-pad) + var(--col-gap) / 2);
+  list-style: none;
+}
+
+.entries::before,
+.entries::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2px;
+  height: 100%;
+  transform-origin: top;
+}
+
+.entries::before {
+  background: rgb(242 239 231 / 0.12);
+}
+
+.entries::after {
+  background: var(--accent);
+  transform: scaleY(var(--spine));
+}
+
+.entry {
+  position: relative;
+  padding-bottom: clamp(6rem, 12vw, 11rem);
+}
+
+.entry:last-child {
+  padding-bottom: 0;
+}
+
+/* A short tick off the spine into each entry; it fills once the line reaches it. */
+.entry::before {
+  content: '';
+  position: absolute;
+  top: 0.75rem;
+  left: calc(-1 * (var(--spine-pad) + var(--col-gap) / 2));
+  width: 0.75rem;
+  height: 2px;
+  background: #3a3942;
+  transform-origin: left;
+  transform: scaleX(0.6);
+  transition: background-color 500ms ease, transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.entry[data-reached]::before {
+  background: var(--accent);
+  transform: none;
+}
+
+.dates {
+  margin: 0;
+  color: var(--secondary);
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.entryTitle {
+  margin: 0.875rem 0 0;
+  max-width: 28ch;
+  color: var(--ink);
+  font-size: clamp(1.375rem, 1.9vw, 1.75rem);
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+}
+
+.datesUnder {
+  margin-top: 0.5rem;
+}
+
+.detailLabel {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.org {
+  margin: 0.5rem 0 0;
+  color: var(--secondary);
+  font-size: 1rem;
+}
+
+.points,
+.point {
+  max-width: 60ch;
+  margin: 1.75rem 0 0;
+  color: var(--body);
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.points {
+  display: grid;
+  gap: 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.points li {
+  position: relative;
+}
+
+/* Hanging markers, so bullet text lines up with the title. */
+.points li::before {
+  content: '';
+  position: absolute;
+  top: 0.85em;
+  left: -1.1em;
+  width: 0.4em;
+  height: 2px;
+  background: var(--secondary);
+}
+
+/* ── Projects ─────────────────────────────────────────────── */
+
+.projects {
+  padding: var(--section-gap) var(--gutter);
+  background: var(--field);
+}
+
+.projectsHead {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: clamp(2rem, 4vw, 4rem);
+  align-items: end;
+}
+
+.lede {
+  max-width: 34rem;
+  margin: 0;
+  font-size: clamp(1.125rem, 1.6vw, 1.5rem);
+  line-height: 1.45;
+}
+
+.projectList {
+  margin: clamp(3rem, 6vw, 5rem) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.project {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: clamp(2rem, 4vw, 4rem);
+  align-items: center;
+  margin-inline: calc(-1 * clamp(0.75rem, 1.5vw, 1.5rem));
+  padding: clamp(1.25rem, 2vw, 1.75rem) clamp(0.75rem, 1.5vw, 1.5rem);
+  color: inherit;
+  text-decoration: none;
+  transition: background-color 180ms ease;
+}
+
+.project:hover,
+.project:focus-visible {
+  background: var(--field-hover);
+}
+
+.project:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.projectName {
+  position: relative;
+  margin: 0;
+  font-size: clamp(2rem, 4.4vw, 4.25rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+/* Hovering a project parks the caret after its name. */
+.projectCaret {
+  display: inline-block;
+  width: 3px;
+  height: 0.8em;
+  margin-left: 0.12em;
+  vertical-align: -0.04em;
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+.project:hover .projectCaret,
+.project:focus-visible .projectCaret {
+  opacity: 1;
+}
+
+.projectText {
+  margin: 0;
+  padding-right: 3rem;
+  font-size: clamp(1rem, 1.2vw, 1.1875rem);
+  line-height: 1.5;
+}
+
+.projectLabel {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--secondary);
+  font-size: 0.9375rem;
+}
+
+.project {
+  position: relative;
+}
+
+.projectArrow {
+  position: absolute;
+  top: 50%;
+  right: clamp(0.75rem, 1.5vw, 1.5rem);
+  margin-top: -0.75em;
+  color: var(--secondary);
+  font-size: 1.5rem;
+  transition: transform 180ms ease, color 180ms ease;
+}
+
+.project:hover .projectArrow,
+.project:focus-visible .projectArrow {
+  color: var(--accent);
+  transform: translate(3px, -3px);
+}
+
+/* ── Close ────────────────────────────────────────────────── */
+
+.close {
+  padding: var(--section-gap) var(--gutter) clamp(2.5rem, 4vw, 3.5rem);
+}
+
+.closeHeading {
+  margin: 0;
+  font-size: clamp(3rem, 8.4vw, 8.5rem);
+  font-weight: 500;
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+}
+
+.email {
+  display: inline-block;
+  margin-top: clamp(2rem, 4vw, 3rem);
+  color: var(--accent);
+  font-size: clamp(1.375rem, 3vw, 2.5rem);
+  letter-spacing: -0.02em;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+  overflow-wrap: anywhere;
+}
+
+.email:hover {
+  color: var(--ink);
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 2rem;
+  margin: clamp(2rem, 3vw, 2.5rem) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: clamp(1.0625rem, 1.4vw, 1.25rem);
+}
+
+.links a {
+  color: var(--ink);
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+
+.links a:hover,
+.links a:focus-visible {
+  color: var(--accent);
+}
+
+.signoff {
+  margin: clamp(5rem, 10vw, 9rem) 0 0;
+  color: var(--secondary);
+  font-size: 0.9375rem;
+}
+
+.root a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* ── Motion ───────────────────────────────────────────────── */
+
+.root [data-rise] {
+  transition: opacity 600ms ease, transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.root [data-rise][data-pending] {
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+@keyframes roll-in {
+  from { opacity: 0; transform: translateY(0.25em); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .year,
+  .asideOrg {
+    animation: none;
+  }
+
+  .entries::after {
+    transform: none;
+  }
+}
+
+/* ── Phones and narrow tablets ────────────────────────────── */
+
+@media (max-width: 800px) {
+  .timeline > .heading {
+    padding-left: 0;
+  }
+
+  .group,
+  .group[data-side='right'],
+  .projectsHead {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .group[data-side='right'] .aside {
+    order: 0;
+  }
+
+  /* The spine runs down the left edge here, so the turn does too. */
+  .turnDown {
+    left: 0;
+  }
+
+  .turnAcross::after {
+    transform-origin: left;
+  }
+
+  /* One column: no gap to centre the spine in. */
+  .entries {
+    margin-left: 0;
+    padding-left: var(--spine-pad);
+  }
+
+  .entry::before {
+    left: calc(-1 * var(--spine-pad));
+  }
+
+  /* No room for the pinned year: it rides at the top of the screen instead. */
+  .aside {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    margin-inline: calc(-1 * var(--gutter));
+    padding: 0.75rem var(--gutter);
+    background: var(--ground);
+  }
+
+  .asideInner {
+    position: static;
+    width: auto;
+    margin-inline: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.875rem;
+    text-align: left;
+  }
+
+
+
+  /* On phones the swap shows as the year jumping to the other end of the bar. */
+  .group[data-side='right'] .asideInner {
+    flex-direction: row-reverse;
+  }
+
+  .groupTitle {
+    display: block;
+    margin: 0;
+    color: var(--secondary);
+    font-size: 1.0625rem;
+  }
+
+
+
+  .year {
+    font-size: 2.5rem;
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  .asideOrg {
+    display: none;
+  }
+
+  .project {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 0.75rem;
+  }
+
+  .projectArrow {
+    top: clamp(1.25rem, 2vw, 1.75rem);
+    margin-top: 0.1em;
+  }
+}

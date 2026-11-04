@@ -1,6 +1,5 @@
 /** Shared site metadata for SEO, Open Graph, and sitemap generation. */
 
-import { HOMEPAGE_TECH } from '@/data/homepage';
 import { PROJECTS, hasCaseStudy } from '@/data/projects';
 import { isValidHttpUrl } from '@/lib/url';
 
@@ -19,13 +18,7 @@ export const SITE_DEFAULT_OG_IMAGE = '/opengraph-image.png';
 export const CANONICAL_SITE_URL = 'https://tangdarren.com';
 
 /** Static app routes included in the sitemap (excluding the 404 catch-all). */
-export const SITE_STATIC_ROUTES = [
-  '/',
-  '/about',
-  '/projects',
-  '/resume',
-  '/contact',
-] as const;
+export const SITE_STATIC_ROUTES = ['/'] as const;
 
 /**
  * Public site origin for canonical URLs, Open Graph, robots.txt, and sitemap.xml.
@@ -52,11 +45,10 @@ export function resolveSiteUrl(envValue?: string | null): string {
   }
 }
 
-/** All indexable paths: static routes, skill project pages, and case studies. */
+/** All indexable paths: the home page and project case studies. */
 export function getSitemapPaths(): string[] {
-  const skillPaths = HOMEPAGE_TECH.map((tech) => `/skills/${tech.id}`);
   const caseStudyPaths = PROJECTS.filter(hasCaseStudy).map(
     (project) => `/projects/${project.id}`,
   );
-  return [...SITE_STATIC_ROUTES, ...skillPaths, ...caseStudyPaths];
+  return [...SITE_STATIC_ROUTES, ...caseStudyPaths];
 }

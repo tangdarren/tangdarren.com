@@ -1,4 +1,5 @@
-import { act, screen } from '@testing-library/react';
+import { act, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import Layout from '@/components/layout/Layout';
@@ -6,7 +7,7 @@ import HomePage from '@/views/HomePage';
 import { renderWithProviders } from '@/test/render';
 
 describe('Homepage intro', () => {
-  it('shows the complete introduction without the portfolio or header', () => {
+  it('shows the introduction, then the timeline, projects and contact, without the header', () => {
     renderWithProviders(<Layout><HomePage /></Layout>, { initialPath: '/' });
 
     expect(screen.getByRole('heading', { level: 1, name: 'Darren Tang' })).toBeVisible();
@@ -15,11 +16,35 @@ describe('Homepage intro', () => {
     expect(screen.getByText('I build software and AI tools for real workflows.', { ignore: '[aria-hidden="true"] *' })).toBeInTheDocument();
     expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
     expect(screen.queryByRole('region', { name: 'Portfolio intro' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('heading', { name: 'Projects' })).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: 'Experience' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: 'AI Agent Development Intern' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: 'Education' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: /Bachelor of Science/ })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: 'Projects' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Tempest/ })).toHaveAttribute('href', 'https://github.com/tangdarren/stock-market-dashboard');
+    expect(screen.getByRole('link', { name: 'tang.darren@gmail.com' })).toHaveAttribute('href', 'mailto:tang.darren@gmail.com');
     expect(screen.queryByRole('button', { name: /back to top/i })).not.toBeInTheDocument();
   });
 });
 
+
+describe('More photos', () => {
+  it('opens the gallery with every moment from the button after Experience', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<HomePage />);
+
+    const button = screen.getByRole('button', { name: /More photos/ });
+    expect(document.getElementById('experience')).toContainElement(button);
+    await user.click(button);
+
+    const dialog = document.querySelector('dialog');
+    expect(dialog).toHaveAttribute('open');
+    for (const title of ['Visiting Meta', 'Visiting the Tesla factory', 'Hiking', 'Debate in high school', 'Early experiments']) {
+      expect(within(dialog as HTMLElement).getByRole('heading', { level: 3, name: title })).toBeInTheDocument();
+    }
+    expect(within(dialog as HTMLElement).getAllByRole('img')).toHaveLength(9);
+  });
+});
 
 describe('Intro loading lifecycle', () => {
   const originalFonts = Object.getOwnPropertyDescriptor(document, 'fonts');

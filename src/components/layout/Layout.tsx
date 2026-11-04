@@ -10,11 +10,11 @@ interface LayoutProps {
 }
 
 /**
- * Site shell with a persistent editorial top header.
- * Content is full-width; page views own their own column width.
+ * Site shell. The home page has no header (its hero is the first thing you
+ * see); case studies and the 404 page get the top bar.
  */
 export default function Layout({ children }: LayoutProps) {
-  const isHomePrototype = usePathname() === '/';
+  const isHome = usePathname() === '/';
 
   return (
     <div className="min-h-screen">
@@ -25,7 +25,7 @@ export default function Layout({ children }: LayoutProps) {
         Skip to main content
       </a>
 
-      {!isHomePrototype && <SiteHeader />}
+      {!isHome && <SiteHeader />}
 
       <main id="main-content" className="w-full">
         {children}
