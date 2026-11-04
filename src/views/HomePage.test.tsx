@@ -11,13 +11,13 @@ describe('Homepage intro', () => {
     renderWithProviders(<Layout><HomePage /></Layout>, { initialPath: '/' });
 
     expect(screen.getByRole('heading', { level: 1, name: 'Darren Tang' })).toBeVisible();
-    expect(screen.getByText('Software Engineer · San Francisco')).toBeVisible();
+    expect(screen.getByText('Software Engineer · Fremont')).toBeVisible();
     // The visible typed copy is aria-hidden; the readable sentence is one node.
     expect(screen.getByText('I build software and AI tools for real workflows.', { ignore: '[aria-hidden="true"] *' })).toBeInTheDocument();
     expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
     expect(screen.queryByRole('region', { name: 'Portfolio intro' })).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 2, name: 'Experience' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { level: 3, name: 'AI Agent Development Intern' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: 'AI Agent Development Intern, Veracyte' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 2, name: 'Education' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 3, name: /Bachelor of Science/ })).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 2, name: 'Projects' })).toBeInTheDocument();

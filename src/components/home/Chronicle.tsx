@@ -15,8 +15,6 @@ interface TimelineEntry {
   title: string;
   /** Shown under the pinned year. */
   place: string;
-  /** Shown under the title; education omits it (the place is pinned beside). */
-  org?: string;
   dates: string;
   year: number;
   sortKey: number;
@@ -42,7 +40,6 @@ const EXPERIENCE_ENTRIES: TimelineEntry[] = EXPERIENCE.map((job) => {
       id: job.company,
       title: job.role,
       place: job.company,
-      org: [job.company, job.location].filter(Boolean).join(' · '),
       dates: job.dates ?? '',
       year: start.year,
       sortKey: start.key,
@@ -252,22 +249,12 @@ function TimelineGroup({
         <ol ref={listRef} className={styles.entries}>
           {entries.map((entry) => (
             <li key={entry.id} className={styles.entry} data-rise>
-              {entry.org ? (
-                <>
-                  <p className={styles.dates}>{entry.dates}</p>
-                  <h3 className={styles.entryTitle}>{entry.title}</h3>
-                  <p className={styles.org}>{entry.org}</p>
-                </>
-              ) : (
-                <>
-                  <h3 className={styles.entryTitle}>
-                    {entry.title}
-                    {/* The school is pinned beside the year; keep it for screen readers. */}
-                    <span className={styles.srOnly}>, {entry.place}</span>
-                  </h3>
-                  <p className={`${styles.dates} ${styles.datesUnder}`}>{entry.dates}</p>
-                </>
-              )}
+              <h3 className={styles.entryTitle}>
+                {entry.title}
+                {/* The place is pinned beside the year; keep it for screen readers. */}
+                <span className={styles.srOnly}>, {entry.place}</span>
+              </h3>
+              <p className={`${styles.dates} ${styles.datesUnder}`}>{entry.dates}</p>
               {entry.points && (entry.points.length > 1 ? (
                 <ul className={styles.points}>
                   {entry.points.map((point) => <li key={point}>{point}</li>)}
@@ -394,7 +381,7 @@ export default function Chronicle() {
             <a href={RESUME_PDF_PATH} target="_blank" rel="noopener noreferrer">Résumé ↗</a>
           </li>
         </ul>
-        <p className={styles.signoff}>Darren Tang · San Francisco · {new Date().getFullYear()}</p>
+        <p className={styles.signoff}>Darren Tang · Fremont · {new Date().getFullYear()}</p>
       </footer>
     </div>
   );

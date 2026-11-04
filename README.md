@@ -8,40 +8,10 @@ My personal website. It's one long page: my name, where I've studied and worked,
 
 ## What's on it
 
-- **The intro.** My name types itself out, slides into place, and a green cursor finishes the sentence underneath. The background is an animated grainy gradient I first made for my [stock market dashboard](https://github.com/tangdarren/stock-market-dashboard).
-- **Education and Experience.** A timeline that runs oldest to newest. The year stays pinned on the left while a green line draws down the page as you scroll, then turns into a horizontal line between Education and Experience. Each school and job has a photo.
-- **More photos.** A small gallery of things outside the timeline: visiting Meta and the Tesla factory, hiking, high school debate, and some early projects.
-- **Projects.** Everything I've built, each linking to its code. A few have longer case studies at `/projects/<name>`.
+- **Intro.** My name types itself out over an animated green gradient.
+- **Education and Experience.** A scrolling timeline with a photo for each school and job.
+- **Projects.** Everything I've built, each linking to its code.
 - **Contact.** Email, GitHub, LinkedIn, and my résumé.
-
-![The Education timeline](docs/images/homepage-v6-timeline.jpg)
-
-## Run it locally
-
-Use Node.js 24 (the same version CI uses).
-
-```sh
-npm ci
-npm run dev
-```
-
-Then open [localhost:3000](http://localhost:3000). No credentials needed. The only optional setting is `SITE_URL` in `.env` (copy `.env.example`); leave it blank and it uses tangdarren.com.
-
-## Changing things
-
-Almost everything you'd want to edit is data, not code:
-
-- `src/data/experience.ts`: schools and jobs, their dates, bullets, and photos. This should match my résumé.
-- `src/data/homepage.ts`: the project list, in the order it appears.
-- `src/data/gallery.ts`: the "More photos" gallery.
-- `src/data/projects.ts`: the longer case studies.
-- `public/`: photos, the gallery, and the résumé PDF. Everything in here is public.
-
-To add a timeline photo, drop a 3:2 landscape image (1400px wide is plenty) in `public/timeline/` and add a `photo` with a short description to that entry. Phone photos should be resized and have their location data stripped first.
-
-The main pieces of code are `src/views/HomePage.tsx` (the intro), `src/components/home/Chronicle.tsx` (timeline, projects, contact), `src/components/home/PhotoGallery.tsx`, and `src/components/home/Grainient.tsx` (the background).
-
-Before pushing, run `npm run lint`, `npm run typecheck`, `npm test`, and `npm run build`.
 
 ## How it got here
 
