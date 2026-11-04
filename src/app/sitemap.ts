@@ -10,8 +10,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return getSitemapPaths().map((path) => ({
     url: toAbsoluteUrl(siteUrl, path === '/' ? '/' : path),
-    changeFrequency: path === '/contact' ? 'yearly' : 'monthly',
-    priority:
-      path === '/' ? 1 : path.startsWith('/projects/') ? 0.7 : 0.8,
+    changeFrequency: 'monthly',
+    priority: path === '/' ? 1 : 0.7,
   }));
 }

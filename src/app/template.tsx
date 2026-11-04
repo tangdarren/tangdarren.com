@@ -8,7 +8,7 @@ import PageTransition from '@/components/layout/PageTransition';
 export default function Template({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  // Keep the prototype immediately visible, including with reduced motion.
+  // The home page runs its own intro, so it skips the page transition.
   if (pathname === '/') return <>{children}</>;
 
   return <PageTransition>{children}</PageTransition>;

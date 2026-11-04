@@ -1,5 +1,5 @@
 .hero {
-  --hero-ground: #0d0c14;
+  --hero-ground: #17161f;
   --hero-ink: #f2efe7;
   --hero-secondary: #b9b7b0;
   --hero-cursor: #7cce99;
@@ -37,6 +37,9 @@
   overflow: hidden;
   opacity: 0.5;
   pointer-events: none;
+  /* Let the gradient settle into the ground before the timeline starts. */
+  -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent);
+  mask-image: linear-gradient(to bottom, #000 72%, transparent);
 }
 
 .name {
@@ -110,6 +113,52 @@
   white-space: nowrap;
 }
 
+/* A quiet cue that the page continues below the hero. */
+.scrollHint {
+  position: absolute;
+  bottom: max(1.75rem, env(safe-area-inset-bottom));
+  left: 50%;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  transform: translateX(-50%);
+  color: var(--hero-secondary);
+  font-size: 0.8125rem;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  opacity: 0.55;
+  transition: opacity 200ms ease, color 200ms ease;
+}
+
+.scrollHint:hover,
+.scrollHint:focus-visible {
+  color: var(--hero-cursor);
+  opacity: 1;
+}
+
+.scrollHint:focus-visible {
+  outline: 2px solid var(--hero-cursor);
+  outline-offset: 2px;
+}
+
+.scrollHint svg {
+  animation: hint-drift 2.4s ease-in-out infinite;
+}
+
+@keyframes hint-drift {
+  0%, 100% { transform: translateY(-3px); }
+  50% { transform: translateY(3px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scrollHint svg {
+    animation: none;
+  }
+}
+
 .hero ::selection {
   background: var(--hero-ink);
   color: var(--hero-ground);
@@ -122,7 +171,7 @@
 /* Keep browser overscroll on graphite while this intro is mounted. */
 :global(html):has(.hero),
 :global(body):has(.hero) {
-  background: #0d0c14;
+  background: #17161f;
 }
 
 .word {
@@ -148,6 +197,16 @@
 
   .hero[data-phase='loading'] .details {
     visibility: hidden;
+  }
+
+  /* The arrow waits until the description has finished typing. */
+  .hero:not([data-phase='complete']) .scrollHint {
+    visibility: hidden;
+    opacity: 0;
+  }
+
+  .hero[data-phase='complete'] .scrollHint {
+    animation: hint-in 600ms ease-out 300ms backwards;
   }
 
   .loadingStatus {
@@ -188,6 +247,11 @@
 
 @keyframes blink-caret {
   50% { opacity: 0; }
+}
+
+@keyframes hint-in {
+  from { opacity: 0; }
+  to { opacity: 0.55; }
 }
 
 @keyframes reveal-detail {

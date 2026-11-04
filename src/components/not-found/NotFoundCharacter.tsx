@@ -29,7 +29,7 @@ export default function NotFoundCharacter() {
       }
     >
       <img
-        src="/easter-egg/darren-character.png"
+        src="/not-found/darren-character.png"
         alt=""
         aria-hidden
         draggable={false}
@@ -39,7 +39,7 @@ export default function NotFoundCharacter() {
         style={{ imageRendering: 'pixelated' }}
       />
       <motion.img
-        src="/easter-egg/confusedmark.png"
+        src="/not-found/confusedmark.png"
         alt=""
         aria-hidden
         draggable={false}

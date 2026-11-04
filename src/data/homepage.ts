@@ -1,3 +1,4 @@
+/** The project list on the home page, in display order. Each links to its code. */
 export interface HomepageProject {
   id: string;
   name: string;
@@ -9,6 +10,20 @@ export interface HomepageProject {
 
 export const HOMEPAGE_PROJECTS: HomepageProject[] = [
   {
+    id: 'minispark',
+    name: 'MiniSpark',
+    description: 'Run Spark-style map, filter, and join jobs in parallel on a C thread pool.',
+    label: 'Systems',
+    githubUrl: 'https://github.com/tangdarren/minispark',
+  },
+  {
+    id: 'musicbloom',
+    name: 'MusicBloom',
+    description: 'Grow a virtual garden while listening to music.',
+    label: 'Full Stack',
+    githubUrl: 'https://github.com/tangdarren/musicbloom',
+  },
+  {
     id: 'tempest',
     name: 'Tempest',
     description: 'Explore stock trends and market forecasts.',
@@ -18,7 +33,7 @@ export const HOMEPAGE_PROJECTS: HomepageProject[] = [
   },
   {
     id: 'safecall',
-    name: 'SafeCall',
+    name: 'SafeCall VR',
     description: 'Practice handling realistic 911 emergency calls.',
     label: 'Spatial Computing',
     githubUrl: 'https://github.com/tangdarren/safecall-vr',
@@ -56,13 +71,6 @@ export const HOMEPAGE_PROJECTS: HomepageProject[] = [
     githubUrl: 'https://github.com/tangdarren/expensense',
   },
   {
-    id: 'musicbloom',
-    name: 'MusicBloom',
-    description: 'Grow a virtual garden while listening to music.',
-    label: 'Full Stack',
-    githubUrl: 'https://github.com/tangdarren/musicbloom',
-  },
-  {
     id: 'godo',
     name: 'GoDo',
     description: 'Discover places, plan events, and share local recommendations.',
@@ -82,169 +90,5 @@ export const HOMEPAGE_PROJECTS: HomepageProject[] = [
     description: 'Track daily water intake and progress toward a goal.',
     label: 'Mobile',
     githubUrl: 'https://github.com/tangdarren/water-reminder-app',
-  },
-];
-
-export type HomepageTechId =
-  | 'python'
-  | 'typescript'
-  | 'postgresql'
-  | 'react'
-  | 'nextjs'
-  | 'springboot'
-  | 'docker'
-  | 'aws';
-
-export interface HomepageTech {
-  id: HomepageTechId;
-  name: string;
-  description: string;
-  /** Homepage project shown when this skill is opened. */
-  projectId: string;
-  /** Stack labels shown on the skill project page. */
-  projectSkills: string[];
-}
-
-/**
- * Curated homepage stack (8 strongest for recruiters).
- * Display order fills a 4×2 desktop grid row-first.
- */
-export const HOMEPAGE_TECH: HomepageTech[] = [
-  {
-    id: 'python',
-    name: 'Python',
-    description: 'Automation',
-    projectId: 'tensor-digits',
-    projectSkills: ['Python', 'TensorFlow', 'Machine Learning'],
-  },
-  {
-    id: 'typescript',
-    name: 'TypeScript',
-    description: 'Typed JavaScript',
-    projectId: 'tempest',
-    projectSkills: ['TypeScript', 'React', 'Vite', 'FastAPI'],
-  },
-  {
-    id: 'postgresql',
-    name: 'PostgreSQL',
-    description: 'SQL Database',
-    projectId: 'musicbloom',
-    projectSkills: ['PostgreSQL', 'SQLAlchemy', 'FastAPI', 'Python'],
-  },
-  {
-    id: 'react',
-    name: 'React',
-    description: 'UI library',
-    projectId: 'musicbloom',
-    projectSkills: ['React', 'TypeScript', 'Vite', 'TanStack Query'],
-  },
-  {
-    id: 'nextjs',
-    name: 'Next.js',
-    description: 'React framework',
-    projectId: 'water-reminder',
-    projectSkills: ['Flutter', 'Dart', 'Mobile'],
-  },
-  {
-    id: 'springboot',
-    name: 'Spring Boot',
-    description: 'Java framework',
-    projectId: 'safecall',
-    projectSkills: ['Spring Boot', 'Java', 'React', 'WebSpatial'],
-  },
-  {
-    id: 'docker',
-    name: 'Docker',
-    description: 'Containers',
-    projectId: 'musicbloom',
-    projectSkills: ['Docker', 'Docker Compose', 'FastAPI', 'Python'],
-  },
-  {
-    id: 'aws',
-    name: 'AWS',
-    description: 'Cloud platform',
-    projectId: 'arc-gpt',
-    projectSkills: ['Python', 'PyTorch', 'Transformers', 'Deep Learning'],
-  },
-];
-
-export function getHomepageProjectById(
-  id: string,
-): HomepageProject | undefined {
-  return HOMEPAGE_PROJECTS.find((project) => project.id === id);
-}
-
-export function getHomepageTechById(
-  id: string,
-): HomepageTech | undefined {
-  return HOMEPAGE_TECH.find((tech) => tech.id === id);
-}
-
-export function skillProjectPath(skillId: HomepageTechId): string {
-  return `/skills/${skillId}`;
-}
-export interface HomepageExperience {
-  id: string;
-  role: string;
-  company: string;
-  type: string;
-  dates: string;
-  description: string;
-}
-
-export interface HomepageEducation {
-  id: string;
-  school: string;
-  degree: string;
-  dates: string;
-  description: string;
-}
-
-export const HOMEPAGE_EXPERIENCE: HomepageExperience[] = [
-  {
-    id: 'veracyte',
-    role: 'AI Agent Development Intern',
-    company: 'Veracyte, Inc.',
-    type: 'Internship',
-    dates: 'Jun 2026 – Present',
-    description:
-      'Building AI workflow tools for automation, including QC flagging, order summarization, and Salesforce-to-TRAF automation targeting 25–40% efficiency improvements.',
-  },
-  {
-    id: 'dataannotation',
-    role: 'Software Engineer',
-    company: 'DataAnnotation',
-    type: 'Contract',
-    dates: 'Jan 2026 – May 2026',
-    description:
-      'Developed and evaluated containerized LLM workflows using Docker, Kubernetes, MCP tools, and A/B testing across 50+ model outputs.',
-  },
-  {
-    id: 'sonic',
-    role: 'Software Engineer',
-    company: 'Sonic Engineering Inc.',
-    type: 'Internship',
-    dates: 'May 2025 – Aug 2025',
-    description:
-      'Built Java inventory automation for CNC operations through Azure DevOps CI/CD, reducing delayed reorders by 50%.',
-  },
-];
-
-export const HOMEPAGE_EDUCATION: HomepageEducation[] = [
-  {
-    id: 'scu',
-    school: 'Santa Clara University',
-    degree: 'Master of Science, Computer Science and Engineering',
-    dates: 'Sep 2025 – Mar 2027',
-    description:
-      'Relevant coursework: Advanced Algorithms, Advanced Operating Systems, Data Mining, Object-Oriented Programming, Mobile App Development, Technology Entrepreneurship.',
-  },
-  {
-    id: 'uw-madison',
-    school: 'University of Wisconsin–Madison',
-    degree: 'Bachelor of Science, Computer Science',
-    dates: 'Sep 2021 – May 2025',
-    description:
-      'Lumen Scholarship Fund Scholar, $40,000 merit-based scholarship.',
   },
 ];

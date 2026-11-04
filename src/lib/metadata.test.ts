@@ -140,17 +140,12 @@ describe('project share images and sitemap paths', () => {
     }
   });
 
-  it('includes static routes and case-study paths in the sitemap', () => {
+  it('lists the home page and every case study, and none of the removed pages', () => {
     const paths = getSitemapPaths();
-    expect(paths).toEqual(
-      expect.arrayContaining([
-        '/',
-        '/about',
-        '/projects',
-        '/resume',
-        '/contact',
-      ]),
-    );
+    expect(paths[0]).toBe('/');
+    for (const removed of ['/about', '/projects', '/resume', '/contact']) {
+      expect(paths).not.toContain(removed);
+    }
 
     for (const project of PROJECTS.filter(hasCaseStudy)) {
       expect(paths).toContain(`/projects/${project.id}`);

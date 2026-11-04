@@ -2,19 +2,13 @@
 
 import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
 import { ArrowLeft, ExternalLink, Github } from 'lucide-react';
 
 import PageHeader from '@/components/layout/PageHeader';
 import ProjectArchitectureFlow from '@/components/projects/ProjectArchitectureFlow';
 import ProjectCaseStudyNav from '@/components/projects/ProjectCaseStudyNav';
 import ProjectScreenshotGallery from '@/components/projects/ProjectScreenshotGallery';
-import {
-  isProjectFilter,
-  projectsGalleryPath,
-  type Project,
-  type ProjectFilter,
-} from '@/data/projects';
+import { PROJECTS_LIST_PATH, type Project } from '@/data/projects';
 import { isValidHttpUrl } from '@/lib/url';
 
 function hasText(value?: string): value is string {
@@ -32,26 +26,14 @@ interface ProjectCaseStudyPageProps {
 export default function ProjectCaseStudyPage({
   project,
 }: ProjectCaseStudyPageProps) {
-  const searchParams = useSearchParams();
-  const categoryParam = searchParams.get('category');
-  const filter: ProjectFilter = isProjectFilter(categoryParam)
-    ? categoryParam
-    : 'All';
-
   return (
     <div className="container-page py-10 sm:py-14">
-      <ProjectCaseStudyShell project={project} filter={filter} />
+      <ProjectCaseStudyShell project={project} />
     </div>
   );
 }
 
-function ProjectCaseStudyShell({
-  project,
-  filter,
-}: {
-  project: Project;
-  filter: ProjectFilter;
-}) {
+function ProjectCaseStudyShell({ project }: { project: Project }) {
   const caseStudy = project.caseStudy;
   const screenshots = caseStudy?.screenshots ?? project.screenshots;
   const githubUrl = isValidHttpUrl(project.githubUrl)
@@ -63,7 +45,6 @@ function ProjectCaseStudyShell({
     caseStudy?.timeline ? { label: 'Context', value: caseStudy.timeline } : null,
     caseStudy?.status ? { label: 'Status', value: caseStudy.status } : null,
   ].filter((item): item is { label: string; value: string } => Boolean(item));
-  const galleryPath = projectsGalleryPath(filter);
 
   const challenge = caseStudy?.challenge ?? project.details.problem;
   const approach = caseStudy?.approach;
@@ -77,7 +58,7 @@ function ProjectCaseStudyShell({
   return (
     <>
       <Link
-        href={galleryPath}
+        href={PROJECTS_LIST_PATH}
         className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-mist-300 transition-colors hover:text-accent-cyan"
       >
         <ArrowLeft className="h-3.5 w-3.5 shrink-0" />
@@ -197,7 +178,7 @@ function ProjectCaseStudyShell({
         )}
       </div>
 
-      <ProjectCaseStudyNav project={project} filter={filter} />
+      <ProjectCaseStudyNav project={project} />
     </>
   );
 }

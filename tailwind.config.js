@@ -67,25 +67,6 @@ export default {
         card: 'var(--shadow-card)',
         glow: 'var(--shadow-glow)',
       },
-      keyframes: {
-        'fade-in-up': {
-          '0%': { opacity: '0', transform: 'translateY(8px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
-        },
-        blink: {
-          '0%, 45%': { opacity: '1' },
-          '55%, 100%': { opacity: '0' },
-        },
-        'pulse-soft': {
-          '0%, 100%': { opacity: '1' },
-          '50%': { opacity: '0.55' },
-        },
-      },
-      animation: {
-        'fade-in-up': 'fade-in-up 0.5s ease-out forwards',
-        blink: 'blink 1.1s steps(1) infinite',
-        'pulse-soft': 'pulse-soft 2.4s ease-in-out infinite',
-      },
     },
   },
   plugins: [],
