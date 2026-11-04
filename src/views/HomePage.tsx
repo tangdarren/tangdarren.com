@@ -2,7 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
-import DotPattern from '@/components/home/DotPattern';
+import Grainient from '@/components/home/Grainient';
 
 import styles from './HomePage.module.css';
 
@@ -10,6 +10,11 @@ type IntroPhase = 'loading' | 'revealing' | 'complete';
 
 /** Pause after the name finishes typing, before it moves into place. */
 const REVEAL_HOLD_MS = 300;
+
+const DESCRIPTION = 'I build software and AI tools for real workflows.';
+/** When the cursor starts typing the description, after the name lands. */
+const TYPE_START_MS = 1150;
+const TYPE_CHAR_MS = 30;
 
 /** Reads a CSS time variable in ms (production CSS may normalize 900ms to .9s). */
 function cssDurationMs(element: Element, name: string, fallback: number) {
@@ -20,6 +25,7 @@ function cssDurationMs(element: Element, name: string, fallback: number) {
 /** Name-first intro. The existing portfolio lives in PortfolioContent. */
 export default function HomePage() {
   const [phase, setPhase] = useState<IntroPhase>('loading');
+  const [typed, setTyped] = useState(0);
   const words = useRef<(HTMLSpanElement | null)[]>([null, null]);
   const startingRects = useRef<DOMRect[]>([]);
 
@@ -53,6 +59,19 @@ export default function HomePage() {
       animations.forEach((animation) => animation.cancel());
       window.removeEventListener('resize', onResize);
     };
+  }, [phase]);
+
+  // The intro cursor carries on: it types the description, then stays as a caret.
+  useEffect(() => {
+    if (phase !== 'revealing') return;
+    let count = 0;
+    let timer = setTimeout(function step() {
+      count += 1;
+      setTyped(count);
+      if (count >= DESCRIPTION.length) setPhase('complete');
+      else timer = setTimeout(step, TYPE_CHAR_MS);
+    }, TYPE_START_MS);
+    return () => clearTimeout(timer);
   }, [phase]);
 
   useEffect(() => {
@@ -107,7 +126,7 @@ export default function HomePage() {
         );
         setPhase('revealing');
         // Also complete if animation events are disabled or interrupted.
-        timers.push(setTimeout(finish, 1800));
+        timers.push(setTimeout(finish, 4000));
       });
     }
 
@@ -119,6 +138,8 @@ export default function HomePage() {
     };
   }, []);
 
+  const shown = phase === 'complete' ? DESCRIPTION.length : typed;
+
   return (
     <section
       id="home"
@@ -129,7 +150,7 @@ export default function HomePage() {
       {phase !== 'complete' && (
         <span className={styles.loadingStatus} role="status" aria-label="Loading portfolio">Loading portfolio</span>
       )}
-      <DotPattern className={styles.dots} width={14} height={14} cx={1} cy={1} cr={1} />
+      <Grainient className={styles.backdrop} />
       <div className={styles.content}>
         <h1 id="hero-name" className={styles.name}>
           <span className={styles.nameText}>
@@ -139,13 +160,13 @@ export default function HomePage() {
         </h1>
         <div className={styles.details}>
           <p className={styles.role}>Software Engineer · San Francisco</p>
-          <p
-            className={styles.description}
-            onAnimationEnd={(event) => {
-              if (event.target === event.currentTarget) setPhase('complete');
-            }}
-          >
-            I build software and AI tools for real workflows.
+          <p className={styles.description}>
+            <span className={styles.srOnly}>{DESCRIPTION}</span>
+            <span aria-hidden="true">
+              {DESCRIPTION.slice(0, shown)}
+              <span className={styles.caret} />
+              <span className={styles.untyped}>{DESCRIPTION.slice(shown)}</span>
+            </span>
           </p>
         </div>
       </div>

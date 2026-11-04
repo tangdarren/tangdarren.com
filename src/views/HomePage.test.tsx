@@ -1,4 +1,4 @@
-import { act, fireEvent, screen } from '@testing-library/react';
+import { act, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import Layout from '@/components/layout/Layout';
@@ -11,7 +11,8 @@ describe('Homepage intro', () => {
 
     expect(screen.getByRole('heading', { level: 1, name: 'Darren Tang' })).toBeVisible();
     expect(screen.getByText('Software Engineer · San Francisco')).toBeVisible();
-    expect(screen.getByText('I build software and AI tools for real workflows.')).toBeVisible();
+    // The visible typed copy is aria-hidden; the readable sentence is one node.
+    expect(screen.getByText('I build software and AI tools for real workflows.', { ignore: '[aria-hidden="true"] *' })).toBeInTheDocument();
     expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
     expect(screen.queryByRole('region', { name: 'Portfolio intro' })).not.toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Projects' })).not.toBeInTheDocument();
@@ -41,7 +42,7 @@ describe('Intro loading lifecycle', () => {
     return release;
   }
 
-  it('waits for the font before revealing the hero, then finishes on the description', async () => {
+  it('waits for the font before revealing the hero, then finishes after typing the description', async () => {
     vi.useFakeTimers();
     const release = holdFonts();
     renderWithProviders(<HomePage />);
@@ -52,23 +53,22 @@ describe('Intro loading lifecycle', () => {
 
     await act(async () => { release(); });
     expect(document.getElementById('home')).toHaveAttribute('data-phase', 'revealing');
-    // JSDOM exposes WebkitAnimation but no AnimationEvent, so React uses this event.
-    fireEvent(
-      screen.getByText('I build software and AI tools for real workflows.'),
-      new Event('webkitAnimationEnd', { bubbles: true }),
-    );
+    // The cursor types the description after the name lands, then finishes.
+    await act(() => vi.advanceTimersByTimeAsync(1000));
+    expect(document.getElementById('home')).toHaveAttribute('data-phase', 'revealing');
+    await act(() => vi.advanceTimersByTimeAsync(2000));
     expect(document.getElementById('home')).toHaveAttribute('data-phase', 'complete');
     expect(screen.queryByRole('status')).not.toBeInTheDocument();
   });
 
-  it('escapes stalled loading and completes even when animation events never fire', async () => {
+  it('escapes stalled loading and completes even when the reveal stalls', async () => {
     vi.useFakeTimers();
     holdFonts();
     renderWithProviders(<HomePage />);
 
     await act(() => vi.advanceTimersByTimeAsync(6000));
     expect(document.getElementById('home')).toHaveAttribute('data-phase', 'revealing');
-    await act(() => vi.advanceTimersByTimeAsync(1800));
+    await act(() => vi.advanceTimersByTimeAsync(4000));
     expect(document.getElementById('home')).toHaveAttribute('data-phase', 'complete');
   });
 

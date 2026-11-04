@@ -1,5 +1,5 @@
 .hero {
-  --hero-ground: #1c1a17;
+  --hero-ground: #0d0c14;
   --hero-ink: #f2efe7;
   --hero-secondary: #b9b7b0;
   --hero-cursor: #7cce99;
@@ -29,37 +29,14 @@
   min-width: 0;
 }
 
-/*
-  Dot field in the open upper-right space, above "Tang" and right of the
-  name's top line. The mask fades it out before it reaches the letters.
-*/
-.dots {
+/* Animated grainy gradient (Grainient), same look as the stock dashboard hero. */
+.backdrop {
   position: absolute;
-  top: 0;
-  right: 0;
+  inset: 0;
   z-index: 0;
-  width: 58%;
-  height: 62%;
-  fill: #57514a;
+  overflow: hidden;
+  opacity: 0.5;
   pointer-events: none;
-  -webkit-mask-image: radial-gradient(
-    ellipse 100% 100% at 100% 0%,
-    #000 20%,
-    transparent 70%
-  );
-  mask-image: radial-gradient(
-    ellipse 100% 100% at 100% 0%,
-    #000 20%,
-    transparent 70%
-  );
-}
-
-/* Phones: a smaller patch tucked into the upper-right corner. */
-@media (max-width: 600px) {
-  .dots {
-    width: 64%;
-    height: 30%;
-  }
 }
 
 .name {
@@ -83,19 +60,54 @@
   color: var(--hero-secondary);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     'Liberation Mono', monospace;
-  font-size: clamp(0.75rem, 0.9vw, 0.875rem);
+  font-size: clamp(0.9375rem, 1.25vw, 1.1875rem);
   font-weight: 400;
   line-height: 1.75;
   letter-spacing: 0.015em;
 }
 
 .description {
-  max-width: 28rem;
-  margin: 0.875rem 0 0;
-  font-size: clamp(1.0625rem, 1.4vw, 1.25rem);
+  max-width: 44rem;
+  margin: 1rem 0 0;
+  font-size: clamp(1.25rem, 2vw, 1.875rem);
   font-weight: 400;
   line-height: 1.6;
   text-wrap: pretty;
+}
+
+/*
+  The intro's typing cursor, kept as a caret at the end of the description.
+  Zero width so moving it never reflows the line; untyped text holds the space.
+*/
+.caret {
+  position: relative;
+  display: inline-block;
+  width: 0;
+  height: 1em;
+  vertical-align: -0.12em;
+}
+
+.caret::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0.12em;
+  width: 2px;
+  background: var(--hero-cursor);
+}
+
+.untyped {
+  color: transparent;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .hero ::selection {
@@ -110,7 +122,7 @@
 /* Keep browser overscroll on graphite while this intro is mounted. */
 :global(html):has(.hero),
 :global(body):has(.hero) {
-  background: #1c1a17;
+  background: #0d0c14;
 }
 
 .word {
@@ -165,8 +177,17 @@
   }
 
   .hero[data-phase='revealing'] .description {
-    animation: reveal-detail 240ms ease-out 1050ms both;
+    animation: reveal-detail 240ms ease-out var(--hero-move-duration) both;
   }
+
+  /* A few blinks once typing finishes, then a steady caret. */
+  .hero[data-phase='complete'] .caret::after {
+    animation: blink-caret 1s steps(1, end) 4;
+  }
+}
+
+@keyframes blink-caret {
+  50% { opacity: 0; }
 }
 
 @keyframes reveal-detail {
