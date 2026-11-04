@@ -29,17 +29,23 @@
   min-width: 0;
 }
 
-/* Animated grainy gradient (Grainient), same look as the stock dashboard hero. */
+/*
+  Animated grainy gradient (Grainient), same look as the stock dashboard hero.
+  It runs half a hero above the page, so pulling down past the top (rubber-band
+  overscroll) reveals more gradient where the browser supports it. The top
+  offset must match bleedTop in HomePage.tsx.
+*/
 .backdrop {
   position: absolute;
-  inset: 0;
+  inset: -50% 0 0;
   z-index: 0;
   overflow: hidden;
   opacity: 0.5;
   pointer-events: none;
-  /* Let the gradient settle into the ground before the timeline starts. */
-  -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent);
-  mask-image: linear-gradient(to bottom, #000 72%, transparent);
+  /* Let the gradient settle into the ground before the timeline starts: the
+     fade begins 72% down the hero, which is (50 + 72) / 150 of this box. */
+  -webkit-mask-image: linear-gradient(to bottom, #000 81.33%, transparent);
+  mask-image: linear-gradient(to bottom, #000 81.33%, transparent);
 }
 
 .name {
@@ -168,7 +174,7 @@
   display: block;
 }
 
-/* Keep browser overscroll on graphite while this intro is mounted. */
+/* Past the backdrop's reach (or where it can't show), overscroll stays graphite. */
 :global(html):has(.hero),
 :global(body):has(.hero) {
   background: #17161f;

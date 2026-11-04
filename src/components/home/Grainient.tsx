@@ -110,6 +110,12 @@ interface GrainientProps {
   color1?: string;
   color2?: string;
   color3?: string;
+  /**
+   * Extra height the container extends above the frame, as a fraction of the
+   * frame's height. The gradient keeps the frame's proportions and simply
+   * continues upward, so the frame itself looks the same at any value.
+   */
+  bleedTop?: number;
   className?: string;
 }
 
@@ -135,6 +141,7 @@ export default function Grainient({
   color1 = '#00FFB2',
   color2 = '#003322',
   color3 = '#000000',
+  bleedTop = 0,
   className,
 }: GrainientProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -201,7 +208,7 @@ export default function Grainient({
       renderer.setSize(Math.max(1, Math.floor(rect.width)), Math.max(1, Math.floor(rect.height)));
       const res = program.uniforms.iResolution.value as Float32Array;
       res[0] = gl.drawingBufferWidth;
-      res[1] = gl.drawingBufferHeight;
+      res[1] = gl.drawingBufferHeight / (1 + bleedTop);
       if (reducedMotion) render();
     };
     const resizeObserver = new ResizeObserver(setSize);
@@ -238,7 +245,7 @@ export default function Grainient({
     timeSpeed, colorBalance, warpStrength, warpFrequency, warpSpeed,
     warpAmplitude, blendAngle, blendSoftness, rotationAmount, noiseScale,
     grainAmount, grainScale, contrast, gamma, saturation,
-    centerX, centerY, zoom, color1, color2, color3,
+    centerX, centerY, zoom, color1, color2, color3, bleedTop,
   ]);
 
   return <div ref={containerRef} aria-hidden="true" className={className} />;

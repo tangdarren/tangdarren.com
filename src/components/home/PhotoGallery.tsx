@@ -63,13 +63,13 @@ const PhotoGallery = forwardRef<PhotoGalleryHandle>(function PhotoGallery(_, ref
         {GALLERY.map((moment) => (
           <section key={moment.id} className={styles.moment} aria-labelledby={`gallery-${moment.id}`}>
             <h3 id={`gallery-${moment.id}`} className={styles.momentTitle}>{moment.title}</h3>
-            <div className={styles.grid}>
+            <div className={styles.grid} style={{ '--row-aspect': moment.rowAspect } as CSSProperties}>
               {moment.items.map((item) =>
                 item.type === 'video' ? (
                   <video
                     key={item.src}
                     className={styles.media}
-                    style={{ '--ar': item.width / item.height } as CSSProperties}
+                    style={{ '--ar': item.width / item.height, '--pos': item.position } as CSSProperties}
                     src={item.src}
                     poster={item.poster}
                     width={item.width}
@@ -84,7 +84,7 @@ const PhotoGallery = forwardRef<PhotoGalleryHandle>(function PhotoGallery(_, ref
                   <img
                     key={item.src}
                     className={styles.media}
-                    style={{ '--ar': item.width / item.height } as CSSProperties}
+                    style={{ '--ar': item.width / item.height, '--pos': item.position } as CSSProperties}
                     src={item.src}
                     alt={item.alt}
                     width={item.width}

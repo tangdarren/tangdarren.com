@@ -39,10 +39,10 @@ describe('More photos', () => {
 
     const dialog = document.querySelector('dialog');
     expect(dialog).toHaveAttribute('open');
-    for (const title of ['Visiting Meta', 'Visiting the Tesla factory', 'Hiking', 'Debate in high school', 'Early experiments']) {
+    for (const title of ['Visiting Meta', 'Hiking', 'Basketball', 'High school debate', 'Early experiments']) {
       expect(within(dialog as HTMLElement).getByRole('heading', { level: 3, name: title })).toBeInTheDocument();
     }
-    expect(within(dialog as HTMLElement).getAllByRole('img')).toHaveLength(9);
+    expect(within(dialog as HTMLElement).getAllByRole('img')).toHaveLength(11);
   });
 });
 

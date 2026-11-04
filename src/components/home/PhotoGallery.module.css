@@ -87,11 +87,13 @@
 }
 
 /*
-  A justified row: each photo grows in proportion to its aspect ratio, so
-  portrait and landscape shots share one height without being cropped.
+  Every row is the same height (set by Early experiments' photos). Each photo's
+  width still follows its shape, so the bigger one keeps its side and the crop
+  is shared evenly; --pos in gallery.ts picks what stays in frame.
 */
 .grid {
   display: flex;
+  aspect-ratio: var(--row-aspect, 3.15);
   gap: clamp(0.75rem, 1.5vw, 1.25rem);
 }
 
@@ -99,9 +101,9 @@
   flex: var(--ar) 1 0;
   min-width: 0;
   width: 100%;
-  height: auto;
-  aspect-ratio: var(--ar);
+  height: 100%;
   object-fit: cover;
+  object-position: var(--pos, center);
   background: #1f1e28;
 }
 
@@ -119,9 +121,12 @@
 @media (max-width: 600px) {
   .grid {
     flex-direction: column;
+    aspect-ratio: auto;
   }
 
   .media {
     flex: none;
+    height: auto;
+    aspect-ratio: 3 / 2;
   }
 }

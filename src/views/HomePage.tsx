@@ -152,7 +152,8 @@ export default function HomePage() {
       {phase !== 'complete' && (
         <span className={styles.loadingStatus} role="status" aria-label="Loading portfolio">Loading portfolio</span>
       )}
-      <Grainient className={styles.backdrop} />
+      {/* bleedTop must match .backdrop's negative top. */}
+      <Grainient className={styles.backdrop} bleedTop={0.5} />
       <div className={styles.content}>
         <h1 id="hero-name" className={styles.name}>
           <span className={styles.nameText}>
