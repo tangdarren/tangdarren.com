@@ -8,8 +8,8 @@ export const SITE_NAME = 'Darren Christopher Tang';
 export const SITE_DEFAULT_DESCRIPTION =
   'Portfolio of Darren Christopher Tang — a full-stack and AI agent engineer building practical applications, automation systems, and financial tools.';
 
-/** Default social-preview image (App Router opengraph-image file convention). */
-export const SITE_DEFAULT_OG_IMAGE = '/opengraph-image.png';
+/** Default social-preview image, served from public/. */
+export const SITE_DEFAULT_OG_IMAGE = '/opengraph-portfolio.png';
 
 /**
  * Canonical public origin used for metadata when `SITE_URL` is unset or invalid.

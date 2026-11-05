@@ -7,6 +7,8 @@
   --body: #d4d1c9;
   --secondary: #a9a6a0;
   --accent: #75c5aa;
+  /* School and company names: the hero glow's brightest colour. */
+  --place: #00ffb2;
   --gutter: clamp(1.5rem, 6.5vw, 7rem);
   --section-gap: clamp(7rem, 14vw, 13rem);
 
@@ -29,7 +31,7 @@
 .timeline {
   --col-gap: clamp(3rem, 6vw, 6rem);
   --year-size: clamp(6rem, 15vw, 15rem);
-  --place-size: clamp(1.75rem, 2.9vw, 2.875rem);
+  --place-size: clamp(1.75rem, 3.7vw, 3.75rem);
   /* The widest year ("2025"–"2027") is ~2.24em; this block holds the heading,
      year and place on one shared left edge, centred in the year column. */
   --year-block: calc(var(--year-size) * 2.26);
@@ -82,11 +84,13 @@
 }
 
 /* Year and place share one left edge in a block centred in their half. It
-   parks mid-screen, level with the spine's tip. The offset assumes a one-line
-   place, so a place that wraps grows downward and the year never jumps. */
+   parks with the visible gap between the year and the place on the screen's
+   midline, level with the spine's tip. A place that wraps grows downward, so
+   the year never jumps. The factors are DM Sans's baseline and cap height at
+   these line heights: the year's baseline to the top of the place's capitals. */
 .asideInner {
   position: sticky;
-  top: calc(50vh - (var(--year-size) * 0.85 + 1.5rem + var(--place-size) * 1.15) / 2);
+  top: calc(50vh - (var(--year-size) * 0.808 + 0.75rem + var(--place-size) * 0.108));
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -238,8 +242,10 @@
 }
 
 .asideOrg {
+  /* A touch wider than the year, so long places stay on two lines. */
+  width: calc(var(--year-block) * 1.1);
   margin: 1.5rem 0 0;
-  color: var(--accent);
+  color: var(--place);
   font-size: var(--place-size);
   line-height: 1.15;
   letter-spacing: -0.015em;
@@ -618,8 +624,9 @@
 
   .asideOrg {
     grid-column: 1 / -1;
+    width: auto;
     margin: 0;
-    font-size: clamp(0.875rem, 4.1vw, 1rem);
+    font-size: clamp(0.9375rem, 4.9vw, 1.25rem);
     line-height: 1.3;
     letter-spacing: 0;
     text-align: right;

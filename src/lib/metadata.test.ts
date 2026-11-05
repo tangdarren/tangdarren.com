@@ -99,7 +99,7 @@ describe('createPageMetadata', () => {
     expect(siteUrl).toBe('https://tangdarren.com');
     expect(canonical).toBe('https://tangdarren.com');
     expect(ogUrl).toBe('https://tangdarren.com');
-    expect(ogImage).toBe('https://tangdarren.com/opengraph-image.png');
+    expect(ogImage).toBe('https://tangdarren.com/opengraph-portfolio.png');
 
     for (const value of [siteUrl, canonical, ogUrl, ogImage]) {
       expect(value).not.toMatch(/localhost|127\.0\.0\.1/i);
