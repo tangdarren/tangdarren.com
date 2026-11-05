@@ -176,10 +176,17 @@
 
 /* With no script or reduced motion, the default is the finished hero. */
 @media (prefers-reduced-motion: no-preference) and (scripting: enabled) {
+  /* Centred in the hero, not the viewport, so landing on a section further down
+     the page doesn't paint the name over it. */
+  .hero[data-phase='loading'] .content {
+    position: static;
+  }
+
   .hero[data-phase='loading'] .name {
-    position: fixed;
+    position: absolute;
     top: 50%;
     left: 50%;
+    z-index: 1;
     width: max-content;
     max-width: none;
     font-size: clamp(2.25rem, 5vw, 5rem);

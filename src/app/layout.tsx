@@ -47,6 +47,19 @@ export const viewport: Viewport = {
   ],
 };
 
+/**
+ * A refresh always starts at the top, so the intro plays where it belongs. Runs
+ * before first paint: an effect would be too late to stop the browser restoring
+ * the old position. The hash goes too, or a refreshed `/#education` would jump
+ * back to that section. Links that arrive with a hash still land on it.
+ */
+const RESET_SCROLL_ON_REFRESH = `
+history.scrollRestoration = 'manual';
+if (performance.getEntriesByType('navigation')[0]?.type === 'reload' && location.hash) {
+  history.replaceState(history.state, '', location.pathname + location.search);
+}
+`;
+
 export default function RootLayout({
   children,
 }: {
@@ -54,6 +67,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={dmSans.variable} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: RESET_SCROLL_ON_REFRESH }} />
+      </head>
       <body className={`${dmSans.className} antialiased`}>
         <ThemeProvider>
           <div id="root">
