@@ -1,8 +1,8 @@
 .dialog {
-  --ground: #17161f;
+  --ground: #111715;
   --ink: #f2efe7;
   --secondary: #a9a6a0;
-  --accent: #7cce99;
+  --accent: #75c5aa;
   --gutter: clamp(1.5rem, 6.5vw, 7rem);
 
   width: 100%;
@@ -55,7 +55,7 @@
   height: 2.75rem;
   border: 0;
   border-radius: 50%;
-  background: #23222c;
+  background: #1d2321;
   color: var(--ink);
   cursor: pointer;
   transition: background-color 150ms ease, color 150ms ease;
@@ -63,7 +63,7 @@
 
 .close:hover,
 .close:focus-visible {
-  background: #2e2d38;
+  background: #282e2c;
   color: var(--accent);
 }
 
@@ -104,7 +104,7 @@
   height: 100%;
   object-fit: cover;
   object-position: var(--pos, center);
-  background: #1f1e28;
+  background: #191f1d;
 }
 
 @keyframes gallery-in {

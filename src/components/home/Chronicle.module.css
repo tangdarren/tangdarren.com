@@ -1,12 +1,12 @@
 .root {
-  --ground: #17161f;
-  --field: #1f1e28;
-  --field-hover: #292833;
+  --ground: #111715;
+  --field: #191f1d;
+  --field-hover: #232927;
   --ink: #f2efe7;
   /* Entry text: one quiet voice, so the pinned year leads. */
   --body: #d4d1c9;
   --secondary: #a9a6a0;
-  --accent: #7cce99;
+  --accent: #75c5aa;
   --gutter: clamp(1.5rem, 6.5vw, 7rem);
   --section-gap: clamp(7rem, 14vw, 13rem);
 

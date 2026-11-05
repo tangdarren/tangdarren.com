@@ -1,5 +1,8 @@
 .hero {
-  --hero-ground: #17161f;
+  --hero-ground: #111715;
+  /* What the translucent glow composites over. Changing it shifts the glow's
+     colours, so it stays put and only the bottom fade lands on --hero-ground. */
+  --hero-glow-ground: #17161f;
   --hero-ink: #f2efe7;
   --hero-secondary: #b9b7b0;
   --hero-cursor: #7cce99;
@@ -46,6 +49,15 @@
      fade begins 72% down the hero, which is (50 + 72) / 150 of this box. */
   -webkit-mask-image: linear-gradient(to bottom, #000 81.33%, transparent);
   mask-image: linear-gradient(to bottom, #000 81.33%, transparent);
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: -50% 0 0;
+  z-index: -1;
+  background: linear-gradient(to bottom, var(--hero-glow-ground) 81.33%, var(--hero-ground));
+  pointer-events: none;
 }
 
 .name {
@@ -162,7 +174,7 @@
 /* Past the backdrop's reach (or where it can't show), overscroll stays graphite. */
 :global(html):has(.hero),
 :global(body):has(.hero) {
-  background: #17161f;
+  background: #111715;
 }
 
 .word {
