@@ -60,6 +60,21 @@
   pointer-events: none;
 }
 
+/*
+  Chrome on Mac only paints the gradient above the page during overscroll if the
+  page has a painted fixed element; without one it shows the flat html background.
+  It can't be 0×0 or visibility: hidden. `next dev` hides this bug, because its
+  dev tools badge is a fixed element, so test overscroll on a production build.
+*/
+.overscrollFix {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
 .name {
   position: relative;
   width: fit-content;

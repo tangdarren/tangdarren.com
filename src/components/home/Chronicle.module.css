@@ -7,6 +7,8 @@
   --body: #d4d1c9;
   --secondary: #a9a6a0;
   --accent: #75c5aa;
+  /* The timeline's drawn line: the hero caret's green, which it grows out of. */
+  --line: #7cce99;
   /* School and company names: the hero glow's brightest colour. */
   --place: #00ffb2;
   --gutter: clamp(1.5rem, 6.5vw, 7rem);
@@ -30,11 +32,12 @@
 
 .timeline {
   --col-gap: clamp(3rem, 6vw, 6rem);
-  --year-size: clamp(6rem, 15vw, 15rem);
+  --year-size: clamp(4.75rem, 12vw, 12rem);
   --place-size: clamp(1.75rem, 3.7vw, 3.75rem);
-  /* The widest year ("2025"–"2027") is ~2.24em; this block holds the heading,
-     year and place on one shared left edge, centred in the year column. */
-  --year-block: calc(var(--year-size) * 2.26);
+  /* This block holds the heading, year and place on one shared left edge,
+     centred in the year column. It's sized for the place names, not the year,
+     so the year can change size without moving that edge or rewrapping them. */
+  --year-block: calc(clamp(6rem, 15vw, 15rem) * 2.26);
   padding: clamp(5rem, 10vw, 9rem) var(--gutter) 0;
 }
 
@@ -135,7 +138,8 @@
 
 .turnDown {
   top: 0;
-  bottom: 0;
+  /* Stops on the horizontal, so the dim tracks don't double up where they meet. */
+  bottom: 2px;
   left: 50%;
   width: 2px;
 }
@@ -152,7 +156,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: var(--accent);
+  background: var(--line);
 }
 
 .turnDown::after {
@@ -160,9 +164,9 @@
   transform: scaleY(var(--down));
 }
 
-/* Spreads out both ways from where the spine comes down. */
+/* Spreads out both ways from the centre of the 2px spine that comes down. */
 .turnAcross::after {
-  transform-origin: center;
+  transform-origin: calc(50% + 1px) 50%;
   transform: scaleX(var(--across));
 }
 
@@ -282,7 +286,7 @@
 }
 
 .entries::after {
-  background: var(--accent);
+  background: var(--line);
   transform: scaleY(var(--spine));
 }
 
@@ -544,7 +548,9 @@
     animation: none;
   }
 
-  .entries::after {
+  .entries::after,
+  .turnDown::after,
+  .turnAcross::after {
     transform: none;
   }
 }

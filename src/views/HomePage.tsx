@@ -153,6 +153,7 @@ export default function HomePage() {
       )}
       {/* bleedTop must match .backdrop's negative top. */}
       <Grainient className={styles.backdrop} bleedTop={0.5} />
+      <span className={styles.overscrollFix} aria-hidden="true" />
       <div className={styles.content}>
         <h1 id="hero-name" className={styles.name}>
           <span className={styles.nameText}>

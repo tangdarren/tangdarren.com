@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode, type Ref } from 'react';
 
 import { EDUCATION, EXPERIENCE } from '@/data/experience';
 import { GALLERY_COUNT } from '@/data/gallery';
@@ -69,64 +69,21 @@ const EDUCATION_ENTRIES: TimelineEntry[] = EDUCATION.map((school) => {
 
 /**
  * After Education: the spine runs on a little, then turns into a horizontal
- * line across the page, closing Education before Experience begins. It draws
- * in green as you scroll, continuing the spine's fill.
+ * line across the page, closing Education before Experience begins. The
+ * timeline above draws it, as the end of its own line.
  */
-function SpineTurn() {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const node = ref.current;
-    if (!node) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      node.style.setProperty('--down', '1');
-      node.style.setProperty('--across', '1');
-      return;
-    }
-    let target = 0;
-    let current = 0;
-    let frame = 0;
-    // 0–1 draws the drop as its top-to-bottom crosses mid-screen; 1–2 then
-    // draws the horizontal over the next fifth of the screen.
-    const measure = () => {
-      const rect = node.getBoundingClientRect();
-      const mid = window.innerHeight * 0.5;
-      const down = (mid - rect.top) / Math.max(1, rect.height);
-      const across = (mid - rect.bottom) / (window.innerHeight * 0.2);
-      target = Math.min(1, Math.max(0, down)) + Math.min(1, Math.max(0, across));
-    };
-    const paint = () => {
-      node.style.setProperty('--down', Math.min(1, current).toFixed(4));
-      node.style.setProperty('--across', Math.max(0, current - 1).toFixed(4));
-    };
-    const tick = () => {
-      current += (target - current) * 0.12;
-      if (Math.abs(target - current) < 0.001) current = target;
-      paint();
-      frame = current === target ? 0 : requestAnimationFrame(tick);
-    };
-    const onScroll = () => {
-      measure();
-      if (!frame) frame = requestAnimationFrame(tick);
-    };
-    measure();
-    current = target;
-    paint();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
-    };
-  }, []);
-
+function SpineTurn({ ref }: { ref: Ref<HTMLDivElement> }) {
   return (
     <div ref={ref} className={styles.turn} aria-hidden="true">
       <span className={styles.turnDown} />
       <span className={styles.turnAcross} />
     </div>
   );
+}
+
+/** How far `distance` is through a stretch of the line, 0–1. */
+function drawn(distance: number, length: number) {
+  return length > 0 ? Math.min(1, Math.max(0, distance / length)) : 0;
 }
 
 /** The entry's photo, or an empty slot of the same size until one is supplied. */
@@ -163,40 +120,61 @@ function TimelineGroup({
   title,
   entries,
   side,
+  turn = false,
   footer,
 }: {
   id: string;
   title: string;
   entries: TimelineEntry[];
   side: 'left' | 'right';
+  /** Carry the spine on into the line that closes this section. */
+  turn?: boolean;
   /** Rendered under the timeline, inside the section. */
   footer?: ReactNode;
 }) {
   const listRef = useRef<HTMLOListElement>(null);
+  const turnRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
 
-  // The spine eases toward the middle of the viewport each frame. The pinned
-  // year changes when the line itself reaches an entry.
+  // The line eases toward the middle of the viewport each frame. The spine, the
+  // drop and the horizontal are one distance along one line, so each can only
+  // start once the part before it has finished, however fast the scroll. The
+  // pinned year changes when the line itself reaches an entry.
   useEffect(() => {
     const list = listRef.current;
     if (!list) return;
+    const turn = turnRef.current;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let target = 0;
     let current = 0;
     let frame = 0;
     let lastActive = -1;
+    let listLength = 0;
+    let dropLength = 0;
+    let acrossLength = 0;
 
     const measure = () => {
       const rect = list.getBoundingClientRect();
-      target = Math.min(1, Math.max(0, (window.innerHeight * 0.5 - rect.top) / rect.height));
+      listLength = rect.height;
+      dropLength = turn?.offsetHeight ?? 0;
+      // The horizontal draws over the next fifth of the screen.
+      acrossLength = turn ? window.innerHeight * 0.2 : 0;
+      const end = listLength + dropLength + acrossLength;
+      target = Math.min(end, Math.max(0, window.innerHeight * 0.5 - rect.top));
     };
     const paint = () => {
-      list.style.setProperty('--spine', current.toFixed(4));
+      const spine = drawn(current, listLength);
+      list.style.setProperty('--spine', spine.toFixed(4));
+      if (turn) {
+        const pastList = current - listLength;
+        turn.style.setProperty('--down', drawn(pastList, dropLength).toFixed(4));
+        turn.style.setProperty('--across', drawn(pastList - dropLength, acrossLength).toFixed(4));
+      }
       const height = list.offsetHeight || 1;
       let index = 0;
       Array.from(list.children).forEach((child, i) => {
         const item = child as HTMLElement;
-        if (item.offsetTop / height <= current + 0.001) index = i;
+        if (item.offsetTop / height <= spine + 0.001) index = i;
       });
       if (index !== lastActive) {
         lastActive = index;
@@ -205,7 +183,7 @@ function TimelineGroup({
     };
     const tick = () => {
       current += (target - current) * 0.12;
-      if (Math.abs(target - current) < 0.0005) current = target;
+      if (Math.abs(target - current) < 0.5) current = target;
       paint();
       frame = current === target ? 0 : requestAnimationFrame(tick);
     };
@@ -270,6 +248,7 @@ function TimelineGroup({
           ))}
         </ol>
       </div>
+      {turn && <SpineTurn ref={turnRef} />}
       {footer}
     </section>
   );
@@ -319,7 +298,7 @@ export default function Chronicle() {
         title="Education"
         entries={EDUCATION_ENTRIES}
         side="left"
-        footer={<SpineTurn />}
+        turn
       />
       <TimelineGroup id="experience" title="Experience" entries={EXPERIENCE_ENTRIES}
         side="left"
