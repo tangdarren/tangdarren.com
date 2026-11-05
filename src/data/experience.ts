@@ -28,10 +28,7 @@ export const EXPERIENCE: ExperienceEntry[] = [
     location: 'South San Francisco, CA',
     dates: 'June 2026 – September 2026',
     bullets: [
-      'Engineered a multi-agent system for CRM issue detection and reporting that cut weekly QC review from 25 to 15 hours.',
-      'Created a Python sensitive data detector for LLM security and compliance, averaging 95% detection across thousands of samples.',
-      'Developed an autonomous desktop AI agent using RAG across 10 enterprise sources to surface context during customer care calls.',
-      'Conducted requirements gathering and functional testing for 8 automation initiatives across Customer Care and Laboratory teams.',
+      'Built a multi-agent system that flagged CRM issues and cut weekly QC review from 25 to 15 hours. Developed a Python tool to flag sensitive data in LLM workflows, achieving a 95% detection rate across thousands of samples.',
     ],
     photo: {
       src: '/timeline/veracyte.jpg',
@@ -44,9 +41,7 @@ export const EXPERIENCE: ExperienceEntry[] = [
     location: 'Remote',
     dates: 'January 2026 – May 2026',
     bullets: [
-      'Built TypeScript and C++ testbeds evaluating LLM factuality, relevance, and reasoning using rubrics for RLHF and fine-tuning.',
-      'Evaluated models, MCP integrations, and prompt variants through A/B tests to identify stronger-performing configurations.',
-      'Ran LLM tool call and structured output evaluation in containerized Docker environments for reproducible and isolated testing.',
+      'Built Rust, TypeScript, and C++ testbeds to evaluate the accuracy, relevance, and reasoning of LLM responses. Ran A/B tests on models, MCP integrations, and prompts to support RLHF and fine-tuning.',
     ],
     photo: {
       src: '/timeline/dataannotation.jpg',
@@ -59,9 +54,7 @@ export const EXPERIENCE: ExperienceEntry[] = [
     location: 'Union City, CA',
     dates: 'June 2025 – September 2025',
     bullets: [
-      'Programmed a Java/SQL inventory service on Azure DevOps CI/CD that automated reorder checks, cutting review time by 50%.',
-      'Collaborated with engineers and CNC operators in an Agile Scrum team to translate product requirements into validated features.',
-      'Prototyped tool lookup, material tracking, and tool life monitoring features, iterating with CNC operators to improve workflows.',
+      'Built a Java and SQL inventory service that automated reorder checks and cut review time by 50%. Worked with CNC operators to prototype tool lookup, material tracking, and tool life monitoring.',
     ],
     photo: {
       src: '/timeline/sonic-engineering.jpg',
@@ -69,11 +62,6 @@ export const EXPERIENCE: ExperienceEntry[] = [
     },
   },
 ];
-
-export interface EducationDetail {
-  label: string;
-  text: string;
-}
 
 export interface TimelinePhoto {
   /** Path under public/, e.g. /timeline/uw-madison-2025.jpg (3:2, centred subject). */
@@ -87,7 +75,6 @@ export interface EducationEntry {
   school: string;
   degree: string;
   dates: string;
-  details: EducationDetail[];
   photo?: TimelinePhoto;
 }
 
@@ -96,12 +83,6 @@ export const EDUCATION: EducationEntry[] = [
     school: 'Santa Clara University',
     degree: 'Master of Science in Computer Science and Engineering',
     dates: 'September 2025 – June 2027',
-    details: [
-      {
-        label: 'Coursework',
-        text: 'Advanced Algorithms, Advanced Operating Systems, Artificial Intelligence, Object-Oriented Programming, Machine Learning, AI Governance and Cybersecurity, Mobile Application Development, Data Mining and Pattern Recognition',
-      },
-    ],
     photo: {
       src: '/timeline/santa-clara.jpg',
       alt: 'The Santa Clara University entrance sign above a bed of red and pink flowers.',
@@ -111,16 +92,9 @@ export const EDUCATION: EducationEntry[] = [
     school: 'University of Wisconsin, Madison',
     degree: 'Bachelor of Science in Computer Science',
     dates: 'September 2021 – May 2025',
-    details: [
-      {
-        label: 'Honors',
-        text: "Lumen Scholarship Fund ($40,000 merit-based scholarship), Dean's List (May 2024)",
-      },
-    ],
     photo: {
       src: '/timeline/uw-madison-2025.jpg',
-      alt: 'Darren in his graduation gown making a W with his hands between giant red 2025 letters on the UW–Madison campus.',
-      zoom: 1.2,
+      alt: 'Darren smiling in a black and red graduation gown on the lawn in front of Bascom Hall at UW–Madison.',
     },
   },
 ];

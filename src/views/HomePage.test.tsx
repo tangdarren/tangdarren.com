@@ -81,7 +81,7 @@ describe('Intro loading lifecycle', () => {
     // The cursor types the description after the name lands, then finishes.
     await act(() => vi.advanceTimersByTimeAsync(1000));
     expect(document.getElementById('home')).toHaveAttribute('data-phase', 'revealing');
-    await act(() => vi.advanceTimersByTimeAsync(2000));
+    await act(() => vi.advanceTimersByTimeAsync(2500));
     expect(document.getElementById('home')).toHaveAttribute('data-phase', 'complete');
     expect(screen.queryByRole('status')).not.toBeInTheDocument();
   });

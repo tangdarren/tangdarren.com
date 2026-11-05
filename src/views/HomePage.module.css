@@ -150,21 +150,6 @@
   outline-offset: 2px;
 }
 
-.scrollHint svg {
-  animation: hint-drift 2.4s ease-in-out infinite;
-}
-
-@keyframes hint-drift {
-  0%, 100% { transform: translateY(-3px); }
-  50% { transform: translateY(3px); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .scrollHint svg {
-    animation: none;
-  }
-}
-
 .hero ::selection {
   background: var(--hero-ink);
   color: var(--hero-ground);
@@ -205,14 +190,9 @@
     visibility: hidden;
   }
 
-  /* The arrow waits until the description has finished typing. */
-  .hero:not([data-phase='complete']) .scrollHint {
+  /* The arrow waits with the role and description, then fades in alongside them. */
+  .hero[data-phase='loading'] .scrollHint {
     visibility: hidden;
-    opacity: 0;
-  }
-
-  .hero[data-phase='complete'] .scrollHint {
-    animation: hint-in 600ms ease-out 300ms backwards;
   }
 
   .loadingStatus {
@@ -243,6 +223,10 @@
 
   .hero[data-phase='revealing'] .description {
     animation: reveal-detail 240ms ease-out var(--hero-move-duration) both;
+  }
+
+  .hero[data-phase='revealing'] .scrollHint {
+    animation: hint-in 240ms ease-out var(--hero-move-duration) backwards;
   }
 
   /* A few blinks once typing finishes, then a steady caret. */

@@ -9,13 +9,10 @@ import styles from './HomePage.module.css';
 
 type IntroPhase = 'loading' | 'revealing' | 'complete';
 
-/** Pause after the name finishes typing, before it moves into place. */
-const REVEAL_HOLD_MS = 300;
-
 const DESCRIPTION = 'I build software and AI tools for real workflows.';
 /** When the cursor starts typing the description, after the name lands. */
 const TYPE_START_MS = 1150;
-const TYPE_CHAR_MS = 30;
+const TYPE_CHAR_MS = 24;
 
 /** Reads a CSS time variable in ms (production CSS may normalize 900ms to .9s). */
 function cssDurationMs(element: Element, name: string, fallback: number) {
@@ -112,11 +109,12 @@ export default function HomePage() {
         Promise.all([pageReady, fontsReady]),
         delay(6000),
       ]);
-      // Let the typed name finish, then hold briefly before it moves.
-      const revealMs = words.current[0]
-        ? cssDurationMs(words.current[0], '--hero-reveal-duration', 600)
-        : 600;
-      Promise.all([assetsReady, delay(revealMs + REVEAL_HOLD_MS)]).then(() => {
+      // The name moves the moment it finishes typing. The CSS typing starts at
+      // first paint, before this runs, so wait only for what's left.
+      const word = words.current[0];
+      const revealMs = word ? cssDurationMs(word, '--hero-reveal-duration', 600) : 600;
+      const typedMs = Number(word?.parentElement?.getAnimations?.()[0]?.currentTime ?? 0);
+      Promise.all([assetsReady, delay(Math.max(0, revealMs - typedMs))]).then(() => {
         if (cancelled || finished) return;
         if (motion.matches) {
           finish();
@@ -126,8 +124,9 @@ export default function HomePage() {
           word?.getBoundingClientRect() ?? new DOMRect(),
         );
         setPhase('revealing');
-        // Also complete if animation events are disabled or interrupted.
-        timers.push(setTimeout(finish, 4000));
+        // Also complete if animation events are disabled or interrupted, leaving
+        // the typing plenty of room so this never cuts it off.
+        timers.push(setTimeout(finish, TYPE_START_MS + DESCRIPTION.length * TYPE_CHAR_MS * 2));
       });
     }
 

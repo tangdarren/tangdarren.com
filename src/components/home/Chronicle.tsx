@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 
-import { EDUCATION, EXPERIENCE, type EducationDetail } from '@/data/experience';
+import { EDUCATION, EXPERIENCE } from '@/data/experience';
 import { GALLERY_COUNT } from '@/data/gallery';
 import { HOMEPAGE_PROJECTS } from '@/data/homepage';
 import { RESUME_PDF_PATH, SOCIAL_LINKS } from '@/data/socials';
@@ -12,14 +12,13 @@ import styles from './Chronicle.module.css';
 
 interface TimelineEntry {
   id: string;
-  title: string;
+  title: ReactNode;
   /** Shown under the pinned year. */
   place: string;
   dates: string;
   year: number;
   sortKey: number;
   points?: string[];
-  details?: EducationDetail[];
   /** Drop a photo in public/timeline/ and set it here; until then a sized slot shows. */
   photo?: { src: string; alt: string; zoom?: number };
 }
@@ -32,6 +31,13 @@ function startOf(dates: string) {
   if (!match) return { year: 0, key: 0 };
   const year = Number(match[2]);
   return { year, key: year * 12 + Math.max(0, MONTHS.indexOf(match[1].toLowerCase())) };
+}
+
+/** "Bachelor of Science in Computer Science": the field starts its own row. */
+function degreeTitle(degree: string): ReactNode {
+  const [level, field] = degree.split(' in ');
+  if (!field) return degree;
+  return <>{level} in <br />{field}</>;
 }
 
 const EXPERIENCE_ENTRIES: TimelineEntry[] = EXPERIENCE.map((job) => {
@@ -52,12 +58,11 @@ const EDUCATION_ENTRIES: TimelineEntry[] = EDUCATION.map((school) => {
     const start = startOf(school.dates);
     return {
       id: school.school,
-      title: school.degree,
+      title: degreeTitle(school.degree),
       place: school.school,
       dates: school.dates,
       year: start.year,
       sortKey: start.key,
-      details: school.details,
       photo: school.photo,
     };
   }).sort((a, b) => a.sortKey - b.sortKey);
@@ -170,8 +175,8 @@ function TimelineGroup({
   const listRef = useRef<HTMLOListElement>(null);
   const [active, setActive] = useState(0);
 
-  // The spine eases toward the middle of the viewport each frame. Stops fill
-  // in, and the pinned year changes, when the line itself reaches an entry.
+  // The spine eases toward the middle of the viewport each frame. The pinned
+  // year changes when the line itself reaches an entry.
   useEffect(() => {
     const list = listRef.current;
     if (!list) return;
@@ -191,9 +196,7 @@ function TimelineGroup({
       let index = 0;
       Array.from(list.children).forEach((child, i) => {
         const item = child as HTMLElement;
-        const reached = item.offsetTop / height <= current + 0.001;
-        item.toggleAttribute('data-reached', reached);
-        if (reached) index = i;
+        if (item.offsetTop / height <= current + 0.001) index = i;
       });
       if (index !== lastActive) {
         lastActive = index;
@@ -261,11 +264,6 @@ function TimelineGroup({
                 </ul>
               ) : (
                 <p className={styles.point}>{entry.points[0]}</p>
-              ))}
-              {entry.details?.map((detail) => (
-                <p key={detail.label} className={styles.point}>
-                  <span className={styles.detailLabel}>{detail.label}:</span> {detail.text}
-                </p>
               ))}
               <EntryPhoto entry={entry} className={styles.entryPhoto} />
             </li>
