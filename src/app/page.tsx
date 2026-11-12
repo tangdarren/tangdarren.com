@@ -6,7 +6,7 @@ import { createPageMetadata } from '@/lib/metadata';
 export const metadata: Metadata = createPageMetadata({
   title: 'Darren Tang Portfolio',
   description:
-    'Software engineer in San Francisco building reliable full-stack systems, backend services, automation, and intelligent applications.',
+    'Software engineer in Fremont building reliable full-stack systems, backend services, automation, and intelligent applications.',
   path: '/',
 });
 
